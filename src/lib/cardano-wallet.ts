@@ -14,6 +14,7 @@ const WALLET_ALIASES: Record<string, string[]> = {
 export class CardanoWalletProvider {
   private config: CardanoWalletConfig;
   private wallet: BrowserWallet | null = null;
+  private rawWallet: any | null = null;
   private user: CardanoWalletUser | null = null;
   private currentWalletName: string = '';
 
@@ -34,14 +35,28 @@ export class CardanoWalletProvider {
             throw new Error(`Wallet ${matchedInjectedKey} does not support CIP-30 enable()`);
           }
           const api = await provider.enable();
-          this.wallet = await (BrowserWallet as any).fromWallet(api, matchedInjectedKey);
+          this.wallet = null;
+          this.rawWallet = api;
           this.currentWalletName = matchedInjectedKey;
 
-          if (!this.wallet) {
-            throw new Error(`Failed to enable wallet ${matchedInjectedKey}`);
-          }
-          const addresses = await this.wallet.getUnusedAddresses();
-          const address = addresses[0];
+          let address: string = '';
+          try {
+            if (this.rawWallet?.getRewardAddresses) {
+              const rewards = await this.rawWallet.getRewardAddresses();
+              if (Array.isArray(rewards) && rewards.length > 0) {
+                address = rewards[0];
+              }
+            }
+            if (!address && this.rawWallet?.getUnusedAddresses) {
+              const unused = await this.rawWallet.getUnusedAddresses();
+              if (Array.isArray(unused) && unused.length > 0) {
+                address = unused[0];
+              }
+            }
+            if (!address && this.rawWallet?.getChangeAddress) {
+              address = await this.rawWallet.getChangeAddress();
+            }
+          } catch {}
 
           this.user = {
             address,
@@ -67,6 +82,7 @@ export class CardanoWalletProvider {
 
       const walletInfo = availableWallets.find(w => w.name === selectedName)!;
 
+      this.rawWallet = null;
       this.wallet = await BrowserWallet.enable(selectedName);
       this.currentWalletName = selectedName;
 
@@ -91,18 +107,27 @@ export class CardanoWalletProvider {
 
   async disconnect(): Promise<void> {
     this.wallet = null;
+    this.rawWallet = null;
     this.user = null;
     this.currentWalletName = '';
   }
 
   async signMessage(message: string): Promise<string> {
-    if (!this.wallet || !this.user) {
+    if ((!this.wallet && !this.rawWallet) || !this.user) {
       throw new Error('Wallet not connected');
     }
 
     try {
-      const signature = await this.wallet.signData(message);
-      return signature.signature;
+      if (this.wallet) {
+        const signature = await this.wallet.signData(message);
+        return signature.signature;
+      }
+      const addr = this.user.address;
+      if (!addr) {
+        throw new Error('No address available for signing');
+      }
+      const result = await this.rawWallet!.signData(addr, message);
+      return result?.signature || result?.sig || result;
     } catch (error) {
       throw error;
     }
@@ -144,7 +169,7 @@ export class CardanoWalletProvider {
   }
 
   getConnectionStatus(): boolean {
-    return this.wallet !== null;
+    return this.wallet !== null || this.rawWallet !== null;
   }
 
   getWallet(): BrowserWallet | null {
