@@ -45,7 +45,7 @@ export const navbars = [
   {
     id: 8,
     target: "_blank",
-    title: "Tool",
-    href: "/tool",
+    title: "LMS",
+    href: "/lms",
   },
 ];

@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-3">
             <div className="relative">
               <div className="absolute -top-2 left-0 h-1 w-8 bg-gradient-to-r from-blue-500 to-transparent opacity-60"></div>
-              <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Stay Connected with Cardano2VN</h3>
+              <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Cardano2VN</h3>
               <ul className="space-y-4">
                                  <li>
                                       <Link
@@ -114,7 +114,6 @@ export default function Footer() {
             <div className="flex flex-col items-center justify-between md:flex-row">
               <div className="mb-4 flex items-center gap-4 md:mb-0">
                 <Image className="h-8 w-auto opacity-80" src={images.logo} alt="cardano2vn" />
-                <div className="text-sm text-gray-400">Trust Protocol for Distributed Work</div>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <ThemeToggle />

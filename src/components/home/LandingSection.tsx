@@ -63,10 +63,7 @@ export default function LandingSection() {
   });
 
   useEffect(() => {
-    console.log('LandingSection - userData:', userData);
-    console.log('LandingSection - user role:', userData?.data?.role?.name);
     const adminStatus = userData?.data?.role?.name === 'ADMIN';
-    console.log('LandingSection - isAdmin:', adminStatus);
     setIsAdmin(adminStatus);
   }, [userData]);
 

@@ -48,7 +48,6 @@ export default function WaveStatsText() {
   const { data: paidToDelegates, error: paidToDelegatesError } = useBlockfrost(
     `https://cardano-mainnet.blockfrost.io/api/v0/pools/${POOL_ID}/history`,
     (data) => {
-      console.log("Paid to Delegates (history) response:", data);
       if (!Array.isArray(data)) return null;
       const total = data.reduce((sum, r) => sum + Number(r.rewards), 0);
       return `${(total / 1_000_000).toLocaleString(undefined, { maximumFractionDigits: 2 })} ₳`;
@@ -56,7 +55,6 @@ export default function WaveStatsText() {
   );
 
   const { data: poolInfo, error: poolInfoError } = useBlockfrost(`https://cardano-mainnet.blockfrost.io/api/v0/pools/${POOL_ID}`, (data) => {
-    console.log("Pool info response:", data);
     return data;
   });
 

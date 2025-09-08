@@ -449,7 +449,7 @@ export default function Header() {
   const isActiveNav = (href: string) => {
     if (href === "/") return pathname === "/";
     if (href === "/docs") return pathname.startsWith("/docs");
-    if (href === "/tool") return pathname.startsWith("/tool");
+    
     if (href === "/blog") return pathname.startsWith("/blog");
     if (href === "/project") return pathname.startsWith("/project");
     if (href === "/about") return pathname.startsWith("/about");

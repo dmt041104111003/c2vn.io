@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Title from "~/components/title";
 import ServiceContent from '~/components/our-service/ServiceContent';
 import { useNotifications } from "~/hooks/useNotifications";
-import WaveFooterSection from "~/components/home/WaveFooterSection";
+// import WaveFooterSection from "~/components/home/WaveFooterSection";
 
 function StatsPageContent() {
   useNotifications();
@@ -47,7 +47,7 @@ function StatsPageContent() {
           </div>
   
       </div>
-      <WaveFooterSection />
+      {/* <WaveFooterSection /> */}
     </main>
   );
 }

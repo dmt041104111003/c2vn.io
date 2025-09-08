@@ -13,7 +13,7 @@ import VideoSection from "~/components/home/VideoSection";
 // import PartnerLogosCarousel from "~/components/home/PartnerLogosCarousel";
 
 import ContactFormSection from "~/components/home/ContactFormSection";
-import WaveFooterSection from "~/components/home/WaveFooterSection";
+// import WaveFooterSection from "~/components/home/WaveFooterSection";
 // import StatsSection from "~/components/home/StatsSection";
 import { useNotifications } from "~/hooks/useNotifications";
 
@@ -57,7 +57,7 @@ export default function HomePage() {
       <CTASection />
       <CourseSection />
       <ContactFormSection />      
-      <WaveFooterSection />
+      {/* <WaveFooterSection /> */}
     </main>
   );
 }

@@ -39,9 +39,6 @@ export default function ContactFormSection() {
         const response = await fetch(url.toString());
         if (response.ok) {
           const data = await response.json();
-          console.log('API response data:', data);
-          console.log('ContactFormSection - data:', data);
-          console.log('ContactFormSection - role:', data?.data?.role?.name);
           setIsAdmin(data?.data?.role?.name === 'ADMIN');
         }
       } catch (error) {
@@ -78,7 +75,6 @@ export default function ContactFormSection() {
 
         
         if (!address && !email) {
-          console.log('No address or email in session');
           return;
         }
         
@@ -86,7 +82,7 @@ export default function ContactFormSection() {
         if (address) url.searchParams.set('address', address);
         if (email) url.searchParams.set('email', email);
         
-        console.log('API URL:', url.toString());
+        
         
         const response = await fetch(url.toString());
  
@@ -95,25 +91,19 @@ export default function ContactFormSection() {
           const userData = await response.json();
 
           if (userData && userData.data && (userData.data.email)) {
-            console.log('User data found:', userData.data);
             setFormData(prev => {
               const newData = {
                 ...prev,
                 "your-email": userData.data.email || ""
               };
-              console.log('Form data before update:', prev);
-              console.log('Form data after update:', newData);
               return newData;
             });
           } else {
-            console.log('No user data found or user not logged in');
-            console.log('userData:', userData);
-            console.log('userData.data:', userData?.data);
+            
           }
         } else {
-          console.log('API response not ok:', response.status);
           const errorText = await response.text();
-          console.log('Error response:', errorText);
+          
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -278,14 +268,12 @@ export default function ContactFormSection() {
     setActiveTab(tab);
   };
 
-  console.log('selectedCourseImage:', selectedCourseImage);
   const backgroundStyle = {
     backgroundImage: selectedCourseImage ? `url(${selectedCourseImage})` : 'linear-gradient(to bottom right, rgb(239 246 255), rgb(224 231 255))',
     backgroundSize: selectedCourseImage ? 'contain' : 'auto',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat'
   };
-  console.log('backgroundStyle:', backgroundStyle);
 
   return (
     <section
