@@ -46,7 +46,8 @@ export class CardanoWalletProvider {
         if (typeof window !== 'undefined' && (window as any).cardano && (window as any).cardano[selectedName]) {
           const provider = (window as any).cardano[selectedName];
           if (provider && typeof provider.enable === 'function') {
-            this.wallet = await provider.enable();
+            const api = await provider.enable();
+            this.wallet = await (BrowserWallet as any).fromWallet(api, selectedName);
           } else {
             throw new Error(`Wallet ${selectedName} found but enable() method not available`);
           }
