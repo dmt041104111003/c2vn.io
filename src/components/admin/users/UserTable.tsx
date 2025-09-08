@@ -249,17 +249,10 @@ export function UserTable({
               Role
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Referral Code
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Referrals
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Ban Duration
-            </th>
-
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Updated
             </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
@@ -348,22 +341,6 @@ export function UserTable({
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {user.referralCode ? (
-                  <div className="flex items-center gap-2">
-                    <Gift className="h-4 w-4 text-purple-600" />
-                    <code 
-                      className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm font-mono cursor-pointer hover:bg-gray-200 transition-colors"
-                      title="Click to copy referral code"
-                      onClick={() => copyReferralCode(user.referralCode!)}
-                    >
-                      {user.referralCode}
-                    </code>
-                  </div>
-                ) : (
-                  <span className="text-gray-400 text-sm">No code</span>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <span className="text-blue-600 font-medium">
                     {user.referralCount || 0}
@@ -390,13 +367,7 @@ export function UserTable({
                   <span className="text-green-600">Not banned</span>
                 )}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {user.updatedAt ? (
-                  <div>{formatDateTime(user.updatedAt)}</div>
-                ) : (
-                  <span className="text-gray-400">N/A</span>
-                )}
-              </td>
+
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-end space-x-2">
                   <button
@@ -556,12 +527,24 @@ export function UserTable({
               <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
                 <Users className="w-5 h-5 text-blue-600" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">Referral Details</h3>
                 <p className="text-sm text-gray-600">
-                  {selectedUserForReferrals.name} ({selectedUserForReferrals.referralCode || 'No referral code'})
+                  {selectedUserForReferrals.name}
                 </p>
               </div>
+              {selectedUserForReferrals.referralCode && (
+                <div className="flex items-center gap-2">
+                  <Gift className="h-5 w-5 text-purple-600" />
+                  <code 
+                    className="px-3 py-2 bg-gray-100 text-gray-800 rounded text-sm font-mono cursor-pointer hover:bg-gray-200 transition-colors"
+                    title="Click to copy referral code"
+                    onClick={() => copyReferralCode(selectedUserForReferrals.referralCode!)}
+                  >
+                    {selectedUserForReferrals.referralCode}
+                  </code>
+                </div>
+              )}
             </div>
             
             {referralsLoading ? (
