@@ -23,12 +23,39 @@ export class CardanoWalletProvider {
 
   async connect(walletName: string = 'eternl'): Promise<CardanoWalletUser> {
     try {
-      const availableWallets = await BrowserWallet.getAvailableWallets();
-
       const candidateNames = (WALLET_ALIASES[walletName] || [walletName]).map(n => n.toLowerCase());
+      const injected = typeof window !== 'undefined' ? (window as any).cardano : null;
+      if (injected && typeof injected === 'object') {
+        const injectedKeys: string[] = Object.keys(injected);
+        const matchedInjectedKey = injectedKeys.find(key => candidateNames.includes(key.toLowerCase()));
+        if (matchedInjectedKey) {
+          const provider = injected[matchedInjectedKey];
+          if (!provider || typeof provider.enable !== 'function') {
+            throw new Error(`Wallet ${matchedInjectedKey} does not support CIP-30 enable()`);
+          }
+          const api = await provider.enable();
+          this.wallet = await (BrowserWallet as any).fromWallet(api, matchedInjectedKey);
+          this.currentWalletName = matchedInjectedKey;
+
+          if (!this.wallet) {
+            throw new Error(`Failed to enable wallet ${matchedInjectedKey}`);
+          }
+          const addresses = await this.wallet.getUnusedAddresses();
+          const address = addresses[0];
+
+          this.user = {
+            address,
+            name: matchedInjectedKey,
+            image: provider.icon || ''
+          };
+
+          return this.user;
+        }
+      }
+
+      const availableWallets = await BrowserWallet.getAvailableWallets();
       const availableLowerNames = availableWallets.map(w => w.name.toLowerCase());
       const matchedLower = candidateNames.find(name => availableLowerNames.includes(name));
-
       const selectedName = matchedLower
         ? availableWallets.find(w => w.name.toLowerCase() === matchedLower)!.name
         : undefined;
@@ -40,31 +67,16 @@ export class CardanoWalletProvider {
 
       const walletInfo = availableWallets.find(w => w.name === selectedName)!;
 
-      try {
-        this.wallet = await BrowserWallet.enable(selectedName);
-      } catch (error) {
-        if (typeof window !== 'undefined' && (window as any).cardano && (window as any).cardano[selectedName]) {
-          const provider = (window as any).cardano[selectedName];
-          if (provider && typeof provider.enable === 'function') {
-            const api = await provider.enable();
-            this.wallet = await (BrowserWallet as any).fromWallet(api, selectedName);
-          } else {
-            throw new Error(`Wallet ${selectedName} found but enable() method not available`);
-          }
-        } else {
-          throw error;
-        }
-      }
-      
+      this.wallet = await BrowserWallet.enable(selectedName);
       this.currentWalletName = selectedName;
-      
+
       if (!this.wallet) {
         throw new Error(`Failed to enable wallet ${selectedName}`);
       }
-      
+
       const addresses = await this.wallet.getUnusedAddresses();
       const address = addresses[0];
-      
+
       this.user = {
         address,
         name: walletInfo.name,
