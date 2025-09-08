@@ -7,15 +7,16 @@ import { useToastContext } from "~/components/toast-provider";
 import { WalletListProps } from '~/constants/login';
 
 export default function WalletList({ wallets }: WalletListProps) {
-  const { connect, disconnect, isConnecting, error, walletUser, isAuthenticated, isWalletInstalled, hasLoggedIn } = useCardanoWallet();
+  const { connect, disconnect, isConnecting, error, walletUser, isAuthenticated, isWalletInstalled, hasLoggedIn, getAvailableWallets } = useCardanoWallet();
   const { connect: connectMetaMask, disconnect: disconnectMetaMask, isConnecting: isConnectingMetaMask, error: metaMaskError, walletUser: metaMaskUser, isAuthenticated: isMetaMaskAuthenticated, hasLoggedIn: hasMetaMaskLoggedIn } = useMetaMask();
   const { showError, showSuccess, showInfo } = useToastContext();
   const lastErrorRef = useRef<string>("");
   const lastSuccessRef = useRef<string>("");
   const [connectingWalletId, setConnectingWalletId] = useState<string | null>(null);
+  const [installedCardanoWallets, setInstalledCardanoWallets] = useState<string[]>([]);
 
   const handleWalletClick = async (walletId: string) => {
-    if (walletId === "eternal" || walletId === "lace" || walletId === "yoroi") {
+    if (["eternal","eternl","lace","yoroi","nami","typhon","gero","gerowallet","nufi","flint"].includes(walletId)) {
       if (isAuthenticated) {
         await disconnect();
         showSuccess("Logout Successful", "Your Cardano wallet has been disconnected successfully.");
@@ -41,12 +42,6 @@ export default function WalletList({ wallets }: WalletListProps) {
           setConnectingWalletId(null);
         }
       }
-    } else if (walletId === "nami") {
-      showInfo("Nami Wallet Upgraded", "Nami has been upgraded to Lace! Please use Lace wallet with Nami mode enabled.");
-    } else if (walletId === "gero") {
-      showInfo("Gero Wallet", "Gero Wallet is currently not supported. Please use Eternl or Lace wallet instead.");
-    } else if (walletId === "nufi") {
-      showInfo("NuFi Wallet", "NuFi Wallet is currently not supported. Please use Eternl or Lace wallet instead.");
     } else if (walletId === "priority") {
       showInfo("Priority Wallet", "Priority Wallet is currently not supported. Please use Eternl or Lace wallet instead.");
     } else if (walletId === "google") {
@@ -59,6 +54,19 @@ export default function WalletList({ wallets }: WalletListProps) {
       console.log(`Connecting to ${walletId}...`);
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await getAvailableWallets?.();
+        if (!cancelled && Array.isArray(list)) {
+          setInstalledCardanoWallets(list.map(w => w.name));
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [getAvailableWallets]);
 
   useEffect(() => {
     if (error && error !== lastErrorRef.current) {
@@ -91,7 +99,22 @@ export default function WalletList({ wallets }: WalletListProps) {
 
 
   const isActiveWallet = (walletId: string) => {
-    return ["eternal", "lace", "yoroi", "nami", "google", "github", "metamask"].includes(walletId);
+    if (walletId === "google" || walletId === "github" || walletId === "metamask" || walletId === "priority") return true;
+    // map UI ids to CIP-30 names from installed list
+    const map: Record<string,string[]> = {
+      eternal: ["eternl"],
+      eternl: ["eternl"],
+      lace: ["lace"],
+      yoroi: ["yoroi"],
+      nami: ["nami"],
+      typhon: ["typhon"],
+      gero: ["gerowallet"],
+      gerowallet: ["gerowallet"],
+      nufi: ["nufi"],
+      flint: ["flint"],
+    };
+    const targets = map[walletId] || [];
+    return targets.some(n => installedCardanoWallets.includes(n));
   };
 
   return (
@@ -104,7 +127,7 @@ export default function WalletList({ wallets }: WalletListProps) {
             <button
               key={wallet.id}
               onClick={() => handleWalletClick(wallet.id)}
-                             disabled={(wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "metamask") && connectingWalletId === wallet.id || !isActive}
+              disabled={(connectingWalletId === wallet.id) || !isActive}
               className={`w-full p-3 rounded-lg border transition-all duration-200 flex items-center gap-3 ${
                 isActive 
                   ? "border-gray-200 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm bg-white dark:border-white/10 dark:bg-gray-900 dark:hover:bg-gray-800 dark:hover:border-white/20" 
