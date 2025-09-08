@@ -100,14 +100,14 @@ export default function WalletList({ wallets }: WalletListProps) {
 
   const isActiveWallet = (walletId: string) => {
     if (walletId === "google" || walletId === "github" || walletId === "metamask" || walletId === "priority") return true;
-    // map UI ids to CIP-30 names from installed list
+    if (walletId === "gero" || walletId === "typhon" || walletId === "nufi" || walletId === "gerowallet") return true;
     const map: Record<string,string[]> = {
       eternal: ["eternl"],
       eternl: ["eternl"],
       lace: ["lace"],
       yoroi: ["yoroi"],
       nami: ["nami"],
-      typhon: ["typhon"],
+      typhon: ["typhon", "typhoncip30"],
       gero: ["gerowallet"],
       gerowallet: ["gerowallet"],
       nufi: ["nufi"],
