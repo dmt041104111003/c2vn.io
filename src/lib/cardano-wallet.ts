@@ -40,8 +40,26 @@ export class CardanoWalletProvider {
 
       const walletInfo = availableWallets.find(w => w.name === selectedName)!;
 
-      this.wallet = await BrowserWallet.enable(selectedName);
+      try {
+        this.wallet = await BrowserWallet.enable(selectedName);
+      } catch (error) {
+        if (typeof window !== 'undefined' && (window as any).cardano && (window as any).cardano[selectedName]) {
+          const provider = (window as any).cardano[selectedName];
+          if (provider && typeof provider.enable === 'function') {
+            this.wallet = await provider.enable();
+          } else {
+            throw new Error(`Wallet ${selectedName} found but enable() method not available`);
+          }
+        } else {
+          throw error;
+        }
+      }
+      
       this.currentWalletName = selectedName;
+      
+      if (!this.wallet) {
+        throw new Error(`Failed to enable wallet ${selectedName}`);
+      }
       
       const addresses = await this.wallet.getUnusedAddresses();
       const address = addresses[0];
