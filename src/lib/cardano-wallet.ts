@@ -82,7 +82,10 @@ export class CardanoWalletProvider {
     const walletMap: { [key: string]: string } = {
       'eternal': 'eternl',
       'lace': 'lace',
-      'yoroi': 'yoroi'
+      'yoroi': 'yoroi',
+      'nufi': 'nufi',
+      'typhon': 'typhoncip30',
+      'gero': 'gerowallet'
     };
 
     const actualWalletName = walletMap[walletName] || walletName;
@@ -121,7 +124,10 @@ export class CardanoWalletProvider {
 export const WALLET_NAMES = {
   eternal: 'eternl',
   lace: 'lace',
-  yoroi: 'yoroi'
+  yoroi: 'yoroi',
+  nufi: 'nufi',
+  typhon: 'typhoncip30',
+  gero: 'gerowallet'
 };
 
 export const cardanoWallet = new CardanoWalletProvider({
