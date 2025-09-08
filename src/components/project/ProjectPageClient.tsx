@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import ProjectCard from "~/components/project-card";
 import ProjectModal from "~/components/project-modal";
@@ -16,6 +16,8 @@ import { useNotifications } from "~/hooks/useNotifications";
 
 function ProjectPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [year, setYear] = useState<number | null>(null); 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,6 +26,7 @@ function ProjectPageContent() {
   const [typeFilter, setTypeFilter] = useState<string>("catalyst");
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const ITEMS_PER_PAGE = 6;
   
   useNotifications();
@@ -49,10 +52,45 @@ function ProjectPageContent() {
   }, [years, year]);
   useEffect(() => {
     const urlTypeFilter = searchParams.get('typeFilter');
+    const urlYear = searchParams.get('year');
+    const urlSearch = searchParams.get('search');
+    const urlStatus = searchParams.get('status');
+    const urlFund = searchParams.get('fund');
+    if (!urlTypeFilter && !isInitialized) {
+      setTypeFilter("catalyst");
+      setIsInitialized(true);
+      const params = new URLSearchParams();
+      params.set('typeFilter', 'catalyst');
+      router.push(`${pathname}?${params.toString()}`);
+      return;
+    }
+    
     if (urlTypeFilter && (urlTypeFilter === 'catalyst' || urlTypeFilter === 'project')) {
       setTypeFilter(urlTypeFilter);
     }
-  }, [searchParams]);
+    
+    if (urlYear) {
+      const yearNum = parseInt(urlYear);
+      if (!isNaN(yearNum)) {
+        setYear(yearNum);
+      }
+    }
+    
+    if (urlSearch) {
+      setSearchTerm(urlSearch);
+    }
+    
+    if (urlStatus) {
+      setStatusFilter(urlStatus);
+    }
+    
+    if (urlFund) {
+      setFundFilter(urlFund);
+    }
+    
+    setCurrentPage(1);
+    setIsInitialized(true);
+  }, [searchParams, router, pathname, isInitialized]);
   
   const filteredProjects = projects.filter((proposal: any) => {
     const matchesYear = year === null || proposal.year === year;
@@ -73,6 +111,40 @@ function ProjectPageContent() {
     setCurrentPage(1);
   };
   
+  const updateURL = (newTypeFilter?: string, newYear?: number, newSearch?: string, newStatus?: string, newFund?: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (newTypeFilter !== undefined) {
+      params.set('typeFilter', newTypeFilter);
+    }
+    if (newYear !== undefined) {
+      params.set('year', newYear.toString());
+    }
+    if (newSearch !== undefined) {
+      if (newSearch) {
+        params.set('search', newSearch);
+      } else {
+        params.delete('search');
+      }
+    }
+    if (newStatus !== undefined) {
+      if (newStatus && newStatus !== 'all') {
+        params.set('status', newStatus);
+      } else {
+        params.delete('status');
+      }
+    }
+    if (newFund !== undefined) {
+      if (newFund && newFund !== 'all') {
+        params.set('fund', newFund);
+      } else {
+        params.delete('fund');
+      }
+    }
+    
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   const handleYearChange = (newYear: number) => {
     setYear(newYear);
     setCurrentPage(1);
@@ -80,6 +152,7 @@ function ProjectPageContent() {
     setStatusFilter("all");
     setFundFilter("all");
     setTypeFilter("catalyst");
+    updateURL("catalyst", newYear, "", "all", "all");
   };
 
   const handleOpenModal = (project: any) => {
@@ -134,18 +207,22 @@ function ProjectPageContent() {
                     selectedYear={year || 0}
                     onSearchChange={(value) => {
                       setSearchTerm(value);
+                      updateURL(undefined, undefined, value);
                       handleFilterChange();
                     }}
                     onStatusChange={(value) => {
                       setStatusFilter(value);
+                      updateURL(undefined, undefined, undefined, value);
                       handleFilterChange();
                     }}
                     onFundChange={(value) => {
                       setFundFilter(value);
+                      updateURL(undefined, undefined, undefined, undefined, value);
                       handleFilterChange();
                     }}
                     onTypeChange={(value) => {
                       setTypeFilter(value);
+                      updateURL(value);
                       handleFilterChange();
                     }}
                     onYearChange={handleYearChange}
@@ -199,6 +276,7 @@ function ProjectPageContent() {
                                 setSearchTerm('');
                                 setStatusFilter('all');
                                 setFundFilter('all');
+                                updateURL(undefined, undefined, '', 'all', 'all');
                               }}
                             />
                           </div>

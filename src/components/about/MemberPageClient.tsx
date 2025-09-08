@@ -243,6 +243,12 @@ export default function MemberPageClient() {
   const sortedTabs = tabs.sort((a, b) => a.order - b.order);
   useEffect(() => {
     setCurrentPage(1);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('page'); // Remove old page param
+      url.hash = 'members?page=1';
+      window.history.replaceState(null, '', url.toString());
+    }
   }, [activeTab]);
 
   const filteredMembers = members.filter((member) => {
@@ -257,7 +263,65 @@ export default function MemberPageClient() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('page');
+      url.hash = `members?page=${page}`;
+      window.history.replaceState(null, '', url.toString());
+      const el = document.getElementById('members');
+      if (el) {
+        const headerOffset = 100;
+        const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const headerOffset = 100;
+    const syncFromUrl = () => {
+      const url = new URL(window.location.href);
+      const hash = url.hash?.slice(1);
+      
+      if (hash && hash.startsWith('members')) {
+        const hashParams = new URLSearchParams(hash.split('?')[1] || '');
+        const pageParam = hashParams.get('page');
+        if (pageParam) {
+          const pageNum = Math.max(1, Math.min(Number(pageParam) || 1, totalPages || 1));
+          if (pageNum !== currentPage) {
+            setCurrentPage(pageNum);
+          }
+        }
+      }
+      
+      if (hash) {
+        const sectionId = hash.split('?')[0]; 
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+          window.scrollTo({ top: y });
+        }
+      }
+    };
+    
+    const handlePopState = () => {
+      syncFromUrl();
+    };
+    
+    const handleHashChange = () => {
+      syncFromUrl();
+    };
+    
+    setTimeout(syncFromUrl, 0);
+    
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [totalPages]); 
 
   const handleMemberClick = (member: MemberType) => {
     setSelectedMember(member);
@@ -268,6 +332,82 @@ export default function MemberPageClient() {
     setIsModalOpen(false);
     setSelectedMember(null);
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ids = ['founding-team', 'about-section', 'our-cardano-team', 'members', 'contact'];
+    const elements = ids.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const topMost = entries
+          .filter(e => e.isIntersecting)
+          .sort((a, b) => (a.boundingClientRect.top - b.boundingClientRect.top))[0];
+        if (topMost?.target?.id) {
+          let newHash = `#${topMost.target.id}`;
+          if (topMost.target.id === 'members' && currentPage >= 1) {
+            newHash = `#members?page=${currentPage}`;
+          }
+          
+          if (window.location.hash !== newHash) {
+            const url = new URL(window.location.href);
+            url.hash = newHash;
+            window.history.replaceState(null, '', url.toString());
+          }
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    elements.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ids = ['founding-team', 'about-section', 'our-cardano-team', 'members', 'contact'];
+    const getActive = () => {
+      const headerOffset = 120; 
+      const scrollPos = window.scrollY + headerOffset;
+      let activeId: string | null = null;
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const top = el.offsetTop;
+        if (scrollPos >= top) {
+          activeId = id;
+        }
+      });
+      if (activeId) {
+        let newHash = `#${activeId}`;
+        if (activeId === 'members' && currentPage >= 1) {
+          newHash = `#members?page=${currentPage}`;
+        }
+        
+        if (window.location.hash !== newHash) {
+          const url = new URL(window.location.href);
+          url.hash = newHash;
+          window.history.replaceState(null, '', url.toString());
+        }
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          getActive();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    getActive();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [currentPage]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -475,16 +615,16 @@ export default function MemberPageClient() {
         />
       </motion.div>
 
-      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-        <div>
+      <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="about-top">
+        <div id="founding-team" className="scroll-mt-28 md:scroll-mt-40">
           <Title title="Founding Team" description="" />
         </div>
         
-        <div>
+        <div id="about-section" className="scroll-mt-28 md:scroll-mt-40">
           <AboutSection />
         </div>
 
-        <div className="mx-auto mb-16">
+        <div className="mx-auto mb-16 scroll-mt-28 md:scroll-mt-40" id="our-cardano-team">
           <div className="rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 backdrop-blur-sm">
             <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Our Cardano Team</h3>
             <p className="mb-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
@@ -568,7 +708,7 @@ export default function MemberPageClient() {
         )}
 
         {/* Members Grid */}
-        <div className="mx-auto pb-20">
+        <div className="mx-auto pb-20 scroll-mt-28 md:scroll-mt-40" id="members">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {paginatedMembers.map(function (member, index) {
               return (
@@ -618,14 +758,14 @@ export default function MemberPageClient() {
             viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.5 }}
           >
-            <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
-          </motion.div>
+            <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={handlePageChange} />
+            </motion.div>
         )}
       </section>
 
       <motion.section 
         id="contact" 
-        className="pt-32 pb-12 lg:pt-40 lg:pb-16 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-950"
+        className="scroll-mt-28 md:scroll-mt-40 pt-32 pb-12 lg:pt-40 lg:pb-16 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-950"
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.3 }}

@@ -19,7 +19,7 @@ const cards = [
     description:
       "Discover how we leverage blockchain and innovative tools to build trust, governance, and contribution management.",
     cta: "Learn More",
-    accent: "from-purple-600/20 to-purple-400/10",
+    accent: "from-green-600/20 to-green-400/10",
   },
   {
     href: "/our-service",
@@ -27,7 +27,7 @@ const cards = [
     description:
       "Support the ecosystem via our SPO and DRep initiatives and explore services we provide to the community.",
     cta: "Explore",
-    accent: "from-blue-600/20 to-blue-400/10",
+    accent: "from-green-600/20 to-green-400/10",
   },
 ];
 
