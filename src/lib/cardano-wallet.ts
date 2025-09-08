@@ -14,15 +14,30 @@ export class CardanoWalletProvider {
   async connect(walletName: string = 'eternl'): Promise<CardanoWalletUser> {
     try {
       const availableWallets = await BrowserWallet.getAvailableWallets();
-      
-      const walletInfo = availableWallets.find(w => w.name === walletName);
-      
-      if (!walletInfo) {
-        throw new Error(`Wallet ${walletName} is not installed. Please install it first.`);
+
+      const candidatesMap: { [key: string]: string[] } = {
+        'eternal': ['eternl', 'eternal'],
+        'eternl': ['eternl', 'eternal'],
+        'lace': ['lace'],
+        'yoroi': ['yoroi'],
+        'nufi': ['nufi', 'NuFi'],
+        'typhon': ['typhoncip30', 'typhon'],
+        'gero': ['gerowallet', 'gero']
+      };
+
+      const candidateNames = candidatesMap[walletName] || [walletName];
+      const availableNames = new Set(availableWallets.map(w => w.name));
+      const selectedName = candidateNames.find(name => availableNames.has(name));
+
+      if (!selectedName) {
+        const detected = Array.from(availableNames).join(', ');
+        throw new Error(`Wallet ${walletName} is not installed or not exposing CIP-30. Detected: ${detected || 'none'}.`);
       }
 
-      this.wallet = await BrowserWallet.enable(walletName);
-      this.currentWalletName = walletName;
+      const walletInfo = availableWallets.find(w => w.name === selectedName)!;
+
+      this.wallet = await BrowserWallet.enable(selectedName);
+      this.currentWalletName = selectedName;
       
       const addresses = await this.wallet.getUnusedAddresses();
       const address = addresses[0];
