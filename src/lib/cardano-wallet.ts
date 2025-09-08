@@ -1,6 +1,16 @@
 import { BrowserWallet } from '@meshsdk/core';
 import { CardanoWalletUser, CardanoWalletConfig } from '~/constants/wallet';
 
+const WALLET_ALIASES: Record<string, string[]> = {
+  eternal: ['eternl', 'eternal'],
+  eternl: ['eternl', 'eternal'],
+  lace: ['lace'],
+  yoroi: ['yoroi'],
+  nufi: ['nufi', 'NuFi'],
+  typhon: ['typhoncip30', 'typhon'],
+  gero: ['gerowallet', 'gero'],
+};
+
 export class CardanoWalletProvider {
   private config: CardanoWalletConfig;
   private wallet: BrowserWallet | null = null;
@@ -15,17 +25,7 @@ export class CardanoWalletProvider {
     try {
       const availableWallets = await BrowserWallet.getAvailableWallets();
 
-      const candidatesMap: { [key: string]: string[] } = {
-        'eternal': ['eternl', 'eternal'],
-        'eternl': ['eternl', 'eternal'],
-        'lace': ['lace'],
-        'yoroi': ['yoroi'],
-        'nufi': ['nufi', 'NuFi'],
-        'typhon': ['typhoncip30', 'typhon'],
-        'gero': ['gerowallet', 'gero']
-      };
-
-      const candidateNames = candidatesMap[walletName] || [walletName];
+      const candidateNames = WALLET_ALIASES[walletName] || [walletName];
       const availableNames = new Set(availableWallets.map(w => w.name));
       const selectedName = candidateNames.find(name => availableNames.has(name));
 
@@ -94,22 +94,11 @@ export class CardanoWalletProvider {
   }
 
   private async checkWalletAvailability(walletName: string): Promise<boolean> {
-    const walletMap: { [key: string]: string } = {
-      'eternal': 'eternl',
-      'lace': 'lace',
-      'yoroi': 'yoroi',
-      'nufi': 'nufi',
-      'typhon': 'typhoncip30',
-      'gero': 'gerowallet'
-    };
-
-    const actualWalletName = walletMap[walletName] || walletName;
+    const candidateNames = WALLET_ALIASES[walletName] || [walletName];
     
     try {
       const availableWallets = await BrowserWallet.getAvailableWallets();
-      
-      const isAvailable = availableWallets.some(wallet => wallet.name === actualWalletName);
-      return isAvailable;
+      return availableWallets.some(wallet => candidateNames.includes(wallet.name));
     } catch (error) {
       return false;
     }
