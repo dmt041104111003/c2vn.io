@@ -102,7 +102,7 @@ export default function CTASection() {
   const sortedEvents = [...events].sort((a, b) => a.orderNumber - b.orderNumber);
 
   return (
-    <section id="CTA" className="w-full border-t border-gray-200 dark:border-gray-700">
+    <section id="CTA" className="w-full border-t border-gray-200 dark:border-gray-700 scroll-mt-28 md:scroll-mt-40">
       <div className="mx-auto w-5/6 max-w-screen-2xl px-4 py-12 lg:px-8 lg:py-20">
         {/* HEADER */}
         <div className="mb-8 lg:mb-16 flex flex-wrap justify-between items-center gap-4">

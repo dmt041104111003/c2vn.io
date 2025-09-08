@@ -80,7 +80,7 @@ export default function VideoSection() {
 
   if (error || !videos || videos.length === 0) {
     return (
-      <section id="videos" className="relative flex min-h-screen items-center border-t border-gray-200 dark:border-white/10">
+      <section id="videos" className="relative flex min-h-screen items-center border-t border-gray-200 dark:border-white/10 scroll-mt-28 md:scroll-mt-40">
         <div className="mx-auto w-5/6 max-w-screen-2xl px-4 py-12 lg:px-8 lg:py-20">
           <div className="relative">
             <motion.div 
@@ -110,7 +110,7 @@ export default function VideoSection() {
 
   if (!currentVideo) {
     return (
-      <section id="videos" className="relative flex min-h-screen items-center border-t border-gray-200 dark:border-white/10">
+      <section id="videos" className="relative flex min-h-screen items-center border-t border-gray-200 dark:border-white/10 scroll-mt-28 md:scroll-mt-40">
         <div className="mx-auto w-5/6 max-w-screen-2xl px-4 py-12 lg:px-8 lg:py-20">
           <div className="relative">
             <motion.div 
@@ -139,7 +139,7 @@ export default function VideoSection() {
   }
 
   return (
-    <section id="videos" className="relative flex min-h-screen items-center border-t border-gray-200 dark:border-white/10">
+    <section id="videos" className="relative flex min-h-screen items-center border-t border-gray-200 dark:border-white/10 scroll-mt-28 md:scroll-mt-40">
       <div className="mx-auto w-5/6 max-w-screen-2xl px-4 py-12 lg:px-8 lg:py-20">
         <div className="relative">
           <motion.div 

@@ -86,7 +86,7 @@ export default function CourseSection() {
   };
 
   return (
-    <section id="courses" className="relative flex min-h-[80vh] items-center border-t border-gray-200 dark:border-white/10">
+    <section id="courses" className="relative flex min-h-[80vh] items-center border-t border-gray-200 dark:border-white/10 scroll-mt-28 md:scroll-mt-40">
       <section className="mx-auto w-5/6 max-w-screen-2xl px-6 py-12 lg:px-8">
         <div className="relative">
           <div className="mb-8">

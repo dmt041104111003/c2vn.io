@@ -61,7 +61,7 @@ export default function ProtocolSection() {
   };
 
   return (
-    <section id="protocol" className="relative flex min-h-[80vh] items-center border-t border-gray-200 dark:border-white/10">
+    <section id="protocol" className="relative flex min-h-[80vh] items-center border-t border-gray-200 dark:border-white/10 scroll-mt-28 md:scroll-mt-40">
       <section className="mx-auto w-5/6 max-w-screen-2xl px-6 py-12 lg:px-8">
         <div className="relative">
           <div className="mb-8">
@@ -155,7 +155,7 @@ export default function ProtocolSection() {
                     className="flex flex-col"
                   >
                     <div className="rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl h-full flex flex-col overflow-hidden">
-                      <Link className="block flex-1 flex flex-col" href={`/blog/${post.slug || post.id}`}>
+                      <Link className="flex-1 flex flex-col" href={`/blog/${post.slug || post.id}`}>
                         {/* Image Section - Fixed height */}
                         <div className="relative h-48 overflow-hidden">
                           <img

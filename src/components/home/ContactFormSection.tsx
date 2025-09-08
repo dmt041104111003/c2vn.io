@@ -278,7 +278,7 @@ export default function ContactFormSection() {
   return (
     <section
       id="contact"
-      className="relative flex min-h-[90vh] items-center overflow-hidden border-t border-gray-200 dark:border-white/10"
+      className="relative flex min-h-[90vh] items-center overflow-hidden border-t border-gray-200 dark:border-white/10 scroll-mt-28 md:scroll-mt-40"
     >
       <div className="relative mx-auto max-w-7xl px-6 py-12 lg:px-8">
         <div className={`grid items-center gap-12 ${activeTab === "manage" ? "lg:grid-cols-1" : "lg:grid-cols-2"}`}>

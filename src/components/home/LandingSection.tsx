@@ -153,7 +153,7 @@ export default function LandingSection() {
 
   return (
     <>
-      <section id="Landing" className="relative flex min-h-screen items-center overflow-hidden">
+      <section id="Landing" className="relative flex min-h-screen items-center overflow-hidden scroll-mt-28 md:scroll-mt-40">
         
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <motion.div
