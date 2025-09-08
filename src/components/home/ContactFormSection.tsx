@@ -276,6 +276,50 @@ export default function ContactFormSection() {
     const scriptURL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL_1 || '';
     
     try {
+      // First, handle referral code if present and user is logged in
+      if (formData["email-intro"] && session?.user) {
+        try {
+          const referralResponse = await fetch('/api/referral/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              referralCode: formData["email-intro"],
+              formData: formData
+            }),
+          });
+
+          const referralData = await referralResponse.json();
+          
+          if (!referralResponse.ok) {
+            if (referralData.error === 'ALREADY_SUBMITTED') {
+              showError("You have already submitted a referral form. You can only submit once.");
+              setIsSubmitting(false);
+              return;
+            } else if (referralData.error === 'CANNOT_USE_OWN_CODE') {
+              showError("You cannot use your own referral code.");
+              setIsSubmitting(false);
+              return;
+            } else if (referralData.error === 'REFERRAL_CODE_NOT_FOUND') {
+              showError("Referral code not found. Please check and try again.");
+              setIsSubmitting(false);
+              return;
+            } else {
+              showError("Invalid referral code. Please check and try again.");
+              setIsSubmitting(false);
+              return;
+            }
+          }
+        } catch (referralError) {
+          console.error('Referral submission error:', referralError);
+          showError("Failed to process referral code. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Then send to Google Sheets
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         formDataToSend.append(key, value);
@@ -302,7 +346,12 @@ export default function ContactFormSection() {
         setCaptchaKey(prev => prev + 1);
         setSelectedCourse(null);
         setSelectedCourseImage('');
-        showSuccess("Thank you! Your message has been sent successfully.");
+        
+        if (formData["email-intro"] && session?.user) {
+          showSuccess("Thank you! Your message has been sent successfully and your referral has been processed.");
+        } else {
+          showSuccess("Thank you! Your message has been sent successfully.");
+        }
         
         setTimeout(() => {
           showSuccess("Please check your email for confirmation. If you don't see it within a few minutes, please check your spam folder or resend the form. For any issues, please contact cardano2vn@gmail.com");

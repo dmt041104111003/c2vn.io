@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Edit, User, LogOut, Copy, Check, Gift } from "lucide-react";
+import { Menu, X, Edit, User, LogOut, Copy, Check, Gift, Users } from "lucide-react";
 import { navbars } from "~/constants/navbars";
 import { images } from "~/public/images";
 import { routers, NavbarType } from "~/constants/routers";
@@ -38,6 +38,7 @@ function UserAvatar({ session }: { session: any }) {
 function MobileUserInfo({ session, onClose }: { session: any; onClose: () => void }) {
   const [name, setName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralCount, setReferralCount] = useState<number>(0);
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const { showSuccess, showInfo, showError } = useToastContext();
 
@@ -76,6 +77,27 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
 
     fetchUserData();
   }, [session.user?.name]);
+
+  // Fetch referral stats for mobile
+  useEffect(() => {
+    const fetchReferralStats = async () => {
+      try {
+        const statsResponse = await fetch('/api/user/referral-stats');
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          if (statsData.success && statsData.data) {
+            setReferralCount(statsData.data.referralCount || 0);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch referral stats:', error);
+      }
+    };
+
+    if (session?.user) {
+      fetchReferralStats();
+    }
+  }, [session?.user]);
 
   const handleGenerateReferralCode = async () => {
     setIsGeneratingCode(true);
@@ -175,6 +197,15 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
                 </p>
               </div>
             )}
+            
+            {referralCode && (
+              <div className="flex items-center gap-1">
+                <Users className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                  {referralCount} referral{referralCount !== 1 ? 's' : ''}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -218,6 +249,7 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
   const [isEditing, setIsEditing] = useState(autoEdit);
   const [name, setName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralCount, setReferralCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -259,6 +291,27 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
 
     fetchUserData();
   }, [session.user?.name]);
+
+  // Fetch referral stats separately
+  useEffect(() => {
+    const fetchReferralStats = async () => {
+      try {
+        const statsResponse = await fetch('/api/user/referral-stats');
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          if (statsData.success && statsData.data) {
+            setReferralCount(statsData.data.referralCount || 0);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch referral stats:', error);
+      }
+    };
+
+    if (session?.user) {
+      fetchReferralStats();
+    }
+  }, [session?.user]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -468,6 +521,15 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
                           ? `${referralCode.slice(0, 8)}...${referralCode.slice(-4)}`
                           : referralCode
                         }
+                      </p>
+                    </div>
+                  )}
+                  
+                  {referralCode && (
+                    <div className="flex items-center gap-1">
+                      <Users className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                      <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                        {referralCount} referral{referralCount !== 1 ? 's' : ''}
                       </p>
                     </div>
                   )}

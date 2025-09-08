@@ -15,6 +15,7 @@ model User {
   image         String?
   provider      String?        // "google", "github", "cardano", etc.
   referralCode  String?        @unique 
+  referralCount Int            @default(0)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   roleId        String
@@ -26,6 +27,7 @@ model User {
   reactions     Reaction[]
   notifications Notification[] @relation("UserNotifications")
   role          Role           @relation(fields: [roleId], references: [id])
+  referralSubmissions ReferralSubmission[] @relation("UserReferralSubmissions")
 
   @@index([createdAt])
   @@index([provider])
@@ -392,4 +394,25 @@ enum ProjectStatus {
 enum ProjectPublishStatus {
   DRAFT
   PUBLISHED
+}
+
+model ReferralSubmission {
+  id            String   @id @default(uuid())
+  userId        String   // User who submitted the form
+  referralCode  String   // Referral code used
+  referrerId    String   // User who owns the referral code
+  email         String   // Email from contact form
+  name          String   // Name from contact form
+  phone         String?  // Phone from contact form
+  wallet        String?  // Wallet from contact form
+  course        String?  // Course from contact form
+  message       String?  // Message from contact form
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation("UserReferralSubmissions", fields: [userId], references: [id])
+
+  @@unique([userId]) // Each user can only submit once
+  @@index([referralCode])
+  @@index([referrerId])
+  @@index([createdAt])
 }

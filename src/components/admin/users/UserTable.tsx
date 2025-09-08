@@ -203,6 +203,9 @@ export function UserTable({
               Referral Code
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Referrals
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Ban Duration
             </th>
 
@@ -310,6 +313,16 @@ export function UserTable({
                 ) : (
                   <span className="text-gray-400 text-sm">No code</span>
                 )}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600 font-medium">
+                    {user.referralCount || 0}
+                  </span>
+                  <span className="text-gray-500 text-sm">
+                    referral{(user.referralCount || 0) !== 1 ? 's' : ''}
+                  </span>
+                </div>
               </td>
 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
