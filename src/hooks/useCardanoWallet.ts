@@ -23,7 +23,7 @@ export function useCardanoWallet() {
     try {
       const actualWalletName = WALLET_NAMES[walletName as keyof typeof WALLET_NAMES] || walletName;
       
-      if (!(await cardanoWallet.isWalletInstalled(walletName))) {
+             if (!(await cardanoWallet.isWalletInstalled(walletName))) {
          throw new Error(`${walletName.charAt(0).toUpperCase() + walletName.slice(1)} Wallet is not installed. Please install it first.`);
        }
       
@@ -79,8 +79,7 @@ export function useCardanoWallet() {
     error,
     walletUser,
     isConnected: isAuthenticated,
-    isWalletInstalled: cardanoWallet.isWalletInstalled,
-    getAvailableWallets: cardanoWallet.getAvailableWallets?.bind(cardanoWallet),
+    isWalletInstalled: cardanoWallet.isWalletInstalled(),
     session,
     status,
     hasLoggedIn,
