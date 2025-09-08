@@ -13,6 +13,7 @@ import { useUser } from "~/hooks/useUser";
 import { WalletAvatar } from "~/components/WalletAvatar";
 import NotificationBell from "~/components/ui/notification-bell";
 import { useToastContext } from "~/components/toast-provider";
+import WelcomeModalReferrals from "~/components/home/WelcomeModalReferrals";
 
 function UserAvatar({ session }: { session: any }) {
   const [imageError, setImageError] = useState(false);
@@ -40,6 +41,7 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState<number>(0);
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const [isReferralsModalOpen, setIsReferralsModalOpen] = useState(false);
   const { showSuccess, showInfo, showError } = useToastContext();
 
   useEffect(() => {
@@ -199,7 +201,11 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
             )}
             
             {referralCode && (
-              <div className="flex items-center gap-1">
+              <div 
+                onClick={() => setIsReferralsModalOpen(true)}
+                className="flex items-center gap-1 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded px-1 py-0.5 transition-colors"
+                title="Click to view referrals"
+              >
                 <Users className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                 <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                   {referralCount} referral{referralCount !== 1 ? 's' : ''}
@@ -241,6 +247,9 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
           Sign Out
         </button>
       </div>
+
+      {/* Referrals Modal */}
+      <WelcomeModalReferrals isOpen={isReferralsModalOpen} onClose={() => setIsReferralsModalOpen(false)} />
     </>
   );
 }
@@ -252,6 +261,7 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
   const [referralCount, setReferralCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const [isReferralsModalOpen, setIsReferralsModalOpen] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { showSuccess, showError } = useToastContext();
@@ -526,7 +536,11 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
                   )}
                   
                   {referralCode && (
-                    <div className="flex items-center gap-1">
+                    <div 
+                      onClick={() => setIsReferralsModalOpen(true)}
+                      className="flex items-center gap-1 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded px-1 py-0.5 transition-colors"
+                      title="Click to view referrals"
+                    >
                       <Users className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                       <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                         {referralCount} referral{referralCount !== 1 ? 's' : ''}
@@ -570,6 +584,8 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
           Sign Out
         </button>
       </div>
+
+      <WelcomeModalReferrals isOpen={isReferralsModalOpen} onClose={() => setIsReferralsModalOpen(false)} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { Edit, Trash2, Shield, User as UserIcon, Ban, Unlock, Copy, Check, Gift } from 'lucide-react';
-import { User, UserTableProps, shortenAddress, formatDateTime } from '~/constants/users';
+import { Edit, Trash2, Shield, User as UserIcon, Ban, Unlock, Copy, Check, Gift, Eye, Users, Mail, Phone, Wallet, BookOpen, ExternalLink, Calendar, MessageSquare } from 'lucide-react';
+import { User, UserTableProps, shortenAddress, formatDateTime, ReferralDetail } from '~/constants/users';
 import { WalletAvatar } from '~/components/WalletAvatar';
 import { useToastContext } from "../../toast-provider";
 import { useState, useEffect } from 'react';
@@ -108,6 +108,13 @@ export function UserTable({
   currentUserRole,
 }: UserTableProps) {
   const { showSuccess } = useToastContext();
+  const [selectedUserForReferrals, setSelectedUserForReferrals] = useState<User | null>(null);
+  const [isReferralsModalOpen, setIsReferralsModalOpen] = useState(false);
+  const [referralsData, setReferralsData] = useState<{ referrals: ReferralDetail[], totalReferrals: number } | null>(null);
+  const [referralsLoading, setReferralsLoading] = useState(false);
+  const [referralsSearchTerm, setReferralsSearchTerm] = useState('');
+  const [referralsCurrentPage, setReferralsCurrentPage] = useState(1);
+  const [referralsPerPage] = useState(10);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User | null>(null);
   const [isBanModalOpen, setIsBanModalOpen] = useState(false);
@@ -184,6 +191,48 @@ export function UserTable({
       showSuccess('Failed to copy');
     }
   };
+
+  const handleViewReferrals = async (user: User) => {
+    setSelectedUserForReferrals(user);
+    setIsReferralsModalOpen(true);
+    setReferralsLoading(true);
+    setReferralsData(null);
+    
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}/referrals`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setReferralsData(data.data);
+      } else {
+        showSuccess('Failed to fetch referrals: ' + (data.message || 'Unknown error'));
+      }
+    } catch (error) {
+      showSuccess('Failed to fetch referrals');
+    } finally {
+      setReferralsLoading(false);
+    }
+  };
+
+  const handleCloseReferralsModal = () => {
+    setIsReferralsModalOpen(false);
+    setSelectedUserForReferrals(null);
+    setReferralsData(null);
+    setReferralsSearchTerm('');
+    setReferralsCurrentPage(1);
+  };
+
+  const filteredReferrals = referralsData?.referrals?.filter((referral: ReferralDetail) => 
+    referral.referralCode?.toLowerCase().includes(referralsSearchTerm.toLowerCase()) ||
+    referral.name?.toLowerCase().includes(referralsSearchTerm.toLowerCase()) ||
+    referral.email?.toLowerCase().includes(referralsSearchTerm.toLowerCase())
+  ) || [];
+
+  const totalPages = Math.ceil(filteredReferrals.length / referralsPerPage);
+  const paginatedReferrals = filteredReferrals.slice(
+    (referralsCurrentPage - 1) * referralsPerPage,
+    referralsCurrentPage * referralsPerPage
+  );
 
   return (
     <div className="overflow-x-auto">
@@ -322,6 +371,15 @@ export function UserTable({
                   <span className="text-gray-500 text-sm">
                     referral{(user.referralCount || 0) !== 1 ? 's' : ''}
                   </span>
+                  {(user.referralCount || 0) > 0 && (
+                    <button
+                      onClick={() => handleViewReferrals(user)}
+                      className="ml-2 p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                      title="View referral details"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </td>
 
@@ -484,6 +542,161 @@ export function UserTable({
             </button>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={isReferralsModalOpen}
+        onClose={handleCloseReferralsModal}
+        title="Referral Details"
+        maxWidth="max-w-6xl"
+      >
+        {selectedUserForReferrals && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                <Users className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Referral Details</h3>
+                <p className="text-sm text-gray-600">
+                  {selectedUserForReferrals.name} ({selectedUserForReferrals.referralCode || 'No referral code'})
+                </p>
+              </div>
+            </div>
+            
+            {referralsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-gray-600">Loading referrals...</span>
+              </div>
+            ) : referralsData ? (
+              <div className="space-y-4">
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="h-5 w-5 text-blue-600" />
+                    <span className="font-medium text-blue-900">
+                      Total Referrals: {referralsData.totalReferrals}
+                    </span>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    Users who used {selectedUserForReferrals.name}'s referral code
+                  </p>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by name, email, or referral code..."
+                    value={referralsSearchTerm}
+                    onChange={(e) => {
+                      setReferralsSearchTerm(e.target.value);
+                      setReferralsCurrentPage(1); 
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+
+                {filteredReferrals.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 mx-auto text-gray-300 mb-4" />
+                    <p className="text-gray-600">
+                      {referralsSearchTerm ? 'No referrals found matching your search' : 'No referrals found'}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Referrals List */}
+                    <div className="space-y-2 max-h-80 overflow-y-auto">
+                      {paginatedReferrals.map((referral: ReferralDetail) => (
+                        <div key={referral.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:bg-gray-100 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <UserIcon className="h-4 w-4 text-gray-500" />
+                                <span className="font-medium text-gray-900">{referral.name}</span>
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                  {referral.referralCode}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm text-gray-600">
+                                <div className="flex items-center gap-1">
+                                  <Mail className="h-3 w-3" />
+                                  <span>{referral.email}</span>
+                                </div>
+                                {referral.phone && (
+                                  <div className="flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    <span>{referral.phone}</span>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  <span>{new Date(referral.createdAt).toLocaleDateString('vi-VN')}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right text-xs text-gray-500">
+                              <div 
+                                className="cursor-pointer hover:underline hover:text-gray-700"
+                                title="Click to copy full ID"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(referral.user.id);
+                                  showSuccess('User ID copied!');
+                                }}
+                              >
+                                ID: {referral.user.id.slice(0, 8)}...
+                              </div>
+                              <div>{referral.user.provider || 'Unknown'}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div className="text-sm text-gray-600">
+                          Showing {((referralsCurrentPage - 1) * referralsPerPage) + 1} to {Math.min(referralsCurrentPage * referralsPerPage, filteredReferrals.length)} of {filteredReferrals.length} results
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setReferralsCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={referralsCurrentPage === 1}
+                            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Previous
+                          </button>
+                          <span className="text-sm text-gray-600">
+                            Page {referralsCurrentPage} of {totalPages}
+                          </span>
+                          <button
+                            onClick={() => setReferralsCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            disabled={referralsCurrentPage === totalPages}
+                            className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-red-600 mb-2">Error</div>
+                <p className="text-gray-600">Failed to load referrals</p>
+              </div>
+            )}
+          </div>
+        )}
       </Modal>
     </div>
   );

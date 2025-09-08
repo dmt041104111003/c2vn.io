@@ -74,4 +74,26 @@ export interface UserHook {
   provider?: string;
   isBanned?: boolean;
   bannedUntil?: string;
+}
+
+// Referral Interfaces
+export interface ReferralDetail {
+  id: string;
+  userId: string;
+  referralCode: string;
+  email: string;
+  name: string;
+  phone: string | null;
+  wallet: string | null;
+  course: string | null;
+  message: string | null;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    wallet: string | null;
+    provider: string | null;
+    createdAt: string;
+  };
 } 
