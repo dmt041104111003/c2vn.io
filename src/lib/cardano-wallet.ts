@@ -25,12 +25,16 @@ export class CardanoWalletProvider {
     try {
       const availableWallets = await BrowserWallet.getAvailableWallets();
 
-      const candidateNames = WALLET_ALIASES[walletName] || [walletName];
-      const availableNames = new Set(availableWallets.map(w => w.name));
-      const selectedName = candidateNames.find(name => availableNames.has(name));
+      const candidateNames = (WALLET_ALIASES[walletName] || [walletName]).map(n => n.toLowerCase());
+      const availableLowerNames = availableWallets.map(w => w.name.toLowerCase());
+      const matchedLower = candidateNames.find(name => availableLowerNames.includes(name));
+
+      const selectedName = matchedLower
+        ? availableWallets.find(w => w.name.toLowerCase() === matchedLower)!.name
+        : undefined;
 
       if (!selectedName) {
-        const detected = Array.from(availableNames).join(', ');
+        const detected = availableWallets.map(w => w.name).join(', ');
         throw new Error(`Wallet ${walletName} is not installed or not exposing CIP-30. Detected: ${detected || 'none'}.`);
       }
 
@@ -94,11 +98,11 @@ export class CardanoWalletProvider {
   }
 
   private async checkWalletAvailability(walletName: string): Promise<boolean> {
-    const candidateNames = WALLET_ALIASES[walletName] || [walletName];
+    const candidateNames = (WALLET_ALIASES[walletName] || [walletName]).map(n => n.toLowerCase());
     
     try {
       const availableWallets = await BrowserWallet.getAvailableWallets();
-      return availableWallets.some(wallet => candidateNames.includes(wallet.name));
+      return availableWallets.some(wallet => candidateNames.includes(wallet.name.toLowerCase()));
     } catch (error) {
       return false;
     }
