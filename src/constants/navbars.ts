@@ -17,35 +17,19 @@ export const navbars = [
     title: "Blogs",
     href: "/blog",
   },
+  
   {
     id: 4,
-    target: "",
-    title: "Projects",
-    href: "/project",
-  },
-  {
-    id: 5,
-    target: "",
-    title: "Abouts",
-    href: "/about",
-  },
-  {
-    id: 6,
-    target: "",
-    title: "Our Service",
-    href: "/our-service",
-  },
-  {
-    id: 7,
     target: "_blank",
     title: "Lms",
     href: "/lms",
   },
 
+
   {
-    id: 8,
-    target: "_blank",
-    title: "LMS",
-    href: "/lms",
+    id: 5,
+    target: "",
+    title: "Service",
+    href: "/service",
   },
 ];
