@@ -12,7 +12,7 @@ export interface AdminFiltersProps {
 export interface AdminHeaderProps {
   title: string;
   description: string;
-  buttonText: string;
+  buttonText?: string;
   onAddClick?: () => void;
 }
 

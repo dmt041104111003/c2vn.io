@@ -1,4 +1,4 @@
-import { Edit, Trash2, Shield, User as UserIcon, Ban, Unlock } from 'lucide-react';
+import { Edit, Trash2, Shield, User as UserIcon, Ban, Unlock, Copy, Check, Gift } from 'lucide-react';
 import { User, UserTableProps, shortenAddress, formatDateTime } from '~/constants/users';
 import { WalletAvatar } from '~/components/WalletAvatar';
 import { useToastContext } from "../../toast-provider";
@@ -114,6 +114,7 @@ export function UserTable({
   const [selectedUserToBan, setSelectedUserToBan] = useState<User | null>(null);
   const [banHours, setBanHours] = useState(24);
   const [onlineMap, setOnlineMap] = useState<Map<string, number>>(new Map());
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
     let stopped = false;
@@ -173,6 +174,17 @@ export function UserTable({
     onUnbanUser(user.id);
   };
 
+  const copyReferralCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(code);
+      showSuccess('Referral code copied!');
+      setTimeout(() => setCopiedCode(null), 2000);
+    } catch (error) {
+      showSuccess('Failed to copy');
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-[700px] md:min-w-full divide-y divide-gray-200">
@@ -186,6 +198,9 @@ export function UserTable({
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Role
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Referral Code
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Ban Duration
@@ -223,8 +238,20 @@ export function UserTable({
                     />
                   </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                    <div className="text-sm text-gray-500">ID: {user.id}</div>
+                    <div 
+                      className="text-sm font-medium text-gray-900 cursor-pointer hover:underline"
+                      title="Click to copy name"
+                      onClick={() => {navigator.clipboard.writeText(user.name || ''); showSuccess('Name copied!');}}
+                    >
+                      {user.name && user.name.length > 20 ? `${user.name.slice(0, 17)}...` : user.name}
+                    </div>
+                    <div 
+                      className="text-sm text-gray-500 font-mono cursor-pointer hover:underline"
+                      title="Click to copy ID"
+                      onClick={() => {navigator.clipboard.writeText(user.id); showSuccess('ID copied!');}}
+                    >
+                      ID: {user.id.length > 20 ? `${user.id.slice(0, 8)}...${user.id.slice(-8)}` : user.id}
+                    </div>
                   </div>
                 </div>
               </td>
@@ -236,7 +263,7 @@ export function UserTable({
                       title="Click to copy email"
                       onClick={() => {navigator.clipboard.writeText(user.email || ''); showSuccess('Copied!');}}
                     >
-                      {user.email}
+                      {user.email && user.email.length > 25 ? `${user.email.slice(0, 22)}...` : user.email}
                     </span>
                   ) : (
                     <span
@@ -267,6 +294,22 @@ export function UserTable({
                     <option value="ADMIN">Admin</option>
                   </select>
                 </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {user.referralCode ? (
+                  <div className="flex items-center gap-2">
+                    <Gift className="h-4 w-4 text-purple-600" />
+                    <code 
+                      className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm font-mono cursor-pointer hover:bg-gray-200 transition-colors"
+                      title="Click to copy referral code"
+                      onClick={() => copyReferralCode(user.referralCode!)}
+                    >
+                      {user.referralCode}
+                    </code>
+                  </div>
+                ) : (
+                  <span className="text-gray-400 text-sm">No code</span>
+                )}
               </td>
 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

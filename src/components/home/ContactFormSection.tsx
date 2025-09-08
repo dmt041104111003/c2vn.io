@@ -65,6 +65,60 @@ export default function ContactFormSection() {
   const [captchaValid, setCaptchaValid] = useState(false);
   const [captchaKey, setCaptchaKey] = useState(0); 
 
+ 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleReferralCode = () => {
+      const url = new URL(window.location.href);
+      const hash = url.hash?.slice(1); 
+      if (hash && hash.startsWith('contact')) {
+        const codeMatch = hash.match(/contact#code=([^#&]+)/);
+        
+        if (codeMatch && codeMatch[1]) {
+          const referralCode = codeMatch[1].trim();
+          
+         
+          setFormData(prev => ({
+            ...prev,
+            "email-intro": referralCode
+          }));
+          
+          
+          setTimeout(() => {
+            const contactElement = document.getElementById('contact');
+            if (contactElement) {
+              const headerOffset = 100;
+              const y = contactElement.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+          }, 100);
+        } else {
+         
+          setTimeout(() => {
+            const contactElement = document.getElementById('contact');
+            if (contactElement) {
+              const headerOffset = 100;
+              const y = contactElement.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+          }, 100);
+        }
+      }
+    };
+    
+    
+    handleReferralCode();
+    
+    
+    const handleHashChange = () => {
+      handleReferralCode();
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {

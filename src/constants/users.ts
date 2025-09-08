@@ -12,6 +12,7 @@ export interface User {
   updatedAt?: string;
   lastLogin?: string;
   avatar?: string;
+  referralCode?: string;
 }
 
 export interface UserTableProps {

@@ -14,6 +14,7 @@ model User {
   name          String?
   image         String?
   provider      String?        // "google", "github", "cardano", etc.
+  referralCode  String?        @unique 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   roleId        String
@@ -29,6 +30,7 @@ model User {
   @@index([createdAt])
   @@index([provider])
   @@index([isBanned])
+  @@index([referralCode])
 }
 
 model Role {

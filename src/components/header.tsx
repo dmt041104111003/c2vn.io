@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Edit, User, LogOut, Copy, Check } from "lucide-react";
+import { Menu, X, Edit, User, LogOut, Copy, Check, Gift } from "lucide-react";
 import { navbars } from "~/constants/navbars";
 import { images } from "~/public/images";
 import { routers, NavbarType } from "~/constants/routers";
@@ -37,14 +37,16 @@ function UserAvatar({ session }: { session: any }) {
 
 function MobileUserInfo({ session, onClose }: { session: any; onClose: () => void }) {
   const [name, setName] = useState('');
-  const { showSuccess, showInfo } = useToastContext();
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
+  const { showSuccess, showInfo, showError } = useToastContext();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/api/user');        
-        if (response.ok) {
-          const userData = await response.json();
+        const userResponse = await fetch('/api/user');        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
           if (userData.success && userData.data) {
             setName(userData.data.name || '');
           } else {
@@ -57,6 +59,14 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
             setName(session.user.name);
           }
         }
+
+        const referralResponse = await fetch('/api/user/referral-code');
+        if (referralResponse.ok) {
+          const referralData = await referralResponse.json();
+          if (referralData.success && referralData.data) {
+            setReferralCode(referralData.data.referralCode);
+          }
+        }
       } catch (error) {
         if (session.user?.name) {
           setName(session.user.name);
@@ -66,6 +76,32 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
 
     fetchUserData();
   }, [session.user?.name]);
+
+  const handleGenerateReferralCode = async () => {
+    setIsGeneratingCode(true);
+    try {
+      const response = await fetch('/api/user/referral-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'generate' }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setReferralCode(data.data.referralCode);
+        showSuccess('Generate referral code successfully!');
+      } else {
+        showError(data.message || 'Failed to generate referral code');
+      }
+    } catch (error) {
+      showError('Failed to generate referral code');
+    } finally {
+      setIsGeneratingCode(false);
+    }
+  };
 
   return (
     <>
@@ -121,6 +157,24 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
                 </p>
               </div>
             )}
+            
+            {referralCode && (
+              <div 
+                onClick={() => {
+                  navigator.clipboard.writeText(referralCode);
+                  showSuccess('Referral code copied!');
+                }}
+                className="cursor-pointer group"
+                title="Click to copy referral code"
+              >
+                <p className="text-xs text-purple-600 dark:text-purple-400 truncate hover:text-purple-700 dark:hover:text-purple-300 transition-colors font-mono">
+                  {referralCode.length > 15
+                    ? `${referralCode.slice(0, 8)}...${referralCode.slice(-4)}`
+                    : referralCode
+                  }
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -135,6 +189,16 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
           <Edit className="w-4 h-4 mr-3" />
           Edit Name
         </button>
+        {!referralCode && (
+          <button
+            onClick={handleGenerateReferralCode}
+            disabled={isGeneratingCode}
+            className="w-full flex items-center px-3 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors rounded disabled:opacity-50"
+          >
+            <Gift className="w-4 h-4 mr-3" />
+            {isGeneratingCode ? 'Generating...' : 'Generate Referral Code'}
+          </button>
+        )}
         <button
           onClick={() => {
             signOut();
@@ -153,7 +217,9 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
 function UserDropdown({ session, onClose, autoEdit = false }: { session: any; onClose: () => void; autoEdit?: boolean }) {
   const [isEditing, setIsEditing] = useState(autoEdit);
   const [name, setName] = useState('');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { showSuccess, showError } = useToastContext();
@@ -161,9 +227,9 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/api/user');        
-        if (response.ok) {
-          const userData = await response.json();
+        const userResponse = await fetch('/api/user');        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
           if (userData.success && userData.data) {
             setName(userData.data.name || '');
           } else {
@@ -174,6 +240,14 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
         } else {
           if (session.user?.name) {
             setName(session.user.name);
+          }
+        }
+
+        const referralResponse = await fetch('/api/user/referral-code');
+        if (referralResponse.ok) {
+          const referralData = await referralResponse.json();
+          if (referralData.success && referralData.data) {
+            setReferralCode(referralData.data.referralCode);
           }
         }
       } catch (error) {
@@ -270,10 +344,37 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
     try {
       await navigator.clipboard.writeText(text);
       setCopiedField(field);
-      showSuccess('Copied to clipboard!');
+      const message = field === 'referral' ? 'Referral code copied!' : 'Copied to clipboard!';
+      showSuccess(message);
       setTimeout(() => setCopiedField(null), 2000);
     } catch (error) {
       showError('Failed to copy to clipboard');
+    }
+  };
+
+  const handleGenerateReferralCode = async () => {
+    setIsGeneratingCode(true);
+    try {
+      const response = await fetch('/api/user/referral-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'generate' }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setReferralCode(data.data.referralCode);
+        showSuccess('Generate referral code successfully!');
+      } else {
+        showError(data.message || 'Unable to generate referral code');
+      }
+    } catch (error) {
+      showError('Failed to generate referral code');
+    } finally {
+      setIsGeneratingCode(false);
     }
   };
 
@@ -337,8 +438,7 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
                       </p>
                     </div>
                   )}
-                  
-                  {(session.user as { email?: string })?.email && (
+                                {(session.user as { email?: string })?.email && (
                     <div 
                       onClick={() => handleCopy((session.user as { email?: string }).email!, 'email')}
                       className="cursor-pointer group"
@@ -348,6 +448,25 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
                         {(session.user as { email?: string }).email && (session.user as { email?: string }).email!.length > 25
                           ? `${(session.user as { email?: string }).email!.slice(0, 12)}...${(session.user as { email?: string }).email!.slice(-10)}`
                           : (session.user as { email?: string }).email
+                        }
+                      </p>
+                    </div>
+                  )}
+                  
+                  {referralCode && (
+                    <div 
+                      onClick={() => handleCopy(referralCode, 'referral')}
+                      className="cursor-pointer group"
+                      title="Click to copy referral code"
+                    >
+                      <p className={`text-xs truncate font-mono transition-colors ${
+                        copiedField === 'referral' 
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300'
+                      }`}>
+                        {referralCode.length > 15
+                          ? `${referralCode.slice(0, 8)}...${referralCode.slice(-4)}`
+                          : referralCode
                         }
                       </p>
                     </div>
@@ -366,6 +485,16 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
           >
             <Edit className="w-4 h-4 mr-3" />
             Edit Name
+          </button>
+        )}
+        {!referralCode && (
+          <button
+            onClick={handleGenerateReferralCode}
+            disabled={isGeneratingCode}
+            className="w-full flex items-center px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50"
+          >
+            <Gift className="w-4 h-4 mr-3" />
+            {isGeneratingCode ? 'Generating...' : 'Generate Referral Code'}
           </button>
         )}
         <button
