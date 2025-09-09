@@ -11,7 +11,6 @@ const cards = [
     description:
       "Meet the people driving Cardano2vn's vision, from product developers to blockchain experts and community builders.",
     cta: "Meet the Team",
-    accent: "from-green-600/20 to-green-400/10",
   },
   {
     href: "/project",
@@ -19,7 +18,6 @@ const cards = [
     description:
       "Discover how we leverage blockchain and innovative tools to build trust, governance, and contribution management.",
     cta: "Learn More",
-    accent: "from-green-600/20 to-green-400/10",
   },
   {
     href: "/our-service",
@@ -27,7 +25,6 @@ const cards = [
     description:
       "Support the ecosystem via our SPO and DRep initiatives and explore services we provide to the community.",
     cta: "Explore",
-    accent: "from-green-600/20 to-green-400/10",
   },
 ];
 
@@ -91,10 +88,9 @@ export default function ServiceHubClient() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5 }}
-              className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 p-6 sm:p-8"
+              className="rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-6 sm:p-8 backdrop-blur-sm"
             >
-              <div className={`pointer-events-none absolute inset-0 opacity-60 bg-gradient-to-br ${card.accent}`} />
-              <Link href={card.href} className="relative flex h-full flex-col">
+              <Link href={card.href} className="flex h-full flex-col">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{card.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 flex-1 leading-relaxed">{card.description}</p>
                 <span className="mt-6 inline-flex items-center text-sm font-semibold text-blue-600 dark:text-blue-400 group">

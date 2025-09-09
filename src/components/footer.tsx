@@ -9,70 +9,10 @@ export default function Footer() {
       <footer className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
         <div className="flex flex-col">
-          <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2">
             <div className="relative">
               <div className="absolute -top-2 left-0 h-1 w-8 bg-gradient-to-r from-blue-500 to-transparent opacity-60"></div>
               <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Cardano2VN</h3>
-              <ul className="space-y-4">
-                                 <li>
-                                      <Link
-                      className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
-                      href="/about#contact"
-                    >
-                      <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>Support
-                    </Link>
-                 </li>
-                 <li>
-                                      <Link
-                      className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
-                      href="/about#contact"
-                    >
-                      <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>Contact Us
-                    </Link>
-                 </li>
-                                 <li>
-                                      <Link
-                      className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
-                      href="/docs"
-                    >
-                      <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>Docs
-                    </Link>
-                 </li>
-              </ul>
-            </div>
-            <div className="relative">
-              <div className="absolute -top-2 left-0 h-1 w-8 bg-gradient-to-r from-blue-500 to-transparent opacity-60"></div>
-              <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Follow Us</h3>
-                             <ul className="space-y-4">
-                 <li>
-                                      <Link
-                      className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
-                      href="https://www.youtube.com/channel/UCJTdAQPGJntJet5v-nk9ebA"
-                    >
-                      <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>YouTube
-                    </Link>
-                 </li>
-                 <li>
-                                      <Link
-                      className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
-                      href="https://t.me/cardano2vn"
-                    >
-                      <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>Telegram
-                    </Link>
-                 </li>
-                 <li>
-                                      <Link
-                      className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
-                      href="https://github.com/cardano2vn"
-                    >
-                      <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>GitHub
-                    </Link>
-                 </li>
-               </ul>
-            </div>
-            <div className="relative">
-              <div className="absolute -top-2 left-0 h-1 w-8 bg-gradient-to-r from-blue-500 to-transparent opacity-60"></div>
-              <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Company</h3>
                              <ul className="space-y-4">
                  <li>
                                       <Link
@@ -107,6 +47,44 @@ export default function Footer() {
                      </Link>
                    </li>
                </ul>
+            </div>
+            <div className="relative">
+              <div className="absolute -top-2 left-0 h-1 w-8 bg-gradient-to-r from-blue-500 to-transparent opacity-60"></div>
+              <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Follow Us</h3>
+              <ul className="space-y-4">
+                <li>
+                  <Link
+                    className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
+                    href="/about#contact"
+                  >
+                    <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
+                    href="https://www.youtube.com/channel/UCJTdAQPGJntJet5v-nk9ebA"
+                  >
+                    <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>YouTube
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
+                    href="https://t.me/cardano2vn"
+                  >
+                    <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>Telegram
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
+                    href="https://github.com/cardano2vn"
+                  >
+                    <span className="mr-3 h-px w-2 bg-gray-600 transition-colors duration-200 group-hover:bg-blue-600 dark:group-hover:bg-blue-400"></span>GitHub
+                  </Link>
+                </li>
+              </ul>
             </div>
 
           </div>
