@@ -111,9 +111,7 @@ export default function CTASection() {
               <div className="h-1 w-8 lg:w-12 bg-gradient-to-r from-blue-500 to-transparent" />
               <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">Events</h2>
             </div>
-            <p className="max-w-3xl text-base lg:text-xl text-gray-700 dark:text-gray-300">
-              Discover the highlights of our recent events and community activities.
-            </p>
+      
           </div>
           {isAdmin && (
             <div className="flex items-center gap-3">

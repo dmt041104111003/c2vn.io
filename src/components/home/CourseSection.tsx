@@ -94,9 +94,7 @@ export default function CourseSection() {
               <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-transparent"></div>
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white lg:text-4xl">C2VN Courses</h2>
             </div>
-            <p className="max-w-3xl text-lg text-gray-700 dark:text-gray-300">
-              Discover our latest courses and educational resources for Cardano development.
-            </p>
+  
           </div>
 
           <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
