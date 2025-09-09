@@ -15,7 +15,7 @@ export default function WalletList({ wallets }: WalletListProps) {
   const [connectingWalletId, setConnectingWalletId] = useState<string | null>(null);
 
   const handleWalletClick = async (walletId: string) => {
-    if (walletId === "eternal" || walletId === "lace" || walletId === "yoroi" || walletId === "nufi" || walletId === "typhon" || walletId === "gero") {
+    if (walletId === "eternal" || walletId === "lace" || walletId === "yoroi" || walletId === "nufi" || walletId === "gero") {
       if (isAuthenticated) {
         await disconnect();
         showSuccess("Logout Successful", "Your Cardano wallet has been disconnected successfully.");
@@ -45,6 +45,8 @@ export default function WalletList({ wallets }: WalletListProps) {
       showInfo("Nami Wallet Upgraded", "Nami has been upgraded to Lace! Please use Lace wallet with Nami mode enabled.");
     } else if (walletId === "priority") {
       showInfo("Priority Wallet", "Priority Wallet is currently not supported. Please use Eternl or Lace wallet instead.");
+    } else if (walletId === "typhon") {
+      showInfo("Typhon Wallet (Beta)", "Typhon Wallet is currently in beta testing. Please use Eternl or Lace wallet for full functionality.");
     } else if (walletId === "google") {
       showInfo("Connecting...", "Please wait while we connect to your Google account.");
       await signIn("google", { callbackUrl: "/" });
@@ -87,7 +89,7 @@ export default function WalletList({ wallets }: WalletListProps) {
 
 
   const isActiveWallet = (walletId: string) => {
-    return ["eternal", "lace", "yoroi", "nufi", "typhon", "gero", "nami", "google", "github", "metamask"].includes(walletId);
+    return ["eternal", "lace", "yoroi", "nufi", "gero", "nami", "google", "github", "metamask"].includes(walletId);
   };
 
   return (
