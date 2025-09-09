@@ -348,15 +348,13 @@ export function UserTable({
                   <span className="text-gray-500 text-sm">
                     referral{(user.referralCount || 0) !== 1 ? 's' : ''}
                   </span>
-                  {(user.referralCount || 0) > 0 && (
-                    <button
-                      onClick={() => handleViewReferrals(user)}
-                      className="ml-2 p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                      title="View referral details"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleViewReferrals(user)}
+                    className="ml-2 p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                    title="View referral details"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
                 </div>
               </td>
 
@@ -533,18 +531,35 @@ export function UserTable({
                   {selectedUserForReferrals.name}
                 </p>
               </div>
-              {selectedUserForReferrals.referralCode && (
-                <div className="flex items-center gap-2">
-                  <Gift className="h-5 w-5 text-purple-600" />
-                  <code 
-                    className="px-3 py-2 bg-gray-100 text-gray-800 rounded text-sm font-mono cursor-pointer hover:bg-gray-200 transition-colors"
-                    title="Click to copy referral code"
-                    onClick={() => copyReferralCode(selectedUserForReferrals.referralCode!)}
-                  >
-                    {selectedUserForReferrals.referralCode}
-                  </code>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <Gift className="h-5 w-5 text-purple-600" />
+                {selectedUserForReferrals.referralCode ? (
+                  <>
+                    <code 
+                      className="px-3 py-2 bg-gray-100 text-gray-800 rounded text-sm font-mono cursor-pointer hover:bg-gray-200 transition-colors"
+                      title="Click to copy referral code"
+                      onClick={() => copyReferralCode(selectedUserForReferrals.referralCode!)}
+                    >
+                      {selectedUserForReferrals.referralCode}
+                    </code>
+                    <button
+                      onClick={() => {
+                        const shareUrl = `${window.location.origin}#contact#code=${selectedUserForReferrals.referralCode}`;
+                        navigator.clipboard.writeText(shareUrl);
+                        showSuccess('Share link copied!');
+                      }}
+                      className="p-2 hover:bg-gray-100 rounded transition-colors"
+                      title="Click to copy share link"
+                    >
+                      <ExternalLink className="w-4 h-4 text-gray-500 hover:text-blue-600" />
+                    </button>
+                  </>
+                ) : (
+                  <span className="px-3 py-2 bg-gray-100 text-gray-500 rounded text-sm">
+                    No referral code
+                  </span>
+                )}
+              </div>
             </div>
             
             {referralsLoading ? (

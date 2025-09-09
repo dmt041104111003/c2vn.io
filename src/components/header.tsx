@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Edit, User, LogOut, Copy, Check, Gift, Users } from "lucide-react";
+import { Menu, X, Edit, User, LogOut, Copy, Check, Gift, Users, ExternalLink } from "lucide-react";
 import { navbars } from "~/constants/navbars";
 import { images } from "~/public/images";
 import { routers, NavbarType } from "~/constants/routers";
@@ -183,20 +183,33 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
             )}
             
             {referralCode && (
-              <div 
-                onClick={() => {
-                  navigator.clipboard.writeText(referralCode);
-                  showSuccess('Referral code copied!');
-                }}
-                className="cursor-pointer group"
-                title="Click to copy referral code"
-              >
-                <p className="text-xs text-purple-600 dark:text-purple-400 truncate hover:text-purple-700 dark:hover:text-purple-300 transition-colors font-mono">
-                  {referralCode.length > 15
-                    ? `${referralCode.slice(0, 8)}...${referralCode.slice(-4)}`
-                    : referralCode
-                  }
-                </p>
+              <div className="flex items-center gap-2">
+                <div 
+                  onClick={() => {
+                    navigator.clipboard.writeText(referralCode);
+                    showSuccess('Referral code copied!');
+                  }}
+                  className="cursor-pointer group"
+                  title="Click to copy referral code"
+                >
+                  <p className="text-xs text-purple-600 dark:text-purple-400 truncate hover:text-purple-700 dark:hover:text-purple-300 transition-colors font-mono">
+                    {referralCode.length > 15
+                      ? `${referralCode.slice(0, 8)}...${referralCode.slice(-4)}`
+                      : referralCode
+                    }
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    const shareUrl = `${window.location.origin}#contact#code=${referralCode}`;
+                    navigator.clipboard.writeText(shareUrl);
+                    showSuccess('Share link copied!');
+                  }}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  title="Click to copy share link"
+                >
+                  <ExternalLink className="w-3 h-3 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
+                </button>
               </div>
             )}
             
@@ -517,21 +530,34 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
                   )}
                   
                   {referralCode && (
-                    <div 
-                      onClick={() => handleCopy(referralCode, 'referral')}
-                      className="cursor-pointer group"
-                      title="Click to copy referral code"
-                    >
-                      <p className={`text-xs truncate font-mono transition-colors ${
-                        copiedField === 'referral' 
-                          ? 'text-green-600 dark:text-green-400' 
-                          : 'text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300'
-                      }`}>
-                        {referralCode.length > 15
-                          ? `${referralCode.slice(0, 8)}...${referralCode.slice(-4)}`
-                          : referralCode
-                        }
-                      </p>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        onClick={() => handleCopy(referralCode, 'referral')}
+                        className="cursor-pointer group"
+                        title="Click to copy referral code"
+                      >
+                        <p className={`text-xs truncate font-mono transition-colors ${
+                          copiedField === 'referral' 
+                            ? 'text-green-600 dark:text-green-400' 
+                            : 'text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300'
+                        }`}>
+                          {referralCode.length > 15
+                            ? `${referralCode.slice(0, 8)}...${referralCode.slice(-4)}`
+                            : referralCode
+                          }
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const shareUrl = `${window.location.origin}#contact#code=${referralCode}`;
+                          navigator.clipboard.writeText(shareUrl);
+                          showSuccess('Share link copied!');
+                        }}
+                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                        title="Click to copy share link"
+                      >
+                        <ExternalLink className="w-3 h-3 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
+                      </button>
                     </div>
                   )}
                   
