@@ -132,7 +132,8 @@ export default function ServiceContent() {
       );
 
       const provider = getSelectedWalletProvider();
-      await lucid.selectWallet(provider);
+      const api = await provider.enable();
+      await lucid.selectWallet(api);
 
       const stakeAddress = await lucid.wallet.rewardAddress();
 
@@ -155,7 +156,8 @@ export default function ServiceContent() {
       );
 
       const provider = getSelectedWalletProvider();
-      await lucid.selectWallet(provider);
+      const api = await provider.enable();
+      await lucid.selectWallet(api);
 
       const stakeAddress = await lucid.wallet.rewardAddress();
 

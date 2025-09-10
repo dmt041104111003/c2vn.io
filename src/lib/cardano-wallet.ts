@@ -118,16 +118,31 @@ export class CardanoWalletProvider {
     }
 
     try {
+      const toHex = (str: string): string =>
+        Array.from(new TextEncoder().encode(str))
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('');
+
+      const payloadHex = toHex(message);
+
       if (this.wallet) {
-        const signature = await this.wallet.signData(message);
-        return signature.signature;
+        let signAddress = this.user.address;
+        if (!signAddress || !signAddress.startsWith('addr')) {
+          signAddress = await this.wallet.getChangeAddress();
+        }
+        const signature = await this.wallet.signData(signAddress, payloadHex);
+        return (signature as any)?.signature || (signature as any)?.sig || (signature as any);
       }
-      const addr = this.user.address;
-      if (!addr) {
+
+      let addrHex = this.user.address;
+      if (!addrHex) {
         throw new Error('No address available for signing');
       }
-      const result = await this.rawWallet!.signData(addr, message);
-      return result?.signature || result?.sig || result;
+      if (addrHex.startsWith('addr')) {
+        addrHex = await this.rawWallet!.getChangeAddress();
+      }
+      const result = await this.rawWallet!.signData(addrHex, payloadHex);
+      return (result as any)?.signature || (result as any)?.sig || (result as any);
     } catch (error) {
       throw error;
     }
