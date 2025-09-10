@@ -18,8 +18,24 @@ export function PostStats({ posts, year: yearProp }: PostStatsProps) {
   months.forEach(m => { postsByMonth[m] = []; });
   if (Array.isArray(posts)) {
     posts.forEach(p => {
-      const d = new Date(p.createdAt);
-      if (d.getFullYear() === year) postsByMonth[d.getMonth()].push(p);
+      let d: Date;
+      if (typeof p.createdAt === 'string') {
+        d = new Date(p.createdAt);
+        if (isNaN(d.getTime())) {
+          return;
+        }
+      } else if (p.createdAt && typeof p.createdAt === 'object' && (p.createdAt as any) instanceof Date) {
+        d = p.createdAt as Date;
+      } else {
+        return;
+      }
+      
+      const yearUTC = d.getUTCFullYear();
+      const monthUTC = d.getUTCMonth();
+      
+      if (yearUTC === year) {
+        postsByMonth[monthUTC].push(p);
+      }
     });
   }
 
