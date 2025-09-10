@@ -3,6 +3,7 @@
 import React from "react";
 import { useToastContext } from "~/components/toast-provider";
 import { Lucid, Blockfrost } from "lucid-cardano";
+import * as CardanoWasm from "@emurgo/cardano-serialization-lib-asmjs";
 import { cardanoWallet } from "~/lib/cardano-wallet";
 
 const BLOCKFROST_API = "https://cardano-mainnet.blockfrost.io/api/v0";
@@ -29,7 +30,6 @@ export default function ServiceContent() {
   const [votingPower, setVotingPower] = React.useState<string>("₳ 0");
   const [pools, setPools] = React.useState<Record<string, PoolInfo>>({});
   const [error, setError] = React.useState<string | null>(null);
-  const [drepRawJson, setDrepRawJson] = React.useState<string>("");
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -45,20 +45,32 @@ export default function ServiceContent() {
         const contentType = drepResp.headers.get("content-type") || "";
         if (contentType.includes("application/json")) {
           const drepJson = await drepResp.json();
-          setDrepRawJson(JSON.stringify(drepJson, null, 2));
+          console.log("DRep JSON:", drepJson);
           if (!drepResp.ok) {
             throw new Error(`DRep HTTP ${drepResp.status}`);
           }
           if (drepJson && typeof drepJson === "object") {
-            if (drepJson.status) setDrepStatus(String(drepJson.status));
-            if (drepJson.voting_power != null) {
-              const vpNum = Number(drepJson.voting_power);
-              setVotingPower(Number.isFinite(vpNum) ? `₳ ${vpNum.toLocaleString()}` : String(drepJson.voting_power));
+            if (drepJson.active) {
+              setDrepStatus("Active");
+            } else if (drepJson.retired) {
+              setDrepStatus("Retired");
+            } else if (drepJson.expired) {
+              setDrepStatus("Expired");
+            } else {
+              setDrepStatus("Inactive");
+            }
+
+            if (drepJson.amount != null) {
+              const vpNum = Number(drepJson.amount) / 1_000_000;
+              if (Number.isFinite(vpNum)) {
+                setVotingPower(`₳ ${vpNum.toLocaleString()}`);
+              } else {
+                setVotingPower(String(drepJson.amount));
+              }
             }
           }
         } else {
-          const text = await drepResp.text();
-          setDrepRawJson(text);
+          const _text = await drepResp.text();
           if (!drepResp.ok) throw new Error(`DRep HTTP ${drepResp.status}`);
         }
 
@@ -146,15 +158,91 @@ export default function ServiceContent() {
     throw new Error("No compatible CIP-30 wallet provider found");
   }
 
-  // moved into client-only component to avoid bundling lucid during SSR
+
 
   async function delegateToDRep(drepId: string) {
     try {
-      showInfo(
-        "CIP-95 delegation not supported",
-        "Lucid npm does not yet support CIP-95 delegation. Please use Eternl/Lace to delegate DRep."
+      const walletProvider = getSelectedWalletProvider();
+      const walletApi = await walletProvider.enable();
+      const hexToBytes = (hex: string): Uint8Array => {
+        const clean = hex.startsWith("0x") ? hex.slice(2) : hex;
+        const bytes = new Uint8Array(clean.length / 2);
+        for (let i = 0; i < bytes.length; i++) {
+          bytes[i] = parseInt(clean.substr(i * 2, 2), 16);
+        }
+        return bytes;
+      };
+      const bytesToHex = (bytes: Uint8Array): string =>
+        Array.from(bytes)
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+
+
+      const rewardAddrHex: string | undefined = (await walletApi.getRewardAddresses())?.[0];
+      if (!rewardAddrHex) throw new Error("Wallet has no reward (staking) address");
+
+      const rewardAddr = CardanoWasm.Address.from_bytes(hexToBytes(rewardAddrHex));
+      const reward = CardanoWasm.RewardAddress.from_address(rewardAddr);
+      if (!reward) throw new Error("Invalid reward address");
+      const stakeCred = reward.payment_cred();
+      const drep = CardanoWasm.DRep.from_bech32(drepId);
+      const cert = CardanoWasm.Certificate.new_vote_delegation(
+        CardanoWasm.VoteDelegation.new(stakeCred, drep)
       );
-      return;
+      const ppRes = await fetch(`${BLOCKFROST_API}/epochs/latest/parameters`, {
+        headers: { project_id: BLOCKFROST_KEY },
+      });
+      if (!ppRes.ok) throw new Error(`Params HTTP ${ppRes.status}`);
+      const protocolParams = await ppRes.json();
+
+      const minFeeA = CardanoWasm.BigNum.from_str(String(protocolParams.min_fee_a));
+      const minFeeB = CardanoWasm.BigNum.from_str(String(protocolParams.min_fee_b));
+      const linearFee = CardanoWasm.LinearFee.new(minFeeA, minFeeB);
+
+      const coinsPerUtxoByteStr = String(
+        protocolParams.coins_per_utxo_byte ??
+        (protocolParams.coins_per_utxo_word ? Math.floor(Number(protocolParams.coins_per_utxo_word) / 8) : 0)
+      );
+
+      const builderCfg = CardanoWasm.TransactionBuilderConfigBuilder.new()
+        .fee_algo(linearFee)
+        .coins_per_utxo_byte(CardanoWasm.BigNum.from_str(coinsPerUtxoByteStr))
+        .pool_deposit(CardanoWasm.BigNum.from_str(String(protocolParams.pool_deposit ?? 0)))
+        .key_deposit(CardanoWasm.BigNum.from_str(String(protocolParams.key_deposit ?? 0)))
+        .max_tx_size(Number(protocolParams.max_tx_size ?? 16384))
+        .max_value_size(Number(protocolParams.max_value_size ?? 5000))
+        .build();
+
+      const txBuilder: any = CardanoWasm.TransactionBuilder.new(builderCfg);
+      const utxosHex: string[] = await walletApi.getUtxos();
+      const utxos = utxosHex.map((u) => CardanoWasm.TransactionUnspentOutput.from_bytes(hexToBytes(u)));
+      
+      // Build UTXO set
+      const utxoSet = CardanoWasm.TransactionUnspentOutputs.new();
+      utxos.forEach((u) => utxoSet.add(u));
+      
+      // Let CSL choose inputs
+      txBuilder.add_inputs_from(
+        utxoSet,
+        CardanoWasm.CoinSelectionStrategyCIP2.LargestFirst
+      );
+      const certs = CardanoWasm.Certificates.new();
+      certs.add(cert);
+      txBuilder.set_certs(certs);
+      const changeAddrHex: string = await walletApi.getChangeAddress();
+      const changeAddr = CardanoWasm.Address.from_bytes(hexToBytes(changeAddrHex));
+      txBuilder.add_change_if_needed(changeAddr);
+      const txBody = txBuilder.build();
+      const tx = CardanoWasm.Transaction.new(
+        txBody,
+        CardanoWasm.TransactionWitnessSet.new()
+      );
+      const txHex = bytesToHex(tx.to_bytes());
+
+      const signedTx = await walletApi.signTx(txHex, true);
+      const txHash = await walletApi.submitTx(signedTx);
+
+      showSuccess("Delegated to DRep", `DRep: ${drepId}\nTx: ${txHash}`);
     } catch (err) {
       console.error(err);
       showError("Delegation to DRep failed", (err as Error).message);
@@ -222,10 +310,13 @@ export default function ServiceContent() {
             Our DREP: C2VN
           </h3>
           <p className="font-semibold">DRep ID:</p>
-          <p className="break-all text-gray-700 dark:text-gray-300">
-            {DREP_BECH32}
+          <p
+            className="text-sm break-all text-gray-700 dark:text-gray-300 cursor-pointer select-none"
+            title={DREP_BECH32}
+            onClick={() => copyPoolId(DREP_BECH32)}
+          >
+            {shortenId(DREP_BECH32)}
           </p>
-          <p className="mt-3 text-sm text-gray-500">Endpoint: /governance/dreps/{"{id}"}</p>
           <p className="mt-3 font-semibold">Status:</p>
           <p className="text-gray-700 dark:text-gray-300">
             {loading ? "…" : drepStatus}
@@ -234,11 +325,6 @@ export default function ServiceContent() {
           <p className="text-gray-700 dark:text-gray-300">
             {loading ? "…" : votingPower}
           </p>
-          {drepRawJson && (
-            <pre className="mt-4 whitespace-pre-wrap text-xs bg-gray-900 text-emerald-200 p-3 rounded-md overflow-auto max-h-80">
-{drepRawJson}
-            </pre>
-          )}
           <button
             onClick={() => delegateToDRep(DREP_BECH32)}
             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
