@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import dynamic from "next/dynamic";
+import { useToastContext } from "~/components/toast-provider";
+import { Lucid, Blockfrost } from "lucid-cardano";
 import { cardanoWallet } from "~/lib/cardano-wallet";
 
 const BLOCKFROST_API = "https://cardano-mainnet.blockfrost.io/api/v0";
 const BLOCKFROST_KEY = process.env.NEXT_PUBLIC_BLOCKFROST_KEY!;
-const KOIOS_PROXY = "/api/koios"; 
 
 const DREP_BECH32 =
   "drep1ygqlu72zwxszcx0kqdzst4k3g6fxx4klwcmpk0fcuujskvg3pmhgs";
@@ -22,54 +22,44 @@ type PoolInfo = {
 };
 
 
-const DelegatePoolButton = dynamic(() => import("./DelegatePoolButton"), { ssr: false });
-
 export default function ServiceContent() {
+  const { showSuccess, showError, showInfo } = useToastContext();
   const [loading, setLoading] = React.useState(true);
   const [drepStatus, setDrepStatus] = React.useState<string>("Not registered");
   const [votingPower, setVotingPower] = React.useState<string>("₳ 0");
   const [pools, setPools] = React.useState<Record<string, PoolInfo>>({});
   const [error, setError] = React.useState<string | null>(null);
+  const [drepRawJson, setDrepRawJson] = React.useState<string>("");
 
   React.useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        console.log("Blockfrost key loaded:", BLOCKFROST_KEY ? "Yes" : "No (check env)"); 
-        const drepRes = await fetch(KOIOS_PROXY, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ endpoint: "drep_info", body: { drep_ids: [DREP_BECH32] } }),
-        });
-        if (!drepRes.ok) {
-          const errorText = await drepRes.text();
-          console.error("DRep proxy error:", drepRes.status, errorText);
-          throw new Error(`DRep fetch failed: ${drepRes.status} - ${errorText.substring(0, 100)}... (Check if /api/koios route exists)`);
-        } else {
-          const drepJson = await drepRes.json();
-          console.log("DRep info:", drepJson); 
-          if (Array.isArray(drepJson) && drepJson.length > 0) {
-            setDrepStatus(drepJson[0].status ?? "Active");
-          }
+        // ================= DRep via Blockfrost =================
+        if (!BLOCKFROST_KEY) {
+          throw new Error("Missing NEXT_PUBLIC_BLOCKFROST_KEY env var");
         }
-
-        const vpRes = await fetch(KOIOS_PROXY, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ endpoint: "drep_voting_power_history", body: { drep_ids: [DREP_BECH32], limit: 1 } }),
-        });
-        if (!vpRes.ok) {
-          const errorText = await vpRes.text();
-          console.error("Voting power proxy error:", vpRes.status, errorText);
-          throw new Error(`Voting power fetch failed: ${vpRes.status} - ${errorText.substring(0, 100)}... (Check if /api/koios route exists)`);
-        } else {
-          const vpJson = await vpRes.json();
-          console.log("Voting power:", vpJson); 
-          if (Array.isArray(vpJson) && vpJson.length > 0) {
-            const vp = vpJson[0].voting_power;
-            setVotingPower(vp ? `₳ ${Number(vp).toLocaleString()}` : "₳ 0");
+        const drepEndpoint = `${BLOCKFROST_API}/governance/dreps/${DREP_BECH32}`;
+        const drepResp = await fetch(drepEndpoint, { headers: { project_id: BLOCKFROST_KEY } });
+        const contentType = drepResp.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const drepJson = await drepResp.json();
+          setDrepRawJson(JSON.stringify(drepJson, null, 2));
+          if (!drepResp.ok) {
+            throw new Error(`DRep HTTP ${drepResp.status}`);
           }
+          if (drepJson && typeof drepJson === "object") {
+            if (drepJson.status) setDrepStatus(String(drepJson.status));
+            if (drepJson.voting_power != null) {
+              const vpNum = Number(drepJson.voting_power);
+              setVotingPower(Number.isFinite(vpNum) ? `₳ ${vpNum.toLocaleString()}` : String(drepJson.voting_power));
+            }
+          }
+        } else {
+          const text = await drepResp.text();
+          setDrepRawJson(text);
+          if (!drepResp.ok) throw new Error(`DRep HTTP ${drepResp.status}`);
         }
 
         async function getPoolInfo(poolId: string) {
@@ -160,13 +150,61 @@ export default function ServiceContent() {
 
   async function delegateToDRep(drepId: string) {
     try {
-      alert(
+      showInfo(
+        "CIP-95 delegation not supported",
         "Lucid npm does not yet support CIP-95 delegation. Please use Eternl/Lace to delegate DRep."
       );
       return;
     } catch (err) {
       console.error(err);
-      alert("Delegation to DRep failed: " + (err as Error).message);
+      showError("Delegation to DRep failed", (err as Error).message);
+    }
+  }
+
+  async function delegateToPool(poolId: string) {
+    try {
+      const walletProvider = getSelectedWalletProvider();
+      const walletApi = await walletProvider.enable();
+
+      const lucid = await Lucid.new(
+        new Blockfrost(BLOCKFROST_API, BLOCKFROST_KEY),
+        "Mainnet"
+      );
+
+      lucid.selectWallet(walletApi);
+
+      const rewardAddress = await lucid.wallet.rewardAddress();
+      if (!rewardAddress) {
+        throw new Error("Wallet has no reward address (no staking key). Please use a staking-capable account.");
+      }
+
+      const tx = await lucid
+        .newTx()
+        .delegateTo(rewardAddress, poolId)
+        .complete();
+
+      const signedTx = await tx.sign().complete();
+      const txHash = await signedTx.submit();
+
+      showSuccess("Delegated to pool", `Pool: ${poolId}\nTx: ${txHash}`);
+    } catch (err) {
+      console.error(err);
+      showError("Delegation failed", (err as Error).message);
+    }
+  }
+
+  function shortenId(id: string): string {
+    if (!id) return "";
+    if (id.length <= 20) return id;
+    return `${id.slice(0, 12)}…${id.slice(-8)}`;
+  }
+
+  async function copyPoolId(id: string) {
+    try {
+      await navigator.clipboard.writeText(id);
+      showSuccess("Copied pool ID", id);
+    } catch (err) {
+      showError("Copy failed", (err as Error).message);
     }
   }
 
@@ -187,6 +225,7 @@ export default function ServiceContent() {
           <p className="break-all text-gray-700 dark:text-gray-300">
             {DREP_BECH32}
           </p>
+          <p className="mt-3 text-sm text-gray-500">Endpoint: /governance/dreps/{"{id}"}</p>
           <p className="mt-3 font-semibold">Status:</p>
           <p className="text-gray-700 dark:text-gray-300">
             {loading ? "…" : drepStatus}
@@ -195,6 +234,11 @@ export default function ServiceContent() {
           <p className="text-gray-700 dark:text-gray-300">
             {loading ? "…" : votingPower}
           </p>
+          {drepRawJson && (
+            <pre className="mt-4 whitespace-pre-wrap text-xs bg-gray-900 text-emerald-200 p-3 rounded-md overflow-auto max-h-80">
+{drepRawJson}
+            </pre>
+          )}
           <button
             onClick={() => delegateToDRep(DREP_BECH32)}
             className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
@@ -213,8 +257,12 @@ export default function ServiceContent() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                   {info.ticker}
                 </h3>
-                <p className="text-sm break-all text-gray-700 dark:text-gray-300">
-                  {poolId}
+                <p
+                  className="text-sm break-all text-gray-700 dark:text-gray-300 cursor-pointer select-none"
+                  title={poolId}
+                  onClick={() => copyPoolId(poolId)}
+                >
+                  {shortenId(poolId)}
                 </p>
                 <p className="mt-2">
                   Delegators: {loading ? "…" : info.delegators ?? 0}
@@ -222,7 +270,12 @@ export default function ServiceContent() {
                 <p>Lifetime Blocks: {loading ? "…" : info.blocks ?? 0}</p>
                 <p>Live Stake: {loading ? "…" : info.stake ?? "-"}</p>
                 <p>Pledge: {loading ? "…" : info.pledge ?? "-"}</p>
-                <DelegatePoolButton poolId={poolId} />
+                <button
+                  onClick={() => delegateToPool(poolId)}
+                  className="mt-3 px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                >
+                  Delegate to {info.ticker}
+                </button>
               </div>
             ))}
           </div>
