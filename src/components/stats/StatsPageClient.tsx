@@ -42,9 +42,7 @@ function StatsPageContent() {
           />
         </motion.div>
    
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/50 hover:shadow-2xl transition-all duration-300">
-            <ServiceContent />
-          </div>
+        <ServiceContent />
   
       </div>
       {/* <WaveFooterSection /> */}
