@@ -45,7 +45,6 @@ export default function ServiceContent() {
         const contentType = drepResp.headers.get("content-type") || "";
         if (contentType.includes("application/json")) {
           const drepJson = await drepResp.json();
-          console.log("DRep JSON:", drepJson);
           if (!drepResp.ok) {
             throw new Error(`DRep HTTP ${drepResp.status}`);
           }
@@ -79,11 +78,9 @@ export default function ServiceContent() {
             headers: { project_id: BLOCKFROST_KEY },
           });
           if (!res.ok) {
-            console.error(`Pool ${poolId} error:`, res.status, await res.text());
             return null;
           }
           const data = await res.json();
-          console.log(`Pool ${poolId} data:`, data);
           return data;
         }
 
@@ -115,7 +112,6 @@ export default function ServiceContent() {
           },
         });
       } catch (e) {
-        console.error("Fetch error:", e);
         setError((e as Error).message);
       } finally {
         setLoading(false);
@@ -244,8 +240,22 @@ export default function ServiceContent() {
 
       showSuccess("Delegated to DRep", `DRep: ${drepId}\nTx: ${txHash}`);
     } catch (err) {
-      console.error(err);
-      showError("Delegation to DRep failed", (err as Error).message);
+      const error = err as Error;
+      if (error.message.includes("No Cardano wallet detected")) {
+        showError("No wallet found", "Please install a Cardano wallet (Eternl, Nami, Lace) and refresh the page.");
+      } else if (error.message.includes("reward address")) {
+        showError("Staking key missing", "Your wallet doesn't have a staking key. Please use a staking-capable account.");
+      } else if (error.message.includes("protocol parameters")) {
+        showError("Network error", "Failed to fetch Cardano network parameters. Check your internet connection.");
+      } else if (error.message.includes("UTXOs")) {
+        showError("Wallet empty", "Your wallet has no UTXOs to spend. Please add some ADA to your wallet.");
+      } else if (error.message.includes("signTx")) {
+        showError("Transaction rejected", "You rejected the transaction or signing failed. Please try again.");
+      } else if (error.message.includes("submitTx")) {
+        showError("Transaction failed", "Transaction was rejected by the network. Check your wallet balance and try again.");
+      } else {
+        showError("DRep delegation failed", `Error: ${error.message}`);
+      }
     }
   }
 
@@ -276,8 +286,20 @@ export default function ServiceContent() {
 
       showSuccess("Delegated to pool", `Pool: ${poolId}\nTx: ${txHash}`);
     } catch (err) {
-      console.error(err);
-      showError("Delegation failed", (err as Error).message);
+      const error = err as Error;
+      if (error.message.includes("No Cardano wallet detected")) {
+        showError("No wallet found", "Please install a Cardano wallet (Eternl, Nami, Lace) and refresh the page.");
+      } else if (error.message.includes("reward address")) {
+        showError("Staking key missing", "Your wallet doesn't have a staking key. Please use a staking-capable account.");
+      } else if (error.message.includes("Blockfrost")) {
+        showError("Network error", "Failed to connect to Cardano network. Check your internet connection.");
+      } else if (error.message.includes("signTx")) {
+        showError("Transaction rejected", "You rejected the transaction or signing failed. Please try again.");
+      } else if (error.message.includes("submitTx")) {
+        showError("Transaction failed", "Transaction was rejected by the network. Check your wallet balance and try again.");
+      } else {
+        showError("Pool delegation failed", `Error: ${error.message}`);
+      }
     }
   }
 
@@ -290,9 +312,16 @@ export default function ServiceContent() {
   async function copyPoolId(id: string) {
     try {
       await navigator.clipboard.writeText(id);
-      showSuccess("Copied pool ID", id);
+      showSuccess("Copied ID", shortenId(id));
     } catch (err) {
-      showError("Copy failed", (err as Error).message);
+      const error = err as Error;
+      if (error.name === 'NotAllowedError') {
+        showError("Copy blocked", "Browser blocked clipboard access. Please allow clipboard permissions.");
+      } else if (error.name === 'NotFoundError') {
+        showError("Clipboard unavailable", "Clipboard API not supported in this browser.");
+      } else {
+        showError("Copy failed", `Unable to copy: ${error.message}`);
+      }
     }
   }
 
@@ -301,10 +330,52 @@ export default function ServiceContent() {
       <div className="max-w-4xl mx-auto space-y-8">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            Error: {error}. Check console for details. (CORS/Proxy issue?)
+            <div className="font-semibold">Failed to load data</div>
+            <div className="text-sm mt-1">
+              {error.includes("Missing NEXT_PUBLIC_BLOCKFROST_KEY") 
+                ? "Blockfrost API key is missing. Please check your environment configuration."
+                : error.includes("CORS") || error.includes("fetch")
+                ? "Network error: Unable to connect to Blockfrost API. This might be a CORS issue or network problem."
+                : error.includes("404")
+                ? "API endpoint not found. The requested data might not be available."
+                : `Error: ${error}`
+              }
+            </div>
+            <div className="text-xs mt-2 opacity-75">Check browser console for technical details.</div>
           </div>
         )}
-        {loading && <p className="text-center">Loading...</p>}
+        {loading && (
+          <div className="space-y-8">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto mb-6 animate-pulse"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-12 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-40 animate-pulse"></div>
+              </div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-32 mt-4 animate-pulse"></div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-3 animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2 animate-pulse"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-28 animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+                  </div>
+                  <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-24 mt-3 animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <h3 className="text-center text-xl font-semibold text-gray-900 dark:text-white mb-6">
             Our DREP: C2VN
