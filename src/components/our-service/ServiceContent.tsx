@@ -1,145 +1,225 @@
 "use client";
-import React from 'react';
 
-type KoiosPoolInfo = {
-  pool_id_bech32: string;
-  ticker?: string;
-  live_delegators?: number;
-  block_count?: number;
-};
+import React from "react";
+import { Lucid, Blockfrost } from "lucid-cardano";
+import { cardanoWallet } from "~/lib/cardano-wallet";
 
+const BLOCKFROST_API = "https://cardano-mainnet.blockfrost.io/api/v0";
+const BLOCKFROST_KEY = process.env.NEXT_PUBLIC_BLOCKFROST_KEY!;
+
+const KOIOS_API = "https://api.koios.rest/api/v1";
+
+// C2VN DRep
+const DREP_BECH32 =
+  "drep1ygqlu72zwxszcx0kqdzst4k3g6fxx4klwcmpk0fcuujskvg3pmhgs";
+
+// Stake pools
 const VILAI_POOL = "pool1u7zrgexnxsysctnnwljjjymr70he829fr5n3vefnv80guxr42dv";
 const HADA_POOL = "pool16rcqtg9gywenzkp6t5qg8um5tuul6d4dzwauppz7z3ufyaj0ky3";
 
+type PoolInfo = { ticker: string; delegators: number | null; blocks: number | null };
+
 export default function ServiceContent() {
-  const [pools, setPools] = React.useState<Record<string, KoiosPoolInfo>>({});
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [loading, setLoading] = React.useState(true);
+  const [drepStatus, setDrepStatus] = React.useState<string>("Unknown");
+  const [votingPower, setVotingPower] = React.useState<string>("-");
+  const [pools, setPools] = React.useState<Record<string, PoolInfo>>({});
 
   React.useEffect(() => {
-    const fetchPools = async () => {
+    const fetchData = async () => {
+      setLoading(true);
+
       try {
-        const res = await fetch("https://api.koios.rest/api/v1/pool_info", {
+        const drepRes = await fetch(`${KOIOS_API}/drep_info`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ pool_bech32_ids: [VILAI_POOL, HADA_POOL] }),
+          body: JSON.stringify({ drep_bech32_ids: [DREP_BECH32] }),
         });
-        if (!res.ok) throw new Error("Failed to fetch pool info");
-        const data: KoiosPoolInfo[] = await res.json();
-        const byId: Record<string, KoiosPoolInfo> = {};
-        data.forEach((p) => {
-          byId[p.pool_id_bech32] = p;
+        if (drepRes.ok) {
+          const drepJson = await drepRes.json();
+          if (Array.isArray(drepJson) && drepJson.length > 0) {
+            setDrepStatus(drepJson[0].status ?? "Unknown");
+          }
+        }
+
+        const vpRes = await fetch(`${KOIOS_API}/drep_voting_power_history`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ drep_bech32_ids: [DREP_BECH32], limit: 1 }),
         });
-        setPools(byId);
+        if (vpRes.ok) {
+          const vpJson = await vpRes.json();
+          if (Array.isArray(vpJson) && vpJson.length > 0) {
+            const vp = vpJson[0].voting_power;
+            setVotingPower(vp ? `₳ ${Number(vp).toLocaleString()}` : "-");
+          }
+        }
+
+        async function getDelegators(poolId: string) {
+          const res = await fetch(`${BLOCKFROST_API}/pools/${poolId}/delegators`, {
+            headers: { project_id: BLOCKFROST_KEY },
+          });
+          return res.ok ? (await res.json()).length : null;
+        }
+
+        async function getBlocks(poolId: string) {
+          const res = await fetch(`${BLOCKFROST_API}/pools/${poolId}/blocks`, {
+            headers: { project_id: BLOCKFROST_KEY },
+          });
+          return res.ok ? (await res.json()).length : null;
+        }
+
+        const vilaiDelegators = await getDelegators(VILAI_POOL);
+        const vilaiBlocks = await getBlocks(VILAI_POOL);
+
+        const hadaDelegators = await getDelegators(HADA_POOL);
+        const hadaBlocks = await getBlocks(HADA_POOL);
+
+        setPools({
+          [VILAI_POOL]: { ticker: "VILAI", delegators: vilaiDelegators, blocks: vilaiBlocks },
+          [HADA_POOL]: { ticker: "HADA", delegators: hadaDelegators, blocks: hadaBlocks },
+        });
       } catch (e) {
         console.error(e);
       } finally {
         setLoading(false);
       }
     };
-    fetchPools();
+
+    fetchData();
   }, []);
 
+  // --- Delegate functions ---
+  function getSelectedWalletProvider(): any {
+    const injected: any = (typeof window !== "undefined" && (window as any).cardano) || null;
+    if (!injected) throw new Error("No Cardano wallet detected in browser");
+
+    const currentName = cardanoWallet.getCurrentWalletName?.();
+    const candidateOrder: string[] = [];
+    if (currentName) candidateOrder.push(currentName);
+
+    const preferredAliases = [
+      "eternl",
+      "eternal",
+      "nami",
+      "lace",
+      "yoroi",
+      "gerowallet",
+      "gero",
+      "nufi",
+      "typhoncip30",
+      "typhon",
+    ];
+    for (const k of preferredAliases) if (!candidateOrder.includes(k)) candidateOrder.push(k);
+
+    for (const key of candidateOrder) {
+      if (injected[key]) return injected[key];
+      const lower = key.toLowerCase();
+      const hit = Object.keys(injected).find((k) => k.toLowerCase() === lower);
+      if (hit) return injected[hit];
+    }
+
+    const firstKey = Object.keys(injected)[0];
+    if (firstKey) return injected[firstKey];
+    throw new Error("No compatible CIP-30 wallet provider found");
+  }
+
+  async function delegateToPool(poolId: string) {
+    try {
+      const lucid = await Lucid.new(
+        new Blockfrost("https://cardano-mainnet.blockfrost.io/api/v0", BLOCKFROST_KEY),
+        "Mainnet"
+      );
+
+      const provider = getSelectedWalletProvider();
+      await lucid.selectWallet(provider);
+
+      const stakeAddress = await lucid.wallet.rewardAddress();
+
+      const tx = await lucid.newTx().delegateTo(stakeAddress!, poolId).complete();
+      const signedTx = await tx.sign().complete();
+      const txHash = await signedTx.submit();
+
+      alert(`Delegated to pool! TxHash: ${txHash}`);
+    } catch (err) {
+      console.error(err);
+      alert("Delegation failed: " + (err as Error).message);
+    }
+  }
+
+  async function delegateToDRep(drepId: string) {
+    try {
+      const lucid = await Lucid.new(
+        new Blockfrost("https://cardano-mainnet.blockfrost.io/api/v0", BLOCKFROST_KEY),
+        "Mainnet"
+      );
+
+      const provider = getSelectedWalletProvider();
+      await lucid.selectWallet(provider);
+
+      const stakeAddress = await lucid.wallet.rewardAddress();
+
+      const txBuilder = lucid.newTx() as any;
+      const builder = typeof txBuilder.delegateToDRep === "function"
+        ? txBuilder.delegateToDRep(stakeAddress!, drepId)
+        : txBuilder.delegateTo(stakeAddress!, drepId);
+      const tx = await builder.complete();
+      const signedTx = await tx.sign().complete();
+      const txHash = await signedTx.submit();
+
+      alert(`Delegated to DRep! TxHash: ${txHash}`);
+    } catch (err) {
+      console.error(err);
+      alert("Delegation to DRep failed: " + (err as Error).message);
+    }
+  }
+
+  // --- Render UI ---
   return (
-    <div className="w-full px-2 sm:px-4 py-4 sm:py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="w-full px-4 py-6">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* DRep card */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-center text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6">
+          <h3 className="text-center text-xl font-semibold text-gray-900 dark:text-white mb-6">
             Our DREP: C2VN
           </h3>
-          <div className="space-y-2 text-sm sm:text-base">
-            <p className="text-gray-900 dark:text-white font-semibold">DRep ID:</p>
-            <p className="text-gray-700 dark:text-gray-300 break-all">drep1ygqlu72zwxszcx0kqdzst4k3g6fxx4klwcmpk0fcuujskvg3pmhgs</p>
-            <p className="text-gray-900 dark:text-white font-semibold mt-3">Legacy DRep ID (CIP-105):</p>
-            <p className="text-gray-700 dark:text-gray-300 break-all">drep1q8l8jsn35qkpnasrg5zad52xjf34dhmkxcdn6w88y59nzyyhrdt</p>
-            <div className="flex items-center gap-2 pt-4">
-              <span className="text-gray-900 dark:text-white font-semibold">Status:</span>
-              <span className="text-green-600 font-semibold">Active</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-gray-900 dark:text-white font-semibold">Voting power:</span>
-              <span className="text-gray-700 dark:text-gray-300">₳ 1,205,799</span>
-            </div>
-          </div>
-          <div className="flex justify-center mt-6">
-            <a
-              href="https://sancho.network"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-3 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+          <p className="font-semibold">DRep ID:</p>
+          <p className="break-all text-gray-700 dark:text-gray-300">{DREP_BECH32}</p>
+          <p className="mt-3 font-semibold">Status:</p>
+          <p className="text-gray-700 dark:text-gray-300">{loading ? "…" : drepStatus}</p>
+          <p className="mt-3 font-semibold">Voting Power:</p>
+          <p className="text-gray-700 dark:text-gray-300">{loading ? "…" : votingPower}</p>
+
+          <button
+            onClick={() => delegateToDRep(DREP_BECH32)}
+            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg"
+          >
+            Delegate to DRep
+          </button>
+        </div>
+
+        {/* Pool cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Object.entries(pools).map(([poolId, info]) => (
+            <div
+              key={poolId}
+              className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
             >
-              Delegate
-            </a>
-          </div>
-        </div>
-
-        <h4 className="text-center text-base sm:text-lg font-semibold text-gray-900 dark:text-white mt-10 mb-4">
-          Our stake pools:
-        </h4>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <p className="text-center font-semibold text-gray-900 dark:text-white">Ticker: VILAI</p>
-            <div className="mt-5 space-y-3 text-sm text-gray-700 dark:text-gray-300">
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white">Pool ID:</span> {VILAI_POOL}
-              </div>
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white">Delegates:</span> {loading ? "…" : pools[VILAI_POOL]?.live_delegators ?? "-"}
-              </div>
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white">Lifetime Blocks:</span> {loading ? "…" : pools[VILAI_POOL]?.block_count ?? "-"}
-              </div>
-            </div>
-            <div className="mt-6">
-              <a
-                href={`https://cardanoscan.io/pool/${VILAI_POOL}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full inline-flex justify-center px-6 py-3 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                {info.ticker}
+              </h3>
+              <p>Pool ID:</p>
+              <p className="text-sm break-all text-gray-700 dark:text-gray-300">{poolId}</p>
+              <p className="mt-2">Delegators: {loading ? "…" : info.delegators ?? "-"}</p>
+              <p>Lifetime Blocks: {loading ? "…" : info.blocks ?? "-"}</p>
+              <button
+                onClick={() => delegateToPool(poolId)}
+                className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg"
               >
-                Delegate
-              </a>
+                Delegate to Pool
+              </button>
             </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <p className="text-center font-semibold text-gray-900 dark:text-white">Ticker: HADA</p>
-            <div className="mt-5 space-y-3 text-sm text-gray-700 dark:text-gray-300">
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white">Pool ID:</span> {HADA_POOL}
-              </div>
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white">Delegates:</span> {loading ? "…" : (pools[HADA_POOL]?.live_delegators ?? "Unavailable")}
-              </div>
-              <div>
-                <span className="font-semibold text-gray-900 dark:text-white">Lifetime Blocks:</span> {loading ? "…" : (pools[HADA_POOL]?.block_count ?? "Unavailable")}
-              </div>
-            </div>
-            <div className="mt-6">
-              {pools[HADA_POOL] ? (
-                <a
-                  href={`https://cardanoscan.io/pool/${HADA_POOL}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full inline-flex justify-center px-6 py-3 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  Delegate
-                </a>
-              ) : (
-                <button
-                  className="w-full px-6 py-3 rounded-md bg-gray-300 text-gray-600 font-semibold cursor-not-allowed"
-                  aria-disabled
-                  title="Pool not found or retired"
-                >
-                  Delegate
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center text-sm text-gray-600 dark:text-gray-300 mt-10">
-          If you need help, drop us a message: <a className="font-semibold text-blue-600 hover:underline" href="https://t.me/cardano2vn" target="_blank" rel="noopener noreferrer">Connect</a>
+          ))}
         </div>
       </div>
     </div>
