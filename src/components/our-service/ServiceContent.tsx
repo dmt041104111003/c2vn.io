@@ -575,7 +575,7 @@ export default function ServiceContent() {
                         </span>
                         {!installed && (
                           <span className="ml-auto text-xs bg-gray-400 text-white px-2 py-1 rounded-full dark:bg-gray-600">
-                            BETA
+                            Not installed
                           </span>
                         )}
                       </button>
