@@ -19,7 +19,7 @@ type AccountInfo = {
 };
 
 export default function DelegateList({ drepId, poolId, title }: { drepId?: string; poolId?: string; title?: string }) {
-  const { showError } = useToastContext();
+  const { showError, showSuccess } = useToastContext();
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [delegators, setDelegators] = React.useState<DelegatorItem[]>([]);
@@ -39,12 +39,12 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
         if (!basePath) throw new Error("Missing drepId or poolId");
         const url = new URL(`${BLOCKFROST_API}${basePath}`);
         url.searchParams.set("order", "desc");
-        url.searchParams.set("count", "10");
+        url.searchParams.set("count", "5");
         url.searchParams.set("page", "1");
         const res = await fetch(url.toString(), { headers: { project_id: BLOCKFROST_KEY } });
         if (!res.ok) throw new Error(`Delegators HTTP ${res.status}`);
         const data = await res.json();
-        const baseList: DelegatorItem[] = Array.isArray(data) ? data.slice(0, 10) : [];
+        const baseList: DelegatorItem[] = Array.isArray(data) ? data.slice(0, 5) : [];
         const withDetails = await Promise.all(
           baseList.map(async (d) => {
             const addr = (d as any).stake_address || (d as any).address;
@@ -95,6 +95,15 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
     return `${headWithSep}.${tail} ₳`;
   }
 
+  async function copyStakeAddress(addr: string) {
+    try {
+      await navigator.clipboard.writeText(addr);
+      showSuccess("Copied address", shorten(addr));
+    } catch (e) {
+      showError("Copy failed", (e as Error).message);
+    }
+  }
+
   const explorerUrl = drepId
     ? `https://cardanoscan.io/drep/${encodeURIComponent(drepId)}`
     : poolId
@@ -140,7 +149,11 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-xs text-gray-500 w-6 shrink-0">#{idx + 1}</span>
                   <div className="min-w-0">
-                    <div className="text-sm text-gray-900 dark:text-gray-100 truncate" title={stake}>
+                    <div
+                      className="text-sm text-gray-900 dark:text-gray-100 truncate cursor-pointer select-none"
+                      title={stake}
+                      onClick={() => stake && copyStakeAddress(stake)}
+                    >
                       {shorten(stake)}
                     </div>
                     <div className="text-xs text-gray-500">Power: {formatAda(power)}</div>
