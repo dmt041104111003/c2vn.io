@@ -37,16 +37,14 @@ export default function BlogPageClient() {
   });
   const posts: BlogPost[] = postsData?.data || [];
 
-  const {
-    data: tagsData,
-  } = useQuery({
+  const { data: tagsData } = useQuery({
     queryKey: ['public-tags'],
     queryFn: async () => {
-      const res = await fetch('/api/admin/tags');
+      const res = await fetch('/api/tags');
       if (!res.ok) throw new Error('Failed to fetch tags');
       const data = await res.json();
-      return data?.data || []; 
-    }
+      return data?.data || [];
+    },
   });
   const allTags: BlogTag[] = tagsData || [];
 
