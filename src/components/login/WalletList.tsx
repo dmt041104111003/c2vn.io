@@ -89,7 +89,27 @@ export default function WalletList({ wallets }: WalletListProps) {
 
 
   const isActiveWallet = (walletId: string) => {
-    return ["eternal", "lace", "yoroi", "nufi", "gero", "nami", "google", "github", "metamask"].includes(walletId);
+    const cardanoIdToInjectedKey: Record<string, string> = {
+      eternal: 'eternl',
+      lace: 'lace',
+      yoroi: 'yoroi',
+      nami: 'nami',
+      nufi: 'nufi',
+      gero: 'gerowallet',
+      typhon: 'typhoncip30',
+      priority: 'priority',
+    };
+    if (walletId in cardanoIdToInjectedKey) {
+      const injected: any = (typeof window !== 'undefined' && (window as any).cardano) || null;
+      if (!injected) return false;
+      const injectedKey = cardanoIdToInjectedKey[walletId];
+      return Object.keys(injected).some((k) => k.toLowerCase() === injectedKey.toLowerCase());
+    }
+    return ["google", "github", "metamask"].includes(walletId);
+  };
+
+  const isCardanoWalletId = (walletId: string) => {
+    return ["eternal", "lace", "yoroi", "nami", "nufi", "gero", "typhon", "priority"].includes(walletId);
   };
 
   return (
@@ -102,7 +122,7 @@ export default function WalletList({ wallets }: WalletListProps) {
             <button
               key={wallet.id}
               onClick={() => handleWalletClick(wallet.id)}
-                             disabled={(wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "metamask") && connectingWalletId === wallet.id || !isActive}
+              disabled={(((wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "metamask") && connectingWalletId === wallet.id)) || !isActive}
               className={`w-full p-3 rounded-lg border transition-all duration-200 flex items-center gap-3 ${
                 isActive 
                   ? "border-gray-200 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm bg-white dark:border-white/10 dark:bg-gray-900 dark:hover:bg-gray-800 dark:hover:border-white/20" 
@@ -119,7 +139,7 @@ export default function WalletList({ wallets }: WalletListProps) {
               
               {!isActive && (
                 <span className="text-xs bg-gray-400 text-white px-2 py-1 rounded-full dark:bg-gray-600">
-                  BETA
+                  {isCardanoWalletId(wallet.id) ? "Not installed" : "BETA"}
                 </span>
               )}
               
