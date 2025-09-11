@@ -7,6 +7,7 @@ const BLOCKFROST_API = "https://cardano-mainnet.blockfrost.io/api/v0";
 const BLOCKFROST_KEY = process.env.NEXT_PUBLIC_BLOCKFROST_KEY!;
 
 type DelegatorItem = {
+  address?: string; 
   stake_address?: string;
   voting_power?: string | number;
   amount?: string | number;
@@ -30,20 +31,23 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
       setError(null);
       try {
         if (!BLOCKFROST_KEY) throw new Error("Missing NEXT_PUBLIC_BLOCKFROST_KEY env var");
-        const baseUrl = drepId
-          ? `${BLOCKFROST_API}/governance/dreps/${drepId}/delegators`
+        const basePath = drepId
+          ? `/governance/dreps/${drepId}/delegators`
           : poolId
-          ? `${BLOCKFROST_API}/pools/${poolId}/delegators`
+          ? `/pools/${poolId}/delegators`
           : null;
-        if (!baseUrl) throw new Error("Missing drepId or poolId");
-        const url = `${baseUrl}?order=desc&count=10&page=1`;
-        const res = await fetch(url, { headers: { project_id: BLOCKFROST_KEY } });
+        if (!basePath) throw new Error("Missing drepId or poolId");
+        const url = new URL(`${BLOCKFROST_API}${basePath}`);
+        url.searchParams.set("order", "desc");
+        url.searchParams.set("count", "10");
+        url.searchParams.set("page", "1");
+        const res = await fetch(url.toString(), { headers: { project_id: BLOCKFROST_KEY } });
         if (!res.ok) throw new Error(`Delegators HTTP ${res.status}`);
         const data = await res.json();
-        const baseList: DelegatorItem[] = Array.isArray(data) ? data : [];
+        const baseList: DelegatorItem[] = Array.isArray(data) ? data.slice(0, 10) : [];
         const withDetails = await Promise.all(
-          baseList.slice(0, 10).map(async (d) => {
-            const addr = d.stake_address;
+          baseList.map(async (d) => {
+            const addr = (d as any).stake_address || (d as any).address;
             let details: AccountInfo | null = null;
             try {
               if (addr) {
@@ -78,9 +82,17 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
 
   function formatAda(value?: string | number) {
     if (value == null) return "-";
-    const num = Number(value);
-    if (!Number.isFinite(num)) return String(value);
-    return `${(num / 1_000_000).toLocaleString()} ₳`;
+    const str = String(value);
+    const num = Number(str);
+    if (Number.isFinite(num)) {
+      return `${(num / 1_000_000).toLocaleString()} ₳`;
+    }
+    const s = str.replace(/\D/g, "");
+    if (s.length <= 6) return `0.${s.padStart(6, '0')} ₳`;
+    const head = s.slice(0, -6);
+    const tail = s.slice(-6);
+    const headWithSep = head.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${headWithSep}.${tail} ₳`;
   }
 
   const explorerUrl = drepId
@@ -118,7 +130,7 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
       ) : (
         <ul className="divide-y divide-gray-200 dark:divide-gray-700 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
           {delegators.map((d: any, idx) => {
-            const stake = d.stake_address ?? "";
+            const stake = d.stake_address ?? d.address ?? "";
             const power = (d as any).voting_power ?? (d as any).amount ?? (d as any).live_stake;
             const detailHref = explorerUrl;
             const active = d.__details?.active;
@@ -140,16 +152,6 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
                     )}
                   </div>
                 </div>
-                {detailHref && (
-                  <a
-                    href={detailHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    Open on explorer
-                  </a>
-                )}
               </li>
             );
           })}
