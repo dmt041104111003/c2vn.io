@@ -26,11 +26,11 @@ export default function BlogFilters({
         <input
           type="text"
           placeholder="Search by title..."
-          className="w-full px-4 py-2 border border-gray-300 dark:border-white/30 bg-white dark:bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/60 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+          className="self-start w-full px-4 py-2 border border-gray-300 dark:border-white/30 bg-white dark:bg-transparent text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/60 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        <div className="relative w-full" ref={dropdownRef}>
+        <div className="relative w-full self-start" ref={dropdownRef}>
           <select
             onChange={(e) => {
               const val = e.target.value;
