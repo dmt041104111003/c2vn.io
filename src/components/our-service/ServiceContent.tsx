@@ -1,7 +1,10 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
+import WalletPickerModal from "~/components/our-service/WalletPickerModal";
+import DrepCard from "~/components/our-service/DrepCard";
+import PoolCard from "~/components/our-service/PoolCard";
+import DelegateList from "~/components/our-service/DelegateList";
 import { useToastContext } from "~/components/toast-provider";
 import { Lucid, Blockfrost } from "lucid-cardano";
 import * as CardanoWasm from "@emurgo/cardano-serialization-lib-asmjs";
@@ -28,7 +31,7 @@ export default function ServiceContent() {
   const { showSuccess, showError, showInfo } = useToastContext();
   const [loading, setLoading] = React.useState(true);
   const [drepStatus, setDrepStatus] = React.useState<string>("Not registered");
-  const [votingPower, setVotingPower] = React.useState<string>("₳ 0");
+  const [votingPower, setVotingPower] = React.useState<string>("0 ₳");
   const [pools, setPools] = React.useState<Record<string, PoolInfo>>({});
   const [error, setError] = React.useState<string | null>(null);
   const [walletPicker, setWalletPicker] = React.useState<{
@@ -73,7 +76,7 @@ export default function ServiceContent() {
             if (drepJson.amount != null) {
               const vpNum = Number(drepJson.amount) / 1_000_000;
               if (Number.isFinite(vpNum)) {
-                setVotingPower(`₳ ${vpNum.toLocaleString()}`);
+                setVotingPower(`${vpNum.toLocaleString()} ₳`);
               } else {
                 setVotingPower(String(drepJson.amount));
               }
@@ -104,10 +107,10 @@ export default function ServiceContent() {
             delegators: vilaiInfo?.live_delegators ?? 0,
             blocks: vilaiInfo?.blocks_minted ?? 0,
             stake: vilaiInfo?.live_stake
-              ? `₳ ${(Number(vilaiInfo.live_stake) / 1_000_000).toLocaleString()}`
+              ? `${(Number(vilaiInfo.live_stake) / 1_000_000).toLocaleString()} ₳`
               : null,
             pledge: vilaiInfo?.live_pledge
-              ? `₳ ${(Number(vilaiInfo.live_pledge) / 1_000_000).toLocaleString()}`
+              ? `${(Number(vilaiInfo.live_pledge) / 1_000_000).toLocaleString()} ₳`
               : null,
           },
           [HADA_POOL]: {
@@ -115,10 +118,10 @@ export default function ServiceContent() {
             delegators: hadaInfo?.live_delegators ?? 0,
             blocks: hadaInfo?.blocks_minted ?? 0,
             stake: hadaInfo?.live_stake
-              ? `₳ ${(Number(hadaInfo.live_stake) / 1_000_000).toLocaleString()}`
+              ? `${(Number(hadaInfo.live_stake) / 1_000_000).toLocaleString()} ₳`
               : null,
             pledge: hadaInfo?.live_pledge
-              ? `₳ ${(Number(hadaInfo.live_pledge) / 1_000_000).toLocaleString()}`
+              ? `${(Number(hadaInfo.live_pledge) / 1_000_000).toLocaleString()} ₳`
               : null,
           },
         });
@@ -391,202 +394,58 @@ export default function ServiceContent() {
             </div>
           </div>
         )}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-center text-xl font-semibold text-gray-900 dark:text-white mb-6">
-            Our DREP: C2VN
-          </h3>
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h4 className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                  Wallet Compatibility Notice
-                </h4>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                  <strong>Cardano wallets only:</strong> DRep and pool delegation only work with Cardano wallets. 
-                  We recommend <strong>Eternl</strong>, <strong>Lace</strong>, or <strong>Yoroi</strong> for the best experience.
-                  <br />
-                  <span className="text-amber-600 dark:text-amber-400">
-                    MetaMask and other non-Cardano wallets are not supported for delegation.
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-          <p className="font-semibold">DRep ID:</p>
-          <p
-            className="text-sm break-all text-gray-700 dark:text-gray-300 cursor-pointer select-none"
-            title={DREP_BECH32}
-            onClick={() => copyPoolId(DREP_BECH32)}
-          >
-            {shortenId(DREP_BECH32)}
-          </p>
-          <p className="mt-3 font-semibold">Status:</p>
-          <p className="text-gray-700 dark:text-gray-300">
-            {loading ? "…" : drepStatus}
-          </p>
-          <p className="mt-3 font-semibold">Voting Power:</p>
-          <p className="text-gray-700 dark:text-gray-300">
-            {loading ? "…" : votingPower}
-          </p>
-          <button
-            onClick={() => setWalletPicker({ open: true, action: { type: "drep", id: DREP_BECH32 } })}
-            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          >
-            Delegate to DRep
-          </button>
-        </div>
+        <DrepCard
+          drepId={DREP_BECH32}
+          status={drepStatus}
+          votingPower={votingPower}
+          loading={loading}
+          onCopy={copyPoolId}
+          onDelegate={() => setWalletPicker({ open: true, action: { type: "drep", id: DREP_BECH32 } })}
+        />
 
         {pools && Object.keys(pools).length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Object.entries(pools).map(([poolId, info]) => (
-              <div
+              <PoolCard
                 key={poolId}
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                  {info.ticker}
-                </h3>
-                <p
-                  className="text-sm break-all text-gray-700 dark:text-gray-300 cursor-pointer select-none"
-                  title={poolId}
-                  onClick={() => copyPoolId(poolId)}
-                >
-                  {shortenId(poolId)}
-                </p>
-                <p className="mt-2">
-                  Delegators: {loading ? "…" : info.delegators ?? 0}
-                </p>
-                <p>Lifetime Blocks: {loading ? "…" : info.blocks ?? 0}</p>
-                <p>Live Stake: {loading ? "…" : info.stake ?? "-"}</p>
-                <p>Pledge: {loading ? "…" : info.pledge ?? "-"}</p>
-                <button
-                  onClick={() => setWalletPicker({ open: true, action: { type: "pool", id: poolId } })}
-                  className="mt-3 px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                >
-                  Delegate to {info.ticker}
-                </button>
-              </div>
+                poolId={poolId}
+                ticker={info.ticker}
+                delegators={info.delegators}
+                blocks={info.blocks}
+                stake={info.stake}
+                pledge={info.pledge}
+                loading={loading}
+                onCopy={copyPoolId}
+                onDelegate={() => setWalletPicker({ open: true, action: { type: "pool", id: poolId } })}
+              />
             ))}
           </div>
         ) : (
           !loading && <p className="text-center text-gray-500">No pool data available (check API key/proxy).</p>
         )}
 
-        {walletPicker.open && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-            onClick={() => setWalletPicker({ open: false, action: null })}
-          >
-            <div
-              className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 w-full max-w-md border border-gray-200 dark:border-gray-700"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <h4 className="text-base font-semibold text-gray-900 dark:text-white">Choose a wallet</h4>
-                <button
-                  onClick={() => setWalletPicker({ open: false, action: null })}
-                  aria-label="Close"
-                  className="absolute"
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    width: '3.2em',
-                    height: '3.2em',
-                    border: 'none',
-                    background: 'rgba(180, 83, 107, 0.11)',
-                    borderRadius: '6px',
-                    transition: 'background 0.3s',
-                    zIndex: 10,
-                  }}
-                >
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      width: '1.8em',
-                      height: '1.5px',
-                      backgroundColor: 'rgb(255, 255, 255)',
-                      transform: 'translate(-50%, -50%) rotate(45deg)',
-                    }}
-                  />
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      width: '1.8em',
-                      height: '1.5px',
-                      backgroundColor: '#fff',
-                      transform: 'translate(-50%, -50%) rotate(-45deg)',
-                    }}
-                  />
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Recommended: Lace, Yoroi, or Eternl.</p>
-              <div className="space-y-2">
-                {([
-                  { key: "lace", name: "Lace", img: "lace" },
-                  { key: "yoroi", name: "Yoroi", img: "yoroi" },
-                  { key: "eternl", name: "Eternl", img: "eternal" },
-                  { key: "nami", name: "Nami", img: "nami" },
-                  { key: "gerowallet", name: "Gero", img: "Gero" },
-                  { key: "nufi", name: "NuFi", img: "nufi" },
-                  { key: "typhoncip30", name: "Typhon", img: "typhon" },
-                ] as const).map((w) => (
-                  (() => {
-                    const installed = isWalletInstalledByKey(w.key);
-                    return (
-                      <button
-                        key={w.key}
-                        disabled={!installed}
-                        onClick={async () => {
-                          try {
-                            const sel = walletPicker.action;
-                            setWalletPicker({ open: false, action: null });
-                            if (!sel) return;
-                            if (sel.type === "drep") await delegateToDRep(sel.id, w.key);
-                            else await delegateToPool(sel.id, w.key);
-                          } catch (err) {
-                            showError("Wallet selection failed", (err as Error).message);
-                          }
-                        }}
-                        className={`w-full p-3 rounded-lg border transition-all duration-200 flex items-center gap-3 text-sm ${
-                          installed
-                            ? "border-gray-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm dark:border-white/10 dark:bg-gray-900 dark:hover:bg-gray-800 dark:hover:border-white/20"
-                            : "border-gray-100 bg-gray-50 cursor-not-allowed opacity-60 dark:border-white/5 dark:bg-gray-900/40"
-                        }`}
-                      >
-                        <Image
-                          src={`/images/wallets/${w.img}.png`}
-                          alt={w.name}
-                          width={28}
-                          height={28}
-                          className="w-7 h-7"
-                        />
-                        <span className={`font-medium ${installed ? "text-gray-800 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}`}>
-                          {w.name}
-                        </span>
-                        {!installed && (
-                          <span className="ml-auto text-xs bg-gray-400 text-white px-2 py-1 rounded-full dark:bg-gray-600">
-                            Not installed
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })()
-                ))}
-              </div>
-             
-            </div>
-          </div>
-        )}
+        <DelegateList drepId={DREP_BECH32} title="Recent DRep Delegators" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <DelegateList poolId={VILAI_POOL} title="VILAI Pool Delegators" />
+          <DelegateList poolId={HADA_POOL} title="HADA Pool Delegators" />
+        </div>
+
+        <WalletPickerModal
+          open={walletPicker.open}
+          onClose={() => setWalletPicker({ open: false, action: null })}
+          isInstalled={isWalletInstalledByKey}
+          onSelect={async (key) => {
+            try {
+              const sel = walletPicker.action;
+              setWalletPicker({ open: false, action: null });
+              if (!sel) return;
+              if (sel.type === "drep") await delegateToDRep(sel.id, key);
+              else await delegateToPool(sel.id, key);
+            } catch (err) {
+              showError("Wallet selection failed", (err as Error).message);
+            }
+          }}
+        />
       </div>
     </div>
   );
