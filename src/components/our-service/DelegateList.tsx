@@ -105,9 +105,9 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
   }
 
   const explorerUrl = drepId
-    ? `https://cardanoscan.io/drep/${encodeURIComponent(drepId)}`
+    ? `https://beta.cexplorer.io/drep/${encodeURIComponent(drepId)}`
     : poolId
-    ? `https://cardanoscan.io/pool/${encodeURIComponent(poolId as string)}`
+    ? `https://beta.cexplorer.io/pool/${encodeURIComponent(poolId as string)}`
     : undefined;
 
   return (
