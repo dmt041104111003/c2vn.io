@@ -30,7 +30,8 @@ export default function BlogFilters({
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        <div className="relative w-full self-start" ref={dropdownRef}>
+        <div className="relative w-full self-start overflow-visible" ref={dropdownRef}>
+
           <select
             onChange={(e) => {
               const val = e.target.value;
