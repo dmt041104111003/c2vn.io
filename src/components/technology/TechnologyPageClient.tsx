@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import TechnologyItem from "./TechnologyItem";
@@ -28,7 +28,6 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
     }
   });
 
-  // Redirect to 404 if technologies data fails to load
   useEffect(() => {
     if (technologiesError) {
       window.location.href = '/not-found';
