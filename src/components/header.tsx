@@ -36,12 +36,13 @@ function UserAvatar({ session }: { session: any }) {
   );
 }
 
-function MobileUserInfo({ session, onClose }: { session: any; onClose: () => void }) {
+function MobileUserInfo({ session, onClose, onShowModal }: { session: any; onClose: () => void; onShowModal: () => void }) {
   const [name, setName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState<number>(0);
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const [isReferralsModalOpen, setIsReferralsModalOpen] = useState(false);
+  const [isLoadingReferralCode, setIsLoadingReferralCode] = useState(true);
   const { showSuccess, showInfo, showError } = useToastContext();
 
   useEffect(() => {
@@ -74,6 +75,8 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
         if (session.user?.name) {
           setName(session.user.name);
         }
+      } finally {
+        setIsLoadingReferralCode(false);
       }
     };
 
@@ -101,30 +104,34 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
     }
   }, [session?.user]);
 
-  const handleGenerateReferralCode = async () => {
-    setIsGeneratingCode(true);
-    try {
-      const response = await fetch('/api/user/referral-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'generate' }),
-      });
+  // const handleGenerateReferralCode = async () => {
+  //   setIsGeneratingCode(true);
+  //   try {
+  //     const response = await fetch('/api/user/referral-code', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ action: 'generate' }),
+  //     });
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      if (data.success) {
-        setReferralCode(data.data.referralCode);
-        showSuccess('Generate referral code successfully!');
-      } else {
-        showError(data.message || 'Failed to generate referral code');
-      }
-    } catch (error) {
-      showError('Failed to generate referral code');
-    } finally {
-      setIsGeneratingCode(false);
-    }
+  //     if (data.success) {
+  //       setReferralCode(data.data.referralCode);
+  //       showSuccess('Generate referral code successfully!');
+  //     } else {
+  //       showError(data.message || 'Failed to generate referral code');
+  //     }
+  //   } catch (error) {
+  //     showError('Failed to generate referral code');
+  //   } finally {
+  //     setIsGeneratingCode(false);
+  //   }
+  // };
+
+  const handleGenerateClick = () => {
+    onShowModal();
   };
 
   return (
@@ -230,18 +237,20 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
       </div>
       
       <div className="space-y-2">
-        <button
-          onClick={() => {
-            showInfo('Edit name feature coming soon');
-          }}
-          className="w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded"
-        >
-          <Edit className="w-4 h-4 mr-3" />
-          Edit Name
-        </button>
-        {!referralCode && (
+        {!isLoadingReferralCode && (
           <button
-            onClick={handleGenerateReferralCode}
+            onClick={() => {
+              showInfo('Edit name feature coming soon');
+            }}
+            className="w-full flex items-center px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors rounded"
+          >
+            <Edit className="w-4 h-4 mr-3" />
+            Edit Name
+          </button>
+        )}
+        {!referralCode && !isLoadingReferralCode && (
+          <button
+            onClick={handleGenerateClick}
             disabled={isGeneratingCode}
             className="w-full flex items-center px-3 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors rounded disabled:opacity-50"
           >
@@ -267,7 +276,7 @@ function MobileUserInfo({ session, onClose }: { session: any; onClose: () => voi
   );
 }
 
-function UserDropdown({ session, onClose, autoEdit = false }: { session: any; onClose: () => void; autoEdit?: boolean }) {
+function UserDropdown({ session, onClose, onShowModal, autoEdit = false }: { session: any; onClose: () => void; onShowModal: () => void; autoEdit?: boolean }) {
   const [isEditing, setIsEditing] = useState(autoEdit);
   const [name, setName] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
@@ -276,6 +285,7 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const [isReferralsModalOpen, setIsReferralsModalOpen] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [isLoadingReferralCode, setIsLoadingReferralCode] = useState(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const { showSuccess, showError } = useToastContext();
 
@@ -309,6 +319,8 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
         if (session.user?.name) {
           setName(session.user.name);
         }
+      } finally {
+        setIsLoadingReferralCode(false);
       }
     };
 
@@ -428,30 +440,34 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
     }
   };
 
-  const handleGenerateReferralCode = async () => {
-    setIsGeneratingCode(true);
-    try {
-      const response = await fetch('/api/user/referral-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'generate' }),
-      });
+  // const handleGenerateReferralCode = async () => {
+  //   setIsGeneratingCode(true);
+  //   try {
+  //     const response = await fetch('/api/user/referral-code', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ action: 'generate' }),
+  //     });
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      if (data.success) {
-        setReferralCode(data.data.referralCode);
-        showSuccess('Generate referral code successfully!');
-      } else {
-        showError(data.message || 'Unable to generate referral code');
-      }
-    } catch (error) {
-      showError('Failed to generate referral code');
-    } finally {
-      setIsGeneratingCode(false);
-    }
+  //     if (data.success) {
+  //       setReferralCode(data.data.referralCode);
+  //       showSuccess('Generate referral code successfully!');
+  //     } else {
+  //       showError(data.message || 'Unable to generate referral code');
+  //     }
+  //   } catch (error) {
+  //     showError('Failed to generate referral code');
+  //   } finally {
+  //     setIsGeneratingCode(false);
+  //   }
+  // };
+
+  const handleGenerateClick = () => {
+    onShowModal();
   };
 
   return (
@@ -580,7 +596,7 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
       </div>
 
       <div className="py-1">
-        {!isEditing && (
+        {!isEditing && !isLoadingReferralCode && (
           <button
             onClick={handleEditClick}
             className="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -589,9 +605,9 @@ function UserDropdown({ session, onClose, autoEdit = false }: { session: any; on
             Edit Name
           </button>
         )}
-        {!referralCode && (
+        {!referralCode && !isLoadingReferralCode && (
           <button
-            onClick={handleGenerateReferralCode}
+            onClick={handleGenerateClick}
             disabled={isGeneratingCode}
             className="w-full flex items-center px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50"
           >
@@ -621,9 +637,10 @@ export default function Header() {
   const { isAdmin } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showGenerateWarningModal, setShowGenerateWarningModal] = useState(false);
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { showSuccess, showInfo } = useToastContext();
+  const { showSuccess, showInfo, showError } = useToastContext();
 
   useEffect(() => {
     const handleSessionUpdate = () => {
@@ -667,17 +684,17 @@ export default function Header() {
     };
   }, []);
 
-  const formatWalletAddress = (address: string) => {
-    if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
+  // const formatWalletAddress = (address: string) => {
+  //   if (!address) return "";
+  //   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  // };
 
-  const formatEmail = (email: string) => {
-    if (!email) return "";
-    const [username, domain] = email.split("@");
-    if (!domain) return email;
-    return `${username.slice(0, 3)}...@${domain}`;
-  };
+  // const formatEmail = (email: string) => {
+  //   if (!email) return "";
+  //   const [username, domain] = email.split("@");
+  //   if (!domain) return email;
+  //   return `${username.slice(0, 3)}...@${domain}`;
+  // };
 
   const isActiveNav = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -689,6 +706,29 @@ export default function Header() {
     if (href === "/login") return pathname === "/login";
     return false;
   };
+
+  // const handleGenerateReferralCode = async () => {
+  //   try {
+  //     const response = await fetch('/api/user/referral-code', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ action: 'generate' }),
+  //     });
+
+  //     const data = await response.json();
+
+  //     if (data.success) {
+  //       showSuccess('Generate referral code successfully!');
+  //       window.dispatchEvent(new CustomEvent('session-update'));
+  //     } else {
+  //       showError(data.message || 'Unable to generate referral code');
+  //     }
+  //   } catch (error) {
+  //     showError('Failed to generate referral code');
+  //   }
+  // };
 
   return (
     <motion.div
@@ -765,7 +805,7 @@ export default function Header() {
                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
                        transition={{ duration: 0.15 }}
                      >
-                       <UserDropdown session={session} onClose={closeDropdown} />
+                       <UserDropdown session={session} onClose={closeDropdown} onShowModal={() => setShowGenerateWarningModal(true)} />
                      </motion.div>
                    )}
                  </AnimatePresence>
@@ -859,7 +899,7 @@ export default function Header() {
 
                                                   {session && (
                     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                      <MobileUserInfo session={session} onClose={closeMenu} />
+                      <MobileUserInfo session={session} onClose={closeMenu} onShowModal={() => setShowGenerateWarningModal(true)} />
                     </div>
                   )}
               </div>
@@ -867,6 +907,13 @@ export default function Header() {
           </motion.div>
         )}
       </div>
+
+      {/* Generate Code Warning Modal */}
+      <WelcomeModalReferrals 
+        isOpen={showGenerateWarningModal} 
+        onClose={() => setShowGenerateWarningModal(false)}
+        isGenerateWarning={true}
+      />
     </motion.div>
   );
 }

@@ -276,8 +276,12 @@ export default function ContactFormSection() {
     const scriptURL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL_1 || '';
     
     try {
-      // First, handle referral code if present and user is logged in
-      if (formData["email-intro"] && session?.user) {
+      if (formData["email-intro"]) {
+        if (!session?.user) {
+          showError("You must be logged in to use a referral code!");
+          setIsSubmitting(false);
+          return;
+        }
         try {
           const userResponse = await fetch('/api/user/referral-code');
           if (userResponse.ok) {

@@ -11,9 +11,10 @@ import { ReferralDetail } from '~/constants/users';
 interface WelcomeModalReferralsProps {
   isOpen: boolean;
   onClose: () => void;
+  isGenerateWarning?: boolean;
 }
 
-export default function WelcomeModalReferrals({ isOpen, onClose }: WelcomeModalReferralsProps) {
+export default function WelcomeModalReferrals({ isOpen, onClose, isGenerateWarning = false }: WelcomeModalReferralsProps) {
   const { data: session } = useSession();
   const { showSuccess } = useToastContext();
   const [referrals, setReferrals] = useState<ReferralDetail[]>([]);
@@ -82,6 +83,120 @@ export default function WelcomeModalReferrals({ isOpen, onClose }: WelcomeModalR
   }, [searchTerm]);
 
   if (!mounted) return null;
+
+  // Generate Warning Modal
+  if (isGenerateWarning) {
+    return createPortal(
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={onClose}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-start justify-between mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white">⚠️ Warning</h4>
+                  <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="absolute"
+                    style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      width: '3.2em',
+                      height: '3.2em',
+                      border: 'none',
+                      background: 'rgba(180, 83, 107, 0.11)',
+                      borderRadius: '6px',
+                      transition: 'background 0.3s',
+                      zIndex: 10,
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        width: '1.8em',
+                        height: '1.5px',
+                        backgroundColor: 'rgb(255, 255, 255)',
+                        transform: 'translate(-50%, -50%) rotate(45deg)',
+                      }}
+                    />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        width: '1.8em',
+                        height: '1.5px',
+                        backgroundColor: '#fff',
+                        transform: 'translate(-50%, -50%) rotate(-45deg)',
+                      }}
+                    />
+                  </button>
+                </div>
+                
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+                    If you generate your own referral code, you will <strong>NOT be able to use someone else's referral code</strong> in the contact form.
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Are you sure you want to generate your own referral code?
+                  </p>
+                </div>
+                
+                <div className="flex justify-center">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/user/referral-code', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({ action: 'generate' }),
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                          showSuccess('Generate referral code successfully!');
+                          window.dispatchEvent(new CustomEvent('session-update'));
+                          onClose();
+                        } else {
+                          showSuccess(data.message || 'Unable to generate referral code');
+                        }
+                      } catch (error) {
+                        showSuccess('Failed to generate referral code');
+                      }
+                    }}
+                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Generate Code
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>,
+      document.body
+    );
+  }
 
   return createPortal(
     <AnimatePresence>
