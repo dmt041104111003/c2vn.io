@@ -10,8 +10,6 @@ import ContactFormQuoteBlock from './ContactFormQuoteBlock';
 import ContactFormImage from './ContactFormImage';
 import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
-import { IPDisplay } from '~/components/IPDisplay';
-import { getRealIP } from '~/lib/webrtc-ip';
 import { useQuery } from '@tanstack/react-query';
 
 type TabType = "form" | "manage";
@@ -281,9 +279,6 @@ export default function ContactFormSection() {
       // First, handle referral code if present and user is logged in
       if (formData["email-intro"] && session?.user) {
         try {
-          // Get real IP from client
-          const realIP = await getRealIP();
-          
           const referralResponse = await fetch('/api/referral/submit', {
             method: 'POST',
             headers: {
@@ -291,8 +286,7 @@ export default function ContactFormSection() {
             },
             body: JSON.stringify({
               referralCode: formData["email-intro"],
-              formData: formData,
-              realIP: realIP
+              formData: formData
             }),
           });
 
@@ -408,20 +402,17 @@ export default function ContactFormSection() {
               <ContactFormTabs activeTab={activeTab} onTabChange={handleTabChange} />
             )}
             {activeTab === "form" ? (
-              <div className="space-y-4">
-                <IPDisplay />
-                <ContactForm
-                  formData={formData}
-                  errors={errors}
-                  isSubmitting={isSubmitting}
-                  captchaValid={captchaValid}
-                  captchaKey={captchaKey}
-                  onInputChange={handleInputChange}
-                  onSubmit={handleSubmit}
-                  onCaptchaChange={setCaptchaValid}
-                  onCourseChange={handleCourseChange}
-                />
-              </div>
+              <ContactForm
+                formData={formData}
+                errors={errors}
+                isSubmitting={isSubmitting}
+                captchaValid={captchaValid}
+                captchaKey={captchaKey}
+                onInputChange={handleInputChange}
+                onSubmit={handleSubmit}
+                onCaptchaChange={setCaptchaValid}
+                onCourseChange={handleCourseChange}
+              />
             ) : activeTab === "manage" ? (
               <div>
                 {coursesLoading ? (

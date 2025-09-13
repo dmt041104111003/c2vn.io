@@ -407,7 +407,6 @@ model ReferralSubmission {
   wallet        String?  // Wallet from contact form
   course        String?  // Course from contact form
   message       String?  // Message from contact form
-  ipAddress     String?  // IP address of the client
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation("UserReferralSubmissions", fields: [userId], references: [id])
@@ -416,5 +415,4 @@ model ReferralSubmission {
   @@index([referralCode])
   @@index([referrerId])
   @@index([createdAt])
-  @@index([ipAddress])
 }
