@@ -1,25 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/lib/api-wrapper';
 import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 import { findUserByReferralCode, validateReferralCode } from '~/lib/referral-utils';
 
-export const POST = withAuth(async (req: NextRequest, currentUser) => {
+export const POST = withAuth(async (req, currentUser) => {
   try {
     if (!currentUser) {
       return NextResponse.json(createErrorResponse('User not found', 'USER_NOT_FOUND'), { status: 404 });
     }
 
-    const { referralCode, formData, realIP } = await req.json();
+    const { referralCode, formData } = await req.json();
 
     if (!referralCode || !validateReferralCode(referralCode)) {
       return NextResponse.json(createErrorResponse('Invalid referral code format', 'INVALID_REFERRAL_CODE'), { status: 400 });
-    }
-
-    const clientIP = realIP;
-
-    if (!clientIP) {
-      return NextResponse.json(createErrorResponse('Real IP address is required', 'MISSING_REAL_IP'), { status: 400 });
     }
 
     const existingSubmission = await prisma.referralSubmission.findUnique({
@@ -28,16 +22,6 @@ export const POST = withAuth(async (req: NextRequest, currentUser) => {
 
     if (existingSubmission) {
       return NextResponse.json(createErrorResponse('You have already submitted a referral form', 'ALREADY_SUBMITTED'), { status: 400 });
-    }
-
-    const existingSubmissionFromIP = await prisma.referralSubmission.findFirst({
-      where: {
-        ipAddress: clientIP
-      }
-    });
-
-    if (existingSubmissionFromIP) {
-      return NextResponse.json(createErrorResponse('This IP address has already submitted a referral form.', 'IP_ALREADY_USED'), { status: 400 });
     }
 
     const referrer = await findUserByReferralCode(referralCode);
@@ -61,7 +45,6 @@ export const POST = withAuth(async (req: NextRequest, currentUser) => {
         wallet: formData['address-wallet'] || null,
         course: formData['your-course'] || null,
         message: formData['message'] || null,
-        ipAddress: clientIP,
       }
     });
 
@@ -83,8 +66,7 @@ export const POST = withAuth(async (req: NextRequest, currentUser) => {
         data: {
           submissionId: submission.id,
           referrerName: formData['your-name'],
-          referralCode: referralCode,
-          ipAddress: clientIP
+          referralCode: referralCode
         }
       }
     });
@@ -94,8 +76,7 @@ export const POST = withAuth(async (req: NextRequest, currentUser) => {
       submission: {
         id: submission.id,
         referralCode: submission.referralCode,
-        referrerName: referrer.name,
-        ipAddress: clientIP
+        referrerName: referrer.name
       }
     }));
 
