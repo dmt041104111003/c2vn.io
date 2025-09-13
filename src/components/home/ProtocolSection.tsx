@@ -3,7 +3,7 @@
 // import { protocols } from "~/constants/protocols";
 // import Protocol from "~/components/protocol";
 // import Action from "~/components/action";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Blog from "~/components/blog";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -19,14 +19,21 @@ function getYoutubeIdFromUrl(url: string) {
 export default function ProtocolSection() {
   const [activeTab, setActiveTab] = useState<TabType>("latest");
 
-  const { data: postsData, isLoading } = useQuery({
+  const { data: postsData, isLoading, error: postsError } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
       const res = await fetch("/api/admin/posts");
+      if (!res.ok) throw new Error('Failed to fetch posts');
       const data = await res.json();
       return data?.data || [];
     },
   });
+
+  useEffect(() => {
+    if (postsError) {
+      window.location.href = '/not-found';
+    }
+  }, [postsError]);
 
   const posts = Array.isArray(postsData) ? postsData.filter((p: any) => p.status === "PUBLISHED") : [];
   

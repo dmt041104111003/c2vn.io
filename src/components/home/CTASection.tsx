@@ -15,7 +15,7 @@ export default function CTASection() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(null);
 
-  const { data: userData } = useQuery({
+  const { data: userData, error: userDataError } = useQuery({
     queryKey: ["user-role"],
     queryFn: async () => {
       if (!session?.user) return null;
@@ -31,6 +31,12 @@ export default function CTASection() {
     },
     enabled: !!session?.user,
   });
+
+  useEffect(() => {
+    if (userDataError) {
+      window.location.href = '/not-found';
+    }
+  }, [userDataError]);
 
   useEffect(() => {
     const adminStatus = userData?.data?.role?.name === "ADMIN";
@@ -54,6 +60,7 @@ export default function CTASection() {
         setEvents(data?.data || []);
       } catch (err: any) {
         setErrorEvents(err.message || "Unknown error");
+        window.location.href = '/not-found';
       } finally {
         setLoadingEvents(false);
       }

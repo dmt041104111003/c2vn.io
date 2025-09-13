@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { AboutContent } from '~/constants/about';
+import { useEffect } from "react";
 
 export default function AboutSection() {
-  const { data: queryData, isLoading } = useQuery({
+  const { data: queryData, isLoading, error: aboutError } = useQuery({
     queryKey: ['about-content'],
     queryFn: async () => {
       const response = await fetch('/api/about');
@@ -15,6 +16,12 @@ export default function AboutSection() {
       return response.json();
     }
   });
+
+  useEffect(() => {
+    if (aboutError) {
+      window.location.href = '/not-found';
+    }
+  }, [aboutError]);
 
   const aboutContent: AboutContent | null = queryData?.data || null;
 

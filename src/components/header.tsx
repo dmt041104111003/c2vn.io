@@ -87,7 +87,7 @@ function MobileUserInfo({ session, onClose, onShowModal }: { session: any; onClo
   useEffect(() => {
     const fetchReferralStats = async () => {
       try {
-        const statsResponse = await fetch('/api/user/referral-stats');
+        const statsResponse = await fetch('/api/user/referrals?includeStats=true&limit=10');
         if (statsResponse.ok) {
           const statsData = await statsResponse.json();
           if (statsData.success && statsData.data) {
@@ -104,31 +104,6 @@ function MobileUserInfo({ session, onClose, onShowModal }: { session: any; onClo
     }
   }, [session?.user]);
 
-  // const handleGenerateReferralCode = async () => {
-  //   setIsGeneratingCode(true);
-  //   try {
-  //     const response = await fetch('/api/user/referral-code', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ action: 'generate' }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (data.success) {
-  //       setReferralCode(data.data.referralCode);
-  //       showSuccess('Generate referral code successfully!');
-  //     } else {
-  //       showError(data.message || 'Failed to generate referral code');
-  //     }
-  //   } catch (error) {
-  //     showError('Failed to generate referral code');
-  //   } finally {
-  //     setIsGeneratingCode(false);
-  //   }
-  // };
 
   const handleGenerateClick = () => {
     onShowModal();
@@ -331,7 +306,7 @@ function UserDropdown({ session, onClose, onShowModal, autoEdit = false }: { ses
   useEffect(() => {
     const fetchReferralStats = async () => {
       try {
-        const statsResponse = await fetch('/api/user/referral-stats');
+        const statsResponse = await fetch('/api/user/referrals?includeStats=true&limit=10');
         if (statsResponse.ok) {
           const statsData = await statsResponse.json();
           if (statsData.success && statsData.data) {
@@ -440,31 +415,6 @@ function UserDropdown({ session, onClose, onShowModal, autoEdit = false }: { ses
     }
   };
 
-  // const handleGenerateReferralCode = async () => {
-  //   setIsGeneratingCode(true);
-  //   try {
-  //     const response = await fetch('/api/user/referral-code', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ action: 'generate' }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (data.success) {
-  //       setReferralCode(data.data.referralCode);
-  //       showSuccess('Generate referral code successfully!');
-  //     } else {
-  //       showError(data.message || 'Unable to generate referral code');
-  //     }
-  //   } catch (error) {
-  //     showError('Failed to generate referral code');
-  //   } finally {
-  //     setIsGeneratingCode(false);
-  //   }
-  // };
 
   const handleGenerateClick = () => {
     onShowModal();
@@ -707,28 +657,6 @@ export default function Header() {
     return false;
   };
 
-  // const handleGenerateReferralCode = async () => {
-  //   try {
-  //     const response = await fetch('/api/user/referral-code', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ action: 'generate' }),
-  //     });
-
-  //     const data = await response.json();
-
-  //     if (data.success) {
-  //       showSuccess('Generate referral code successfully!');
-  //       window.dispatchEvent(new CustomEvent('session-update'));
-  //     } else {
-  //       showError(data.message || 'Unable to generate referral code');
-  //     }
-  //   } catch (error) {
-  //     showError('Failed to generate referral code');
-  //   }
-  // };
 
   return (
     <motion.div

@@ -1,7 +1,7 @@
 "use client";
 
 // import Action from "~/components/action";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import VideoSectionSkeleton from "./VideoSectionSkeleton";
@@ -42,6 +42,12 @@ export default function VideoSection() {
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
+
+  useEffect(() => {
+    if (error) {
+      window.location.href = '/not-found';
+    }
+  }, [error]);
 
   React.useEffect(() => {
     if (videos.length > 0 && !currentVideo) {

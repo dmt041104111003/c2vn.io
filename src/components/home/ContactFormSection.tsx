@@ -181,6 +181,12 @@ export default function ContactFormSection() {
   });
 
   useEffect(() => {
+    if (coursesError) {
+      window.location.href = '/not-found';
+    }
+  }, [coursesError]);
+
+  useEffect(() => {
     if (courses.length > 0 && !selectedCourse && formData["your-course"]) {
       const course = (courses as any[]).find((c: any) => c.name === formData["your-course"]);
       if (course) {

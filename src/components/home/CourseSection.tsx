@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Course } from "~/constants/admin";
@@ -16,14 +16,21 @@ export default function CourseSection() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
 
-  const { data: coursesData, isLoading } = useQuery({
+  const { data: coursesData, isLoading, error: coursesError } = useQuery({
     queryKey: ["courses"],
     queryFn: async () => {
       const res = await fetch("/api/courses");
+      if (!res.ok) throw new Error('Failed to fetch courses');
       const data = await res.json();
       return data?.data || [];
     },
   });
+
+  useEffect(() => {
+    if (coursesError) {
+      window.location.href = '/not-found';
+    }
+  }, [coursesError]);
 
   const courses = coursesData?.filter((c: Course) => c.isActive) || [];
   
