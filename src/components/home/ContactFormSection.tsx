@@ -11,6 +11,7 @@ import ContactFormImage from './ContactFormImage';
 import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
 import { IPDisplay } from '~/components/IPDisplay';
+import { getRealIP } from '~/lib/webrtc-ip';
 import { useQuery } from '@tanstack/react-query';
 
 type TabType = "form" | "manage";
@@ -280,6 +281,9 @@ export default function ContactFormSection() {
       // First, handle referral code if present and user is logged in
       if (formData["email-intro"] && session?.user) {
         try {
+          // Get real IP from client
+          const realIP = await getRealIP();
+          
           const referralResponse = await fetch('/api/referral/submit', {
             method: 'POST',
             headers: {
@@ -287,7 +291,8 @@ export default function ContactFormSection() {
             },
             body: JSON.stringify({
               referralCode: formData["email-intro"],
-              formData: formData
+              formData: formData,
+              realIP: realIP
             }),
           });
 

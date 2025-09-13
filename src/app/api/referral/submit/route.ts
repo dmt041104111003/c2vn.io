@@ -3,7 +3,6 @@ import { prisma } from '~/lib/prisma';
 import { withAuth } from '~/lib/api-wrapper';
 import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 import { findUserByReferralCode, validateReferralCode } from '~/lib/referral-utils';
-import { getClientInfo } from '~/lib/ip-utils';
 
 export const POST = withAuth(async (req: NextRequest, currentUser) => {
   try {
@@ -11,14 +10,17 @@ export const POST = withAuth(async (req: NextRequest, currentUser) => {
       return NextResponse.json(createErrorResponse('User not found', 'USER_NOT_FOUND'), { status: 404 });
     }
 
-    const { referralCode, formData } = await req.json();
+    const { referralCode, formData, realIP } = await req.json();
 
     if (!referralCode || !validateReferralCode(referralCode)) {
       return NextResponse.json(createErrorResponse('Invalid referral code format', 'INVALID_REFERRAL_CODE'), { status: 400 });
     }
 
-    const clientInfo = getClientInfo(req);
-    const clientIP = clientInfo.ip;
+    const clientIP = realIP;
+
+    if (!clientIP) {
+      return NextResponse.json(createErrorResponse('Real IP address is required', 'MISSING_REAL_IP'), { status: 400 });
+    }
 
     const existingSubmission = await prisma.referralSubmission.findUnique({
       where: { userId: currentUser.id }
