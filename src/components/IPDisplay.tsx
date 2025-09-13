@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { getRealIP } from '~/lib/webrtc-ip';
 
 interface IPInfo {
   ip: string;
@@ -16,14 +17,14 @@ export function IPDisplay() {
   useEffect(() => {
     const fetchIPInfo = async () => {
       try {
-        const response = await fetch('/api/ip-info');
-        if (!response.ok) {
-          throw new Error('Failed to fetch IP information');
-        }
-        const data = await response.json();
-        setIpInfo(data.data);
+        const realIP = await getRealIP();
+        setIpInfo({
+          ip: realIP,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent
+        });
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : 'Cannot get real IP address');
       } finally {
         setLoading(false);
       }
@@ -70,21 +71,21 @@ export function IPDisplay() {
           <span className="text-green-700 dark:text-green-300 font-medium text-sm">Your connection information:</span>
         </div>
         
-        <div className="pl-6 space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="text-green-600 dark:text-green-400 text-xs font-medium">IP Address:</span>
-            <span className="text-green-800 dark:text-green-200 text-xs font-mono bg-green-100 dark:bg-green-800 px-2 py-1 rounded">
-              {ipInfo.ip}
-            </span>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <span className="text-green-600 dark:text-green-400 text-xs font-medium">Time:</span>
-            <span className="text-green-800 dark:text-green-200 text-xs">
-              {new Date(ipInfo.timestamp).toLocaleString('vi-VN')}
-            </span>
-          </div>
-        </div>
+         <div className="pl-6 space-y-1">
+           <div className="flex items-center space-x-2">
+             <span className="text-green-600 dark:text-green-400 text-xs font-medium">Your IP Address:</span>
+             <span className="text-green-800 dark:text-green-200 text-xs font-mono bg-green-100 dark:bg-green-800 px-2 py-1 rounded">
+               {ipInfo.ip}
+             </span>
+           </div>
+           
+           <div className="flex items-center space-x-2">
+             <span className="text-green-600 dark:text-green-400 text-xs font-medium">Time:</span>
+             <span className="text-green-800 dark:text-green-200 text-xs">
+               {new Date(ipInfo.timestamp).toLocaleString('vi-VN')}
+             </span>
+           </div>
+         </div>
       </div>
     </div>
   );
