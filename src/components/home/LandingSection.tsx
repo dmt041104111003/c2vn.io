@@ -30,7 +30,7 @@ export default function LandingSection() {
     publishStatus: 'DRAFT' as 'DRAFT' | 'PUBLISHED'
   });
 
-  const { data: userData } = useQuery({
+  const { data: userData, error: userDataError } = useQuery({
     queryKey: ['user-role'],
     queryFn: async () => {
       if (!session?.user) {
@@ -50,17 +50,29 @@ export default function LandingSection() {
     enabled: !!session?.user,
   });
 
-  const { data: landingContents = [] } = useQuery({
+  useEffect(() => {
+    if (userDataError) {
+      window.location.href = '/not-found';
+    }
+  }, [userDataError]);
+
+  const { data: landingContents = [], error: landingContentsError } = useQuery({
     queryKey: ['landing-content'],
     queryFn: async () => {
       const response = await fetch('/api/landing-content');
       if (!response.ok) {
-        return [];
+        throw new Error('Failed to fetch landing content');
       }
       const data = await response.json();
       return data?.data || [];
     }
   });
+
+  useEffect(() => {
+    if (landingContentsError) {
+      window.location.href = '/not-found';
+    }
+  }, [landingContentsError]);
 
   useEffect(() => {
     const adminStatus = userData?.data?.role?.name === 'ADMIN';

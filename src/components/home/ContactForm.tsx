@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ContactFormData, FormErrors, ContactFormProps } from '~/constants/contact';
 import { Captcha } from '~/components/ui/captcha';
@@ -8,7 +8,7 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
   const typedErrors: FormErrors = errors;
   const [selectedCourseImage, setSelectedCourseImage] = useState<string>('');
 
-  const { data: eventLocations } = useQuery({
+  const { data: eventLocations, error: eventLocationsError } = useQuery({
     queryKey: ['contact-form-event-locations'],
     queryFn: async () => {
       const response = await fetch('/api/event-locations');
@@ -23,7 +23,13 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
     refetchOnWindowFocus: false,
   });
 
-  const { data: courses } = useQuery({
+  useEffect(() => {
+    if (eventLocationsError) {
+      window.location.href = '/not-found';
+    }
+  }, [eventLocationsError]);
+
+  const { data: courses, error: coursesError } = useQuery({
     queryKey: ['contact-form-courses'],
     queryFn: async () => {
       const response = await fetch('/api/courses');
@@ -37,6 +43,12 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
     gcTime: 10 * 60 * 1000, 
     refetchOnWindowFocus: false,
   });
+
+  useEffect(() => {
+    if (coursesError) {
+      window.location.href = '/not-found';
+    }
+  }, [coursesError]);
   return (
          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden max-w-2xl mx-auto">
        <form onSubmit={onSubmit} className="p-4 sm:p-5 space-y-2 sm:space-y-3">

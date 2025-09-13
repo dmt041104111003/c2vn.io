@@ -16,6 +16,7 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
   const {
     data: queryData,
     isLoading,
+    error: technologiesError,
   } = useQuery({
     queryKey: ['technologies'],
     queryFn: async () => {
@@ -26,6 +27,13 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
       return response.json();
     }
   });
+
+  // Redirect to 404 if technologies data fails to load
+  useEffect(() => {
+    if (technologiesError) {
+      window.location.href = '/not-found';
+    }
+  }, [technologiesError]);
 
   const technologies: Technology[] = queryData?.data || [];
 

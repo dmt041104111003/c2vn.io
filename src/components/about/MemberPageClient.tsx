@@ -203,7 +203,7 @@ export default function MemberPageClient() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: queryData, isLoading } = useQuery({
+  const { data: queryData, isLoading, error: membersError } = useQuery({
     queryKey: ["members"],
     queryFn: async () => {
       const response = await fetch("/api/members");
@@ -214,7 +214,13 @@ export default function MemberPageClient() {
     },
   });
 
-  const { data: tabsData } = useQuery({
+  useEffect(() => {
+    if (membersError) {
+      window.location.href = '/not-found';
+    }
+  }, [membersError]);
+
+  const { data: tabsData, error: tabsError } = useQuery({
     queryKey: ["tabs"],
     queryFn: async () => {
       const response = await fetch("/api/tabs");
@@ -224,6 +230,13 @@ export default function MemberPageClient() {
       return response.json();
     },
   });
+
+  // Redirect to 404 if tabs data fails to load
+  useEffect(() => {
+    if (tabsError) {
+      window.location.href = '/not-found';
+    }
+  }, [tabsError]);
 
   const members: MemberType[] = queryData?.data || [];
   const tabs: TabType[] = tabsData?.data || [];

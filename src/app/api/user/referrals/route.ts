@@ -5,6 +5,10 @@ import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 
 export const GET = withAuth(async (req, currentUser) => {
   try {
+    const url = new URL(req.url);
+    const includeStats = url.searchParams.get('includeStats') === 'true';
+    const limit = url.searchParams.get('limit');
+
     const user = await prisma.user.findUnique({
       where: { id: currentUser.id },
       select: {
@@ -45,14 +49,23 @@ export const GET = withAuth(async (req, currentUser) => {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      ...(limit && { take: parseInt(limit) })
     });
 
-    return NextResponse.json(createSuccessResponse({
+    const response: any = {
       user,
       referrals,
       totalReferrals: referrals.length
-    }));
+    };
+
+    if (includeStats) {
+      response.referralCount = user.referralCount;
+      response.referralCode = user.referralCode;
+      response.recentReferrals = referrals.slice(0, 10);
+    }
+
+    return NextResponse.json(createSuccessResponse(response));
 
   } catch (error) {
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });

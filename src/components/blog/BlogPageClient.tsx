@@ -27,6 +27,7 @@ export default function BlogPageClient() {
 
   const {
     data: postsData,
+    error: postsError,
   } = useQuery({
     queryKey: ['public-posts'],
     queryFn: async () => {
@@ -35,6 +36,12 @@ export default function BlogPageClient() {
       return res.json();
     }
   });
+
+  useEffect(() => {
+    if (postsError) {
+      window.location.href = '/not-found';
+    }
+  }, [postsError]);
   const posts: BlogPost[] = postsData?.data || [];
 
   const { data: tagsData } = useQuery({
