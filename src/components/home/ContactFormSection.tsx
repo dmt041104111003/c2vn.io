@@ -279,6 +279,20 @@ export default function ContactFormSection() {
       // First, handle referral code if present and user is logged in
       if (formData["email-intro"] && session?.user) {
         try {
+          const userResponse = await fetch('/api/user/referral-code');
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            if (userData.success && userData.data?.referralCode) {
+              showError("You have created your own referral code, you cannot use someone else's code!");
+              setIsSubmitting(false);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error('Error checking user referral code:', error);
+        }
+
+        try {
           const referralResponse = await fetch('/api/referral/submit', {
             method: 'POST',
             headers: {
