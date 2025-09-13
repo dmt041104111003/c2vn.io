@@ -10,6 +10,7 @@ import ContactFormQuoteBlock from './ContactFormQuoteBlock';
 import ContactFormImage from './ContactFormImage';
 import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
+import { IPDisplay } from '~/components/IPDisplay';
 import { useQuery } from '@tanstack/react-query';
 
 type TabType = "form" | "manage";
@@ -402,17 +403,20 @@ export default function ContactFormSection() {
               <ContactFormTabs activeTab={activeTab} onTabChange={handleTabChange} />
             )}
             {activeTab === "form" ? (
-              <ContactForm
-                formData={formData}
-                errors={errors}
-                isSubmitting={isSubmitting}
-                captchaValid={captchaValid}
-                captchaKey={captchaKey}
-                onInputChange={handleInputChange}
-                onSubmit={handleSubmit}
-                onCaptchaChange={setCaptchaValid}
-                onCourseChange={handleCourseChange}
-              />
+              <div className="space-y-4">
+                <IPDisplay />
+                <ContactForm
+                  formData={formData}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                  captchaValid={captchaValid}
+                  captchaKey={captchaKey}
+                  onInputChange={handleInputChange}
+                  onSubmit={handleSubmit}
+                  onCaptchaChange={setCaptchaValid}
+                  onCourseChange={handleCourseChange}
+                />
+              </div>
             ) : activeTab === "manage" ? (
               <div>
                 {coursesLoading ? (
