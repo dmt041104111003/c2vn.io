@@ -11,10 +11,10 @@ cloudinary.config({
 
 const SUPPORTED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff'];
 
-async function uploadImageToCloudinary(imagePath) {
+async function uploadImageToCloudinary(imagePath, targetFolder) {
   try {
     const result = await cloudinary.uploader.upload(imagePath, {
-      folder: 'events',
+      folder: targetFolder,
       use_filename: true,
       unique_filename: true
     });
@@ -41,7 +41,7 @@ function getImageFiles(folderPath) {
   }
 }
 
-async function uploadImagesAndGetMarkdown(folderPath) {
+async function uploadImagesAndGetMarkdown(folderPath, targetFolder) {
   const imageFiles = getImageFiles(folderPath);
   
   if (imageFiles.length === 0) {
@@ -54,7 +54,7 @@ async function uploadImagesAndGetMarkdown(folderPath) {
   
   for (const imagePath of imageFiles) {
     const fileName = path.basename(imagePath);
-    const cloudinaryUrl = await uploadImageToCloudinary(imagePath);
+    const cloudinaryUrl = await uploadImageToCloudinary(imagePath, targetFolder);
     
     if (cloudinaryUrl) {
       markdownLines.push(`<img src="${cloudinaryUrl}" alt="Cloudinary Image" width="800" height="600" style={{maxWidth: "100%", height: "auto"}} />`);
@@ -77,6 +77,20 @@ async function main() {
   }
   
   const folderPath = args[0];
+  let targetFolder = 'events';
+  for (let i = 1; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--folder' || a === '-f') {
+      if (i + 1 < args.length) {
+        targetFolder = args[i + 1];
+        i++;
+      }
+    } else if (a.startsWith('--folder=')) {
+      targetFolder = a.split('=')[1] || targetFolder;
+    } else if (!a.startsWith('-') && i === 1) {
+      targetFolder = a;
+    }
+  }
   if (!fs.existsSync(folderPath)) {
     console.error(`Folder not found: ${folderPath}`);
     return;
@@ -88,10 +102,10 @@ async function main() {
   }
   
   try {
-    const markdown = await uploadImagesAndGetMarkdown(folderPath);
+    const markdown = await uploadImagesAndGetMarkdown(folderPath, targetFolder);
     
     if (markdown) {
-      console.log('\nGenerated Image Tags:');
+      console.log(`\nGenerated Image Tags (folder: ${targetFolder}):`);
       console.log('='.repeat(50));
       console.log(markdown);
       console.log('='.repeat(50));
