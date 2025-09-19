@@ -16,11 +16,12 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 3838
           script: |
-            cd /home/tung/c2vn.io
-            source ~/.bashrc   # load fnm và PATH của user tung
-            git fetch origin
-            git checkout production
-            git pull
-            npm install
-            npm run build
-            pm2 reload c2vn
+            bash -lc "
+              cd /home/tung/c2vn.io &&
+              git fetch origin &&
+              git checkout production &&
+              git pull &&
+              npm install &&
+              npm run build &&
+              pm2 reload c2vn
+            "
