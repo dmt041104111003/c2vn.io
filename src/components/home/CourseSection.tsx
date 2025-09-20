@@ -26,11 +26,12 @@ export default function CourseSection() {
     },
   });
 
-  useEffect(() => {
-    if (coursesError) {
-      window.location.href = '/not-found';
-    }
-  }, [coursesError]);
+  // Removed redirect to not-found on coursesError
+  // useEffect(() => {
+  //   if (coursesError) {
+  //     window.location.href = '/not-found';
+  //   }
+  // }, [coursesError]);
 
   const courses = coursesData?.filter((c: Course) => c.isActive) || [];
   

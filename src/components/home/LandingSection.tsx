@@ -50,11 +50,12 @@ export default function LandingSection() {
     enabled: !!session?.user,
   });
 
-  useEffect(() => {
-    if (userDataError) {
-      window.location.href = '/not-found';
-    }
-  }, [userDataError]);
+  // Removed redirect to not-found on userDataError
+  // useEffect(() => {
+  //   if (userDataError) {
+  //     window.location.href = '/not-found';
+  //   }
+  // }, [userDataError]);
 
   const { data: landingContents = [], error: landingContentsError } = useQuery({
     queryKey: ['landing-content'],
@@ -68,11 +69,12 @@ export default function LandingSection() {
     }
   });
 
-  useEffect(() => {
-    if (landingContentsError) {
-      window.location.href = '/not-found';
-    }
-  }, [landingContentsError]);
+  // Removed redirect to not-found on landingContentsError
+  // useEffect(() => {
+  //   if (landingContentsError) {
+  //     window.location.href = '/not-found';
+  //   }
+  // }, [landingContentsError]);
 
   useEffect(() => {
     const adminStatus = userData?.data?.role?.name === 'ADMIN';

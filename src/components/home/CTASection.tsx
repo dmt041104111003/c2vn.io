@@ -32,11 +32,12 @@ export default function CTASection() {
     enabled: !!session?.user,
   });
 
-  useEffect(() => {
-    if (userDataError) {
-      window.location.href = '/not-found';
-    }
-  }, [userDataError]);
+  // Removed redirect to not-found on userDataError
+  // useEffect(() => {
+  //   if (userDataError) {
+  //     window.location.href = '/not-found';
+  //   }
+  // }, [userDataError]);
 
   useEffect(() => {
     const adminStatus = userData?.data?.role?.name === "ADMIN";
