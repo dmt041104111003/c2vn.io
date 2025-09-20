@@ -45,7 +45,8 @@ export default function VideoSection() {
 
   useEffect(() => {
     if (error) {
-      window.location.href = '/not-found';
+      // Removed redirect to not-found
+      // window.location.href = '/not-found';
     }
   }, [error]);
 

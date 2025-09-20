@@ -23,11 +23,12 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
     refetchOnWindowFocus: false,
   });
 
-  useEffect(() => {
-    if (eventLocationsError) {
-      window.location.href = '/not-found';
-    }
-  }, [eventLocationsError]);
+  // Removed redirect to not-found on eventLocationsError
+  // useEffect(() => {
+  //   if (eventLocationsError) {
+  //     window.location.href = '/not-found';
+  //   }
+  // }, [eventLocationsError]);
 
   const { data: courses, error: coursesError } = useQuery({
     queryKey: ['contact-form-courses'],
@@ -44,11 +45,12 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
     refetchOnWindowFocus: false,
   });
 
-  useEffect(() => {
-    if (coursesError) {
-      window.location.href = '/not-found';
-    }
-  }, [coursesError]);
+  // Removed redirect to not-found on coursesError
+  // useEffect(() => {
+  //   if (coursesError) {
+  //     window.location.href = '/not-found';
+  //   }
+  // }, [coursesError]);
   return (
          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden max-w-2xl mx-auto">
        <form onSubmit={onSubmit} className="p-4 sm:p-5 space-y-2 sm:space-y-3">
