@@ -1,116 +1,86 @@
 ---
 title: Introduction
-description: This is just example of the blog post
-date: 2025-8-24
+description: Giới thiệu về Cardano dành cho nhà phát triển
+date: 2025-08-24
 author: Dao Manh Tung
 ---
 
-## Introduction to MDX Magic
+## Bắt đầu
+Bắt đầu với Cardano.
 
-### Introduction to MDX Magic
+Xin chào bạn đến với **Cardano2vn**. Đây là bản dịch của trang [developers.cardano.org](https://developers.cardano.org/).  
+Nếu bạn quan tâm đến ví **Cardano wallet**, bạn có thể tham khảo **showcase section**.
 
-Welcome to the world of **MDX**, a revolutionary way to write technical documentation and blog posts. MDX seamlessly blends Markdown's simplicity with the power of React components.
+Cũng cần lưu ý: **Portal cho nhà phát triển** bao quát tất cả mọi thứ bạn có thể làm hôm nay trên **Cardano mainnet**.  
+Đây là trang thuần túy kỹ thuật trên nền tảng blockchain Cardano.
 
-## Why MDX is Awesome
+---
 
-MDX transforms how we create content by allowing full React component integration. Here's a simple component example:
+## Cardano là gì?
+Cardano là một tập hợp các giao thức mã nguồn mở, không có bằng sáng chế.  
+Nó là nền tảng cho phép bạn lưu trữ, chuyển đổi và quản lý giá trị, danh tính và quản trị.  
 
-```jsx
-import React from "react";
+Cardano được xây dựng dựa trên **nghiên cứu khoa học**, không phải ý kiến hay thiên vị.
 
-const CalloutBox = ({ children, type = "info" }) => {
-  return { children };
-};
+---
 
-export default CalloutBox;
-```
+## Nó bắt đầu như thế nào?
+Cardano bắt đầu như một dự án R&D quan trọng vào **2015**, mất gần **2 năm nghiên cứu** để bắt đầu viết mã.  
 
-You can use this component directly in your MDX file, creating dynamic and interactive content that goes far beyond traditional markdown.
+Mục tiêu:  
+- Làm thế nào để xây dựng một hệ thống xã hội & tài chính bền vững cho **hàng tỷ người**?  
+- Cần kết hợp những công nghệ nào để đạt được hiệu quả với **chi phí hợp lý**?
 
-## Setting Up Your MDX Environment
+Cardano đã sản sinh ra hơn **100 bài báo học thuật** (Eurocrypt, Asiacrypt...).  
+Ví dụ: **Ouroboros: A Secure Proof-of-Stake Blockchain Protocol** là một trong những nghiên cứu bảo mật được trích dẫn nhiều nhất (2015–2019).
 
-Configuring MDX involves several steps. Here's a comprehensive webpack configuration:
+---
 
-```javascript
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.mdx?$/,
-        use: ["babel-loader", "@mdx-js/loader"],
-      },
-    ],
-  },
-  plugins: [
-    new MDXPlugin({
-      remarkPlugins: [remarkGfm, remarkFrontmatter],
-    }),
-  ],
-};
-```
+## Những gì bạn cần mang theo
+Để tận dụng tối đa **Cổng thông tin nhà phát triển Cardano**, bạn cần:  
+- Kinh nghiệm lập trình.  
+- Hiểu các khái niệm cơ bản: **UTxO, transactions, addresses, key derivation, networking**.  
 
-## Advanced MDX Techniques
+👉 Nếu bạn chưa quen, hãy bắt đầu với **Khái niệm kỹ thuật** hoặc khóa học **Stake Pool Course**.
 
-React hooks work beautifully with MDX. Consider this interactive counter component:
+---
 
-```jsx
-import React, { useState } from 'react';
+## Cardano thì khác gì?
+Nếu bạn đến từ các nền tảng hợp đồng thông minh khác, cần lưu ý:  
 
-const InteractiveCounter = () => {
-  const [count, setCount] = useState(0);
+- **UTxO & eUTxO model** → là nền tảng tư duy.  
+- **Tokens** trên Cardano là **native**, không cần hợp đồng thông minh.  
+- Giao dịch token = giao dịch chuẩn, không gọi hàm `transfer`.  
+- **Smart contracts** hoạt động theo **mô hình eUTxO** → khác hoàn toàn Ethereum.
 
-  return (
+---
 
-      Current Count: {count}
-      <button onClick={() => setCount(count + 1)}>
-        Increment
+## Bạn có thể làm gì trên Cardano hôm nay
+- Gửi & nhận **native tokens** (bao gồm ADA).  
+- Ủy quyền ADA cho **stake pools** để nhận thưởng.  
+- Tham gia **Project Catalyst** → bỏ phiếu phân bổ **1B+ USD** từ treasury.  
+- Đề xuất & thảo luận ý tưởng qua **CIP process**.  
+- Tương tác với **smart contracts**.
 
+---
 
-  );
-};
+## Tại sao xây dựng trên Cardano?
+- **Nhanh hơn, an toàn hơn, tiết kiệm hơn.**  
+- **Chi phí dự đoán chính xác**, không có đấu giá phí gas.  
+- **Cộng đồng >1 triệu ví** → dễ thu hút người dùng thử sản phẩm.  
+- **Nguồn quỹ đầu tư**: cứ 10–12 tuần, cộng đồng bỏ phiếu tài trợ dự án.  
+- **Bằng chứng cổ phần (PoS)** → tiêu thụ ít năng lượng hơn.  
+- **Ouroboros** → cơ chế đồng thuận dựa trên nghiên cứu học thuật, peer-reviewed.
 
-export default InteractiveCounter;
-```
+---
 
-## Deep Dive into MDX Imports
+## Những gì bạn có thể xây dựng trên Cardano ngay hôm nay
+- Tích hợp Cardano vào **website & dịch vụ hiện có**.  
+- Phát hành **native tokens & NFTs**.  
+- Gắn **metadata** vào giao dịch (danh tính, chứng thực, truy xuất nguồn gốc).  
+- Chứng minh sự tồn tại của **file/text/data** tại thời điểm cụ thể.  
+- Xác minh **sản phẩm vật lý & hàng chính hãng** qua metadata.  
+- Thiết lập, quản lý & duy trì **stake pool**.  
+- Viết & triển khai **smart contracts**.
 
-Managing complex imports becomes straightforward with MDX:
-
-```typescript
-// Import multiple components
-import Button from "./components/Button";
-import CodeHighlighter from "./components/CodeHighlighter";
-import DataVisualization from "./components/DataVisualization";
-
-// Dynamic imports for performance
-const LazyLoadedComponent = React.lazy(
-  () => import("./components/HeavyComponent")
-);
-```
-
-## Lorem Ipsum Content Exploration
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nunc eget ultricies tincidunt, velit velit bibendum velit, vel bibendum velit velit sit amet velit.
-
-Donec euismod, nisl eget ultricies tincidunt, velit velit bibendum velit, vel bibendum velit velit sit amet velit. Sed euismod, nisl eget ultricies tincidunt, velit velit bibendum velit, vel bibendum velit velit sit amet velit.
-
-## Performance Considerations in MDX
-
-Performance matters! Here's an optimization technique:
-
-```javascript
-// Memoization for complex components
-const MemoizedComponent = React.memo(
-  ExpensiveComponent,
-  (prevProps, nextProps) => {
-    // Custom comparison logic
-    return prevProps.data === nextProps.data;
-  }
-);
-```
-
-## The Future of Technical Writing
-
-MDX represents a **paradigm shift** in documentation. By combining markdown's readability with React's interactivity, we're creating a new standard for technical communication.
-
-Embrace the **MDX revolution**! Write documentation that's not just informative, but truly interactive. 🚀📝
+---
