@@ -216,7 +216,8 @@ export default function MemberPageClient() {
 
   useEffect(() => {
     if (membersError) {
-      window.location.href = '/not-found';
+      // Removed redirect to not-found
+      // window.location.href = '/not-found';
     }
   }, [membersError]);
 
@@ -234,7 +235,8 @@ export default function MemberPageClient() {
   // Redirect to 404 if tabs data fails to load
   useEffect(() => {
     if (tabsError) {
-      window.location.href = '/not-found';
+      // Removed redirect to not-found
+      // window.location.href = '/not-found';
     }
   }, [tabsError]);
 

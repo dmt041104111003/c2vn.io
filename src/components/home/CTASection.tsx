@@ -61,7 +61,8 @@ export default function CTASection() {
         setEvents(data?.data || []);
       } catch (err: any) {
         setErrorEvents(err.message || "Unknown error");
-        window.location.href = '/not-found';
+        // Removed redirect to not-found
+        // window.location.href = '/not-found';
       } finally {
         setLoadingEvents(false);
       }
