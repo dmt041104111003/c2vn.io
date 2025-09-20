@@ -30,7 +30,8 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
 
   useEffect(() => {
     if (technologiesError) {
-      window.location.href = '/not-found';
+      // Removed redirect to not-found
+      // window.location.href = '/not-found';
     }
   }, [technologiesError]);
 

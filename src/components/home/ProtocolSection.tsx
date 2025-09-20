@@ -31,7 +31,8 @@ export default function ProtocolSection() {
 
   useEffect(() => {
     if (postsError) {
-      window.location.href = '/not-found';
+      // Removed redirect to not-found
+      // window.location.href = '/not-found';
     }
   }, [postsError]);
 
