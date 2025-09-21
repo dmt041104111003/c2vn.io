@@ -32,43 +32,51 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
       return;
     }
 
-    if (!event?.id) {
-      showError("Missing event ID");
-      return;
-    }
-
     setIsSaving(true);
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("location", location);
+    formData.append("orderNumber", index.toString());
     
     if (selectedMedia) {
       formData.append("imageUrl", selectedMedia.url);
     }
 
     try {
-      const res = await fetch(`/api/admin/event-images/${event.id}`, {
-        method: "PUT",
-        body: formData,
-      });
+      const isNewEvent = !event.id || event.id === index.toString();
+      
+      let res;
+      if (isNewEvent) {
+        res = await fetch('/api/admin/event-images', {
+          method: "POST",
+          body: formData,
+        });
+      } else {
+        res = await fetch(`/api/admin/event-images/${event.id}`, {
+          method: "PUT",
+          body: formData,
+        });
+      }
 
       if (res.ok) {
         const data = await res.json();
         const updatedEvent: Partial<Event> = {
+          id: data.data?.id || event.id,
           title,
           location,
           imageUrl: selectedMedia?.url || event.imageUrl,
+          orderNumber: index,
         };
         onSave(index, updatedEvent);
         onClose();
-        showSuccess("Event updated successfully!");
+        showSuccess(isNewEvent ? "Event created successfully!" : "Event updated successfully!");
       } else {
         const errorData = await res.json();
-        showError(errorData.error || "Failed to update event");
+        showError(errorData.error || `Failed to ${isNewEvent ? 'create' : 'update'} event`);
       }
     } catch {
-      showError("Failed to update event");
+      showError("Failed to save event");
     } finally {
       setIsSaving(false);
     }
