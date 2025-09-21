@@ -19,8 +19,7 @@ export default function AboutSection() {
 
   useEffect(() => {
     if (aboutError) {
-      // Removed redirect to not-found
-      // window.location.href = '/not-found';
+
     }
   }, [aboutError]);
 

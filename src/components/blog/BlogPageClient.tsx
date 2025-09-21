@@ -39,8 +39,7 @@ export default function BlogPageClient() {
 
   useEffect(() => {
     if (postsError) {
-      // Removed redirect to not-found
-      // window.location.href = '/not-found';
+
     }
   }, [postsError]);
   const posts: BlogPost[] = postsData?.data || [];
