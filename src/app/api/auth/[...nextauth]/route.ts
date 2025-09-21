@@ -15,6 +15,21 @@ interface TokenWithAddress extends Record<string, unknown> {
 
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_ID!,
@@ -93,7 +108,7 @@ export const authOptions = {
         }
       }
       if (!session.expires) {
-        session.expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(); // 30 ngày
+        session.expires = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(); // 1 ngày
       }
       return { ...session, expires: session.expires! };
     },
