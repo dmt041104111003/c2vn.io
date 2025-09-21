@@ -16,7 +16,7 @@ interface TokenWithAddress extends Record<string, unknown> {
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
     maxAge: 24 * 60 * 60,
   },
   cookies: {
@@ -24,7 +24,7 @@ export const authOptions = {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: 'lax' as const,
         path: '/',
         secure: process.env.NODE_ENV === 'production'
       }
