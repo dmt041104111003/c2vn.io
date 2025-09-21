@@ -175,15 +175,6 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
                       onMediaAdd={handleMediaAdd}
                       mediaType="image"
                     />
-                    {selectedMedia && (
-                      <div className="mt-2">
-                        <img 
-                          src={selectedMedia.url} 
-                          alt="Selected media" 
-                          className="w-32 h-32 object-cover rounded-lg"
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
                 <div className="mt-6 flex justify-end gap-2">
