@@ -3,27 +3,21 @@ import { DocsPage, DocsBody, DocsDescription, DocsTitle } from "fumadocs-ui/page
 import { notFound } from "next/navigation";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { getMDXComponents } from "~/mdx-components";
-import { LLMCopyButton, ViewOptions } from "~/components/ai/page-actions";
-
-const owner = "fumadocs";
-const repo = "fumadocs";
 
 export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
   const page = source.getPage(params.slug);
+  console.log("params", params);
   if (!page) notFound();
 
-  console.log(page);
+  console.log("page", page);
   const MDXContent = page.data.body;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
-      <div className="flex flex-row gap-2 items-center border-b pt-2 pb-6">
-        <LLMCopyButton markdownUrl={`${page.url}.mdx`} />
-        <ViewOptions markdownUrl={`${page.url}.mdx`} githubUrl={`https://github.com/${owner}/${repo}/blob/dev/apps/docs/content/docs/${page.path}`} />
-      </div>
+
       <DocsBody>
         <MDXContent
           components={getMDXComponents({
