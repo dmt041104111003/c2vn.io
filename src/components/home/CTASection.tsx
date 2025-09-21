@@ -32,12 +32,7 @@ export default function CTASection() {
     enabled: !!session?.user,
   });
 
-  // Removed redirect to not-found on userDataError
-  // useEffect(() => {
-  //   if (userDataError) {
-  //     window.location.href = '/not-found';
-  //   }
-  // }, [userDataError]);
+
 
   useEffect(() => {
     const adminStatus = userData?.data?.role?.name === "ADMIN";
@@ -61,8 +56,7 @@ export default function CTASection() {
         setEvents(data?.data || []);
       } catch (err: any) {
         setErrorEvents(err.message || "Unknown error");
-        // Removed redirect to not-found
-        // window.location.href = '/not-found';
+
       } finally {
         setLoadingEvents(false);
       }

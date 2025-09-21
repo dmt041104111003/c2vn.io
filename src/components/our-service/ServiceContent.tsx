@@ -127,8 +127,7 @@ export default function ServiceContent() {
         });
       } catch (e) {
         setError((e as Error).message);
-        // Removed redirect to not-found
-        // window.location.href = '/not-found';
+
       } finally {
         setLoading(false);
       }

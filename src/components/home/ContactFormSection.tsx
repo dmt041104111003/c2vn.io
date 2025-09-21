@@ -180,12 +180,7 @@ export default function ContactFormSection() {
     refetchOnWindowFocus: false,
   });
 
-  // Removed redirect to not-found on coursesError
-  // useEffect(() => {
-  //   if (coursesError) {
-  //     window.location.href = '/not-found';
-  //   }
-  // }, [coursesError]);
+
 
   useEffect(() => {
     if (courses.length > 0 && !selectedCourse && formData["your-course"]) {

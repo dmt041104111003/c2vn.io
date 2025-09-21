@@ -216,8 +216,7 @@ export default function MemberPageClient() {
 
   useEffect(() => {
     if (membersError) {
-      // Removed redirect to not-found
-      // window.location.href = '/not-found';
+
     }
   }, [membersError]);
 
