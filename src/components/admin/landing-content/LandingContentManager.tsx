@@ -108,10 +108,10 @@ export default function LandingContentManager({ formData, setFormData }: Landing
       description?: string;
       mainText?: string;
       subText?: string;
-      media1Url?: string;
-      media2Url?: string;
-      media3Url?: string;
-      media4Url?: string;
+      media1Url: string;
+      media2Url: string;
+      media3Url: string;
+      media4Url: string;
     }) => {
       const method = currentContentId ? 'PUT' : 'POST';
       const url = currentContentId 
@@ -155,20 +155,11 @@ export default function LandingContentManager({ formData, setFormData }: Landing
       mainText: formData.mainText,
       subText: formData.subText,
       publishStatus: formData.publishStatus,
+      media1Url: formData.media1Url || '',
+      media2Url: formData.media2Url || '',
+      media3Url: formData.media3Url || '',
+      media4Url: formData.media4Url || '',
     };
-
-    if (formData.media1Url && formData.media1Url.trim()) {
-      (submitData as any).media1Url = formData.media1Url;
-    }
-    if (formData.media2Url && formData.media2Url.trim()) {
-      (submitData as any).media2Url = formData.media2Url;
-    }
-    if (formData.media3Url && formData.media3Url.trim()) {
-      (submitData as any).media3Url = formData.media3Url;
-    }
-    if (formData.media4Url && formData.media4Url.trim()) {
-      (submitData as any).media4Url = formData.media4Url;
-    }
 
     console.log('Submit data:', submitData);
     updateMutation.mutate(submitData);

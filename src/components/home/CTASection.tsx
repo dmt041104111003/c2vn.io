@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { PenSquare } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
@@ -73,7 +73,7 @@ export default function CTASection() {
     const updated = [...events];
     const eventIndex = updated.findIndex(e => e.orderNumber === index);
     if (eventIndex !== -1) {
-      updated[eventIndex] = { ...updated[eventIndex], ...updatedEvent };
+      updated[eventIndex] = { ...updatedEvent, orderNumber: index } as Event;
     } else {
       updated.push({ ...updatedEvent, orderNumber: index } as Event);
     }
@@ -107,7 +107,16 @@ export default function CTASection() {
   // if (errorEvents) return <p className="text-red-500">Error loading events: {errorEvents}</p>;
   // if (userData === undefined) return <p>Loading user info...</p>;
 
-  const sortedEvents = [...events].sort((a, b) => a.orderNumber - b.orderNumber);
+  const modalEvent = useMemo(() => {
+    if (selectedEventIndex === null) return null;
+    return events.find(e => e.orderNumber === selectedEventIndex) || { 
+      id: selectedEventIndex.toString(), 
+      title: '', 
+      location: '', 
+      imageUrl: '', 
+      orderNumber: selectedEventIndex 
+    };
+  }, [selectedEventIndex, events]);
 
   return (
     <section id="CTA" className="w-full border-t border-gray-200 dark:border-gray-700 scroll-mt-28 md:scroll-mt-40">
@@ -145,7 +154,7 @@ export default function CTASection() {
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row gap-6">
             <EventCard
-              event={sortedEvents[0] || { id: '0', title: '', location: '', imageUrl: '', orderNumber: 0 }}
+              event={events.find(e => e.orderNumber === 0) || { id: '0', title: '', location: '', imageUrl: '', orderNumber: 0 }}
               index={0}
               editMode={editMode}
               onEditClick={handleEditClick}
@@ -153,7 +162,7 @@ export default function CTASection() {
               className="lg:w-[70%] h-70"
             />
             <EventCard
-              event={sortedEvents[1] || { id: '1', title: '', location: '', imageUrl: '', orderNumber: 1 }}
+              event={events.find(e => e.orderNumber === 1) || { id: '1', title: '', location: '', imageUrl: '', orderNumber: 1 }}
               index={1}
               editMode={editMode}
               onEditClick={handleEditClick}
@@ -165,7 +174,7 @@ export default function CTASection() {
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex flex-col sm:flex-row gap-6 lg:w-[70%]">
               <EventCard
-                event={sortedEvents[2] || { id: '2', title: '', location: '', imageUrl: '', orderNumber: 2 }}
+                event={events.find(e => e.orderNumber === 2) || { id: '2', title: '', location: '', imageUrl: '', orderNumber: 2 }}
                 index={2}
                 editMode={editMode}
                 onEditClick={handleEditClick}
@@ -173,7 +182,7 @@ export default function CTASection() {
                 className="sm:w-1/2 h-70"
               />
               <EventCard
-                event={sortedEvents[3] || { id: '3', title: '', location: '', imageUrl: '', orderNumber: 3 }}
+                event={events.find(e => e.orderNumber === 3) || { id: '3', title: '', location: '', imageUrl: '', orderNumber: 3 }}
                 index={3}
                 editMode={editMode}
                 onEditClick={handleEditClick}
@@ -184,7 +193,7 @@ export default function CTASection() {
 
             <div className="flex flex-col gap-6 lg:w-[30%]">
               <EventCard
-                event={sortedEvents[4] || { id: '4', title: '', location: '', imageUrl: '', orderNumber: 4 }}
+                event={events.find(e => e.orderNumber === 4) || { id: '4', title: '', location: '', imageUrl: '', orderNumber: 4 }}
                 index={4}
                 editMode={editMode}
                 onEditClick={handleEditClick}
@@ -192,7 +201,7 @@ export default function CTASection() {
                 className="h-32"
               />
               <EventCard
-                event={sortedEvents[5] || { id: '5', title: '', location: '', imageUrl: '', orderNumber: 5 }}
+                event={events.find(e => e.orderNumber === 5) || { id: '5', title: '', location: '', imageUrl: '', orderNumber: 5 }}
                 index={5}
                 editMode={editMode}
                 onEditClick={handleEditClick}
@@ -204,11 +213,14 @@ export default function CTASection() {
         </div>
 
         {/* MODAL */}
-        {selectedEventIndex !== null && (
+        {selectedEventIndex !== null && modalEvent && (
           <EditModal
             isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            event={events[selectedEventIndex] || { id: selectedEventIndex.toString(), title: '', location: '', imageUrl: '', orderNumber: selectedEventIndex }}
+            onClose={() => {
+              setModalOpen(false);
+              setSelectedEventIndex(null);
+            }}
+            event={modalEvent}
             index={selectedEventIndex}
             onSave={handleSaveEvent}
           />
