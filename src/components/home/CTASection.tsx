@@ -71,7 +71,12 @@ export default function CTASection() {
 
   const handleSaveEvent = (index: number, updatedEvent: Partial<Event>) => {
     const updated = [...events];
-    updated[index] = { ...updated[index], ...updatedEvent };
+    const eventIndex = updated.findIndex(e => e.orderNumber === index);
+    if (eventIndex !== -1) {
+      updated[eventIndex] = { ...updated[eventIndex], ...updatedEvent };
+    } else {
+      updated.push({ ...updatedEvent, orderNumber: index } as Event);
+    }
     setEvents(updated);
   };
 
