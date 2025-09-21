@@ -1,14 +1,4 @@
 {
-  "pages": [
-    "Cardano-coffee-lounge",
-    "CBCA01",
-    "CBCA02",
-    "even-HCM",
-    "even-HN",
-    "even",
-    "F12",
-    "hotro-spo",
-    "iohk-blog",
-    "overview"
-  ]
+  "title": "Các sự kiện",
+  "pages": ["CBCA01", "overview", "iohk-blog", "hotro-spo", "Cardano-coffee-lounge", "even-HN", "even-HCM", "even", "F12", "CBCA02"]
 }
