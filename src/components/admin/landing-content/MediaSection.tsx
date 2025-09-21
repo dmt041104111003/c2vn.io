@@ -76,11 +76,6 @@ export default function MediaSection({ formData, setFormData, handleMediaSelect,
           [mediaField]: result.data.media.url
         }));
         
-        handleMediaSelect({
-          id: result.data.media.url,
-          url: result.data.media.url,
-          type: 'image'
-        });
         showSuccess('Image uploaded successfully');
       } else {
         showError(result.error || 'Upload failed');
@@ -112,11 +107,6 @@ export default function MediaSection({ formData, setFormData, handleMediaSelect,
           [mediaField]: result.data.media.url
         }));
         
-        handleMediaSelect({
-          id: result.data.media.url,
-          url: result.data.media.url,
-          type: 'image'
-        });
         showSuccess('Image URL added successfully');
       } else {
         showError(result.error || 'Failed to add image URL');
@@ -178,14 +168,6 @@ export default function MediaSection({ formData, setFormData, handleMediaSelect,
         ...prev,
         ...newFormData
       }));
-
-      results.forEach(({ url }) => {
-        handleMediaSelect({
-          id: url,
-          url: url,
-          type: 'image'
-        });
-      });
 
       showSuccess(`Successfully uploaded ${results.length} image(s)`);
     } catch (error) {
