@@ -61,7 +61,7 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
                   e.preventDefault();
                 }
               }}
-                             className={`w-full px-3 py-2 border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm ${
+                className={`w-full px-3 py-2 border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm ${
                  typedErrors["your-name"] 
                    ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" 
                    : "border-gray-300 dark:border-gray-600"

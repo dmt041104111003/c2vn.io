@@ -136,90 +136,74 @@ export default function CTASection() {
           )}
         </div>
 
-        {/* GRID */}
-        {loadingEvents ? (
-          <CTALoadingGrid />
-        ) : (
-          <div className="space-y-6">
-            <div className="flex flex-col lg:flex-row gap-6">
-              {sortedEvents[0] && (
-                <EventCard
-                  event={sortedEvents[0]}
-                  index={0}
-                  editMode={editMode}
-                  onEditClick={handleEditClick}
-                  onUpload={handleImageUpload}
-                  className="lg:w-[70%] h-70"
-                />
-              )}
-              {sortedEvents[1] && (
-                <EventCard
-                  event={sortedEvents[1]}
-                  index={1}
-                  editMode={editMode}
-                  onEditClick={handleEditClick}
-                  onUpload={handleImageUpload}
-                  className="lg:w-[30%] h-70"
-                />
-              )}
+     
+        <div className="space-y-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <EventCard
+              event={sortedEvents[0] || { id: '0', title: '', location: '', imageUrl: '', orderNumber: 0 }}
+              index={0}
+              editMode={editMode}
+              onEditClick={handleEditClick}
+              onUpload={handleImageUpload}
+              className="lg:w-[70%] h-70"
+            />
+            <EventCard
+              event={sortedEvents[1] || { id: '1', title: '', location: '', imageUrl: '', orderNumber: 1 }}
+              index={1}
+              editMode={editMode}
+              onEditClick={handleEditClick}
+              onUpload={handleImageUpload}
+              className="lg:w-[30%] h-70"
+            />
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex flex-col sm:flex-row gap-6 lg:w-[70%]">
+              <EventCard
+                event={sortedEvents[2] || { id: '2', title: '', location: '', imageUrl: '', orderNumber: 2 }}
+                index={2}
+                editMode={editMode}
+                onEditClick={handleEditClick}
+                onUpload={handleImageUpload}
+                className="sm:w-1/2 h-70"
+              />
+              <EventCard
+                event={sortedEvents[3] || { id: '3', title: '', location: '', imageUrl: '', orderNumber: 3 }}
+                index={3}
+                editMode={editMode}
+                onEditClick={handleEditClick}
+                onUpload={handleImageUpload}
+                className="sm:w-1/2 h-70"
+              />
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-6">
-              <div className="flex flex-col sm:flex-row gap-6 lg:w-[70%]">
-                {sortedEvents[2] && (
-                  <EventCard
-                    event={sortedEvents[2]}
-                    index={2}
-                    editMode={editMode}
-                    onEditClick={handleEditClick}
-                    onUpload={handleImageUpload}
-                    className="sm:w-1/2 h-70"
-                  />
-                )}
-                {sortedEvents[3] && (
-                  <EventCard
-                    event={sortedEvents[3]}
-                    index={3}
-                    editMode={editMode}
-                    onEditClick={handleEditClick}
-                    onUpload={handleImageUpload}
-                    className="sm:w-1/2 h-70"
-                  />
-                )}
-              </div>
-
-              <div className="flex flex-col gap-6 lg:w-[30%]">
-                {sortedEvents[4] && (
-                  <EventCard
-                    event={sortedEvents[4]}
-                    index={4}
-                    editMode={editMode}
-                    onEditClick={handleEditClick}
-                    onUpload={handleImageUpload}
-                    className="h-32"
-                  />
-                )}
-                {sortedEvents[5] && (
-                  <EventCard
-                    event={sortedEvents[5]}
-                    index={5}
-                    editMode={editMode}
-                    onEditClick={handleEditClick}
-                    onUpload={handleImageUpload}
-                    className="h-32"
-                  />
-                )}
-              </div>
+            <div className="flex flex-col gap-6 lg:w-[30%]">
+              <EventCard
+                event={sortedEvents[4] || { id: '4', title: '', location: '', imageUrl: '', orderNumber: 4 }}
+                index={4}
+                editMode={editMode}
+                onEditClick={handleEditClick}
+                onUpload={handleImageUpload}
+                className="h-32"
+              />
+              <EventCard
+                event={sortedEvents[5] || { id: '5', title: '', location: '', imageUrl: '', orderNumber: 5 }}
+                index={5}
+                editMode={editMode}
+                onEditClick={handleEditClick}
+                onUpload={handleImageUpload}
+                className="h-32"
+              />
             </div>
           </div>
-        )}
+        </div>
 
         {/* MODAL */}
-        {selectedEventIndex !== null && events[selectedEventIndex] && (
+        {selectedEventIndex !== null && (
           <EditModal
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
-            event={events[selectedEventIndex]}
+            event={events[selectedEventIndex] || { id: selectedEventIndex.toString(), title: '', location: '', imageUrl: '', orderNumber: selectedEventIndex }}
             index={selectedEventIndex}
             onSave={handleSaveEvent}
           />

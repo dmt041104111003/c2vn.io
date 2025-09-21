@@ -3,8 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { XIcon, UploadCloud } from "lucide-react";
-import { useDropzone } from "react-dropzone";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import EventImageModal from "./EventImageModal";
 import { Event, EventCardProps } from "~/constants/events";
 
@@ -34,24 +33,6 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      if (acceptedFiles[0] && onUpload) {
-        onUpload(acceptedFiles[0], index);
-      }
-    },
-    [index, onUpload],
-  );
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { "image/*": [] },
-    maxFiles: 1,
-    disabled: !editMode || !!event.imageUrl,
-  });
-
-  const rootProps = editMode && !event.imageUrl ? getRootProps() : {};
-  const { onAnimationStart: _, ...safeRootProps } = rootProps as any;
 
   return (
     <>
@@ -59,10 +40,8 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
         whileHover={{ scale: editMode ? 1 : 1.02 }}
         whileTap={{ scale: editMode ? 1 : 0.98 }}
         className={`relative rounded-xl overflow-hidden shadow-lg group cursor-pointer ${className}`}
-        {...safeRootProps}
       >
-      {editMode && !event.imageUrl && <input {...getInputProps()} />}
-      <div className="relative w-full h-full bg-gray-100 flex items-center justify-center">
+      <div className="relative w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
         {event.imageUrl ? (
           <>
             <Image
@@ -82,7 +61,7 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
                 }}
                 className="absolute top-0 right-0 p-1.5 rounded-full cursor-pointer bg-transparent"
               >
-                <XIcon className="h-6 w-6 text-red-700" />
+                <XIcon className="h-6 w-6 text-red-700 dark:text-red-400" />
               </div>
             )}
             {!editMode && (
@@ -97,17 +76,19 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
           </>
         ) : editMode ? (
           <div
-            className={`flex flex-col items-center justify-center w-full h-full border-2 border-dashed rounded-lg transition ${
-              isDragActive ? "border-blue-400 bg-blue-50" : "border-blue-300 bg-white"
-            }`}
+            className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed rounded-lg transition cursor-pointer border-blue-300 bg-white dark:bg-gray-800"
+            onClick={() => onEditClick?.(index)}
           >
-            <UploadCloud className="h-12 w-12 text-blue-500 mb-2" />
-            <p className="text-sm font-medium text-blue-500">{isDragActive ? "Drop the file here" : "Drag & drop or click to upload"}</p>
+            <UploadCloud className="h-12 w-12 text-blue-500 dark:text-blue-400 mb-2" />
+            <p className="text-sm font-medium text-blue-500 dark:text-blue-400">Click to add event</p>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed rounded-lg bg-white">
-            <UploadCloud className="h-12 w-12 text-blue-500 mb-2" />
-            <p className="text-sm font-medium text-blue-500">No image</p>
+          <div className="flex flex-col items-center justify-center w-full h-full">
+            <img
+              src="/images/common/loading.png"
+              alt="Loading placeholder"
+              className="w-full h-full object-cover"
+            />
           </div>
         )}
       </div>
