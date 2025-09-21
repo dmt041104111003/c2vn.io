@@ -6,6 +6,7 @@ import { CardanoWalletProvider } from "~/lib/cardano-auth-provider"
 import { MetaMaskAuthProvider } from "~/lib/metamask-auth-provider"
 import { generateWalletAvatar } from '~/lib/wallet-avatar';
 import cloudinary from '~/lib/cloudinary';
+import { isValidAvatarUrl, validateBase64Image } from '~/lib/avatar-validator';
 
 const roleCache = new Map<string, any>();
 
@@ -24,7 +25,7 @@ export const authOptions = {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'lax' as const,
+        sameSite: 'strict' as const,
         path: '/',
         secure: process.env.NODE_ENV === 'production'
       }
@@ -157,16 +158,21 @@ export const authOptions = {
 
 
             let avatar: string | null = user.image || null;
-            if (avatar && avatar.startsWith('https://lh3.googleusercontent.com')) {
+            if (avatar && isValidAvatarUrl(avatar)) {
               try {
                 const uploadRes = await cloudinary.uploader.upload(avatar, { 
                   resource_type: 'image',
-                  folder: 'google-avatars'
+                  folder: 'google-avatars',
+                  transformation: [
+                    { width: 400, height: 400, crop: 'fill', quality: 'auto' }
+                  ]
                 });
                 avatar = uploadRes.url;
               } catch (uploadError) {
-                avatar = user.image || null;
+                avatar = null;
               }
+            } else if (avatar) {
+              avatar = null;
             }
 
             dbUser = await prisma.user.create({
@@ -210,7 +216,7 @@ export const authOptions = {
         } catch (e) {
           
           if (e instanceof Error && e.message.includes("Can't reach database server")) {
-            return true;
+            return false; 
           }
           
           return false;
@@ -256,16 +262,21 @@ export const authOptions = {
 
 
             let avatar: string | null = user.image || null;
-            if (avatar && avatar.startsWith('https://avatars.githubusercontent.com')) {
+            if (avatar && isValidAvatarUrl(avatar)) {
               try {
                 const uploadRes = await cloudinary.uploader.upload(avatar, {
                   resource_type: 'image',
-                  folder: 'github-avatars'
+                  folder: 'github-avatars',
+                  transformation: [
+                    { width: 400, height: 400, crop: 'fill', quality: 'auto' }
+                  ]
                 });
                 avatar = uploadRes.url;
               } catch (uploadError) {
-                avatar = user.image || null;
+                avatar = null; 
               }
+            } else if (avatar) {
+              avatar = null;
             }
 
             dbUser = await prisma.user.create({
@@ -296,7 +307,7 @@ export const authOptions = {
               await prisma.user.update({
                 where: { id: dbUser.id },
                 data: {
-                  name: dbUser.name || user.name, // Ưu tiên name từ database, nếu không có thì lấy từ GitHub
+                  name: dbUser.name || user.name, 
                   image: avatar,
                 }
               });
@@ -305,9 +316,12 @@ export const authOptions = {
           
           return true;
         } catch (e) {
+          console.error('GitHub sign-in failed:', e);
           
+          // ❌ KHÔNG return true khi DB unreachable - bảo mật hơn
           if (e instanceof Error && e.message.includes("Can't reach database server")) {
-            return true;
+            console.error('Database unreachable during GitHub sign-in');
+            return false; // Reject sign-in if DB is down
           }
           
           return false;
@@ -354,11 +368,29 @@ export const authOptions = {
             let avatar: string | null = user.image || null;
             if (!avatar && user.address) {
               const dataImage = generateWalletAvatar(user.address);
-              const uploadRes = await cloudinary.uploader.upload(dataImage, { resource_type: 'image' });
+              const uploadRes = await cloudinary.uploader.upload(dataImage, { 
+                resource_type: 'image',
+                transformation: [
+                  { width: 400, height: 400, crop: 'fill', quality: 'auto' }
+                ]
+              });
               avatar = uploadRes.url;
             } else if (avatar && avatar.startsWith('data:image')) {
-              const uploadRes = await cloudinary.uploader.upload(avatar, { resource_type: 'image' });
-              avatar = uploadRes.url;
+              if (validateBase64Image(avatar)) {
+                try {
+                  const uploadRes = await cloudinary.uploader.upload(avatar, { 
+                    resource_type: 'image',
+                    transformation: [
+                      { width: 400, height: 400, crop: 'fill', quality: 'auto' }
+                    ]
+                  });
+                  avatar = uploadRes.url;
+                } catch (uploadError) {
+                  avatar = null;
+                }
+              } else {
+                avatar = null;
+              }
             }
 
             dbUser = await prisma.user.create({
@@ -391,7 +423,7 @@ export const authOptions = {
           return true;
         } catch (e) {
           if (e instanceof Error && e.message.includes("Can't reach database server")) {
-            return true; 
+            return false; 
           }
           return false;
         }
@@ -476,7 +508,7 @@ export const authOptions = {
         } catch (e) {
           
           if (e instanceof Error && e.message.includes("Can't reach database server")) {
-            return true; 
+            return false;
           }
           
           return false;
