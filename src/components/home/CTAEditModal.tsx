@@ -21,7 +21,15 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
     if (isOpen) {
       setTitle(event.title);
       setLocation(event.location);
-      setSelectedMedia(null);
+      if (event.imageUrl) {
+        setSelectedMedia({
+          id: (event as any).publicId || "",
+          url: event.imageUrl,
+          type: "image"
+        });
+      } else {
+        setSelectedMedia(null);
+      }
     }
   }, [isOpen]);
 
@@ -52,7 +60,8 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
           title,
           location,
           imageUrl: selectedMedia.url,
-          publicId: selectedMedia.id || ""
+          publicId: selectedMedia.id || "",
+          orderNumber: index
         };
         
         console.log("Creating new event with data:", createData);
@@ -69,9 +78,11 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
         const formData = new FormData();
         formData.append("title", title);
         formData.append("location", location);
+        formData.append("orderNumber", index.toString());
         
         if (selectedMedia) {
           formData.append("imageUrl", selectedMedia.url);
+          formData.append("publicId", selectedMedia.id || "");
         }
         
         res = await fetch(`/api/admin/event-images/${event.id}`, {

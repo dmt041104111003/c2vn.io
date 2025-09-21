@@ -16,6 +16,7 @@ export const PUT = withAdmin(async (req) => {
     const location = formData.get('location') as string;
     const file = formData.get('file') as File;
     const imageUrl = formData.get('imageUrl') as string;
+    const orderNumber = formData.get('orderNumber') as string;
 
     if (!title || !location) {
       return NextResponse.json(createErrorResponse('Title and location are required', 'MISSING_FIELDS'), { status: 400 });
@@ -62,7 +63,8 @@ export const PUT = withAdmin(async (req) => {
         title,
         location,
         imageUrl: finalImageUrl,
-        publicId
+        publicId,
+        orderNumber: orderNumber ? parseInt(orderNumber) : undefined
       }
     });
 
