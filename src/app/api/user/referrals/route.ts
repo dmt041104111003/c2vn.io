@@ -5,6 +5,9 @@ import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 
 export const GET = withAuth(async (req, currentUser) => {
   try {
+    if (!currentUser) {
+      return NextResponse.json(createErrorResponse('Unauthorized', 'UNAUTHORIZED'), { status: 401 });
+    }
     const url = new URL(req.url);
     const includeStats = url.searchParams.get('includeStats') === 'true';
     const limit = url.searchParams.get('limit');
