@@ -1,4 +1,4 @@
-name: C2VN Deployment
+name: C2VN Docker Deployment
 
 on:
   push:
@@ -8,7 +8,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy using ssh
+      - name: Deploy using Docker
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -16,12 +16,11 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 3838
           script: |
-            bash -lc "
-              cd /home/tung/c2vn.io &&
-              git fetch origin &&
-              git checkout production &&
-              git pull &&
-              npm install &&
-              npm run build &&
-              pm2 reload c2vn
-            "
+            cd /home/tung/c2vn &&
+            git fetch origin &&
+            git checkout production &&
+            git pull &&
+            docker-compose down &&
+            docker-compose build --no-cache &&
+            docker-compose up -d &&
+            docker system prune -f
