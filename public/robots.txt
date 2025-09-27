@@ -4,5 +4,15 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /login
+Disallow: /_next/
+Disallow: /private/
+
+Allow: /docs/
+Allow: /project/
+Allow: /service/
+Allow: /our-service/
+
+Crawl-delay: 1
 
 Sitemap: https://cardano2vn.io/sitemap.xml
+Sitemap: https://cardano2vn.io/sitemap-index.xml
