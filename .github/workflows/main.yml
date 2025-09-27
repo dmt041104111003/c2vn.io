@@ -2,7 +2,7 @@ name: C2VN Docker Deployment
 
 on:
   push:
-    branches: [main, production]
+    branches: [main]
 
 jobs:
   deploy:
@@ -20,7 +20,7 @@ jobs:
           script: |
             cd /home/tung/c2vn &&
             git fetch origin &&
-            git checkout production &&
+            git checkout main &&
             git pull &&
             docker-compose down &&
             docker system prune -f &&
