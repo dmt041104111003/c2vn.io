@@ -2,7 +2,7 @@ name: C2VN Docker Deployment
 
 on:
   push:
-    branches: [production]
+    branches: [main, production]
 
 jobs:
   deploy:
