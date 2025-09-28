@@ -30,6 +30,6 @@ export const navbars = [
     id: 5,
     target: "_blank",
     title: "LMS",
-    href: "/lms",
+    href: "https://lms.cardano2vn.io",
   },
 ];
