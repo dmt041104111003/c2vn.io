@@ -47,54 +47,24 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
 
     try {
   
-      const isNewEvent = !event.id || event.id === index.toString() || !event.id.startsWith('cl');
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("location", location);
+      formData.append("orderNumber", index.toString());
       
-      let res;
-      if (isNewEvent) {
-        if (!selectedMedia?.url) {
-          showError("Please select an image before creating event");
-          return;
-        }
-        
-        const createData = {
-          title,
-          location,
-          imageUrl: selectedMedia.url,
-          publicId: selectedMedia.id || "",
-          orderNumber: index
-        };
-        
-        console.log("Creating new event with data:", createData);
-        
-        res = await fetch('/api/admin/event-images', {
-          method: "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(createData),
-        });
-      } else {
-
-        const formData = new FormData();
-        formData.append("title", title);
-        formData.append("location", location);
-        formData.append("orderNumber", index.toString());
-        
-        if (selectedMedia) {
-          formData.append("imageUrl", selectedMedia.url);
-          formData.append("publicId", selectedMedia.id || "");
-        }
-        
-        res = await fetch(`/api/admin/event-images/${event.id}`, {
-          method: "PUT",
-          body: formData,
-        });
+      if (selectedMedia) {
+        formData.append("imageUrl", selectedMedia.url);
       }
+      
+      const res = await fetch(`/api/admin/event-images/${event.id}`, {
+        method: "PUT",
+        body: formData,
+      });
 
       if (res.ok) {
         const data = await res.json();
         const updatedEvent: Partial<Event> = {
-          id: isNewEvent ? data.data?.id : event.id,
+          id: event.id,
           title,
           location,
           imageUrl: selectedMedia?.url || event.imageUrl,
@@ -102,10 +72,10 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
         };
         onSave(index, updatedEvent);
         onClose();
-        showSuccess(isNewEvent ? "Event created successfully!" : "Event updated successfully!");
+        showSuccess("Event updated successfully!");
       } else {
         const errorData = await res.json();
-        showError(errorData.error || `Failed to ${isNewEvent ? 'create' : 'update'} event`);
+        showError(errorData.error || "Failed to update event");
       }
     } catch {
       showError("Failed to save event");
