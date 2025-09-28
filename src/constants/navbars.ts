@@ -20,16 +20,16 @@ export const navbars = [
   
   {
     id: 4,
-    target: "_blank",
-    title: "Lms",
-    href: "/lms",
+    target: "",
+    title: "Service",
+    href: "/service",
   },
 
 
   {
     id: 5,
-    target: "",
-    title: "Service",
-    href: "/service",
+    target: "_blank",
+    title: "LMS",
+    href: "/lms",
   },
 ];
