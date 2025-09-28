@@ -35,7 +35,7 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
           const media: MediaInputMedia = { 
             type: 'image', 
             url: result.data.media.url, 
-            id: result.data.media.url 
+            id: result.data.media.public_id || result.data.media.url 
           };
           uploaded.push(media);
           setCurrentMedia(media);
@@ -71,7 +71,7 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
         const media: MediaInputMedia = { 
           type: 'image', 
           url: result.data.media.url, 
-          id: result.data.media.url 
+          id: result.data.media.id || result.data.media.url 
         };
         setCurrentMedia(media);
         if (onMediaAdd) onMediaAdd(media);
