@@ -16,6 +16,7 @@ export const PUT = withAdmin(async (req) => {
     const location = formData.get('location') as string;
     const file = formData.get('file') as File;
     const imageUrl = formData.get('imageUrl') as string;
+    const publicIdFromForm = formData.get('publicId') as string;
     const orderNumber = formData.get('orderNumber') as string;
 
     if (!title || !location) {
@@ -31,8 +32,10 @@ export const PUT = withAdmin(async (req) => {
     }
 
     let finalImageUrl = existingEvent.imageUrl;
-    let publicId = existingEvent.publicId;
-    if (file) {
+
+    if (imageUrl) {
+      finalImageUrl = imageUrl;
+    } else if (file) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
       
@@ -50,11 +53,6 @@ export const PUT = withAdmin(async (req) => {
       });
 
       finalImageUrl = (result as any).secure_url;
-      publicId = (result as any).public_id;
-    }
-
-    else if (imageUrl) {
-      finalImageUrl = imageUrl;
     }
 
     const updatedEvent = await prisma.eventImages.update({
@@ -63,7 +61,6 @@ export const PUT = withAdmin(async (req) => {
         title,
         location,
         imageUrl: finalImageUrl,
-        publicId,
         orderNumber: orderNumber ? parseInt(orderNumber) : undefined
       }
     });
@@ -73,8 +70,7 @@ export const PUT = withAdmin(async (req) => {
         id: updatedEvent.id,
         title: updatedEvent.title,
         location: updatedEvent.location,
-        imageUrl: updatedEvent.imageUrl,
-        publicId: updatedEvent.publicId
+        imageUrl: updatedEvent.imageUrl
       }
     }));
   } catch (error) {

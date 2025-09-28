@@ -15,14 +15,14 @@ export const GET = withAdmin(async () => {
 });
 
 export const POST = withAdmin(async (req) => {
-  const { location, title, imageUrl, publicId, orderNumber } = await req.json();
+  const { location, title, imageUrl, orderNumber } = await req.json();
   
-  if (!location || !title || !imageUrl || !publicId) {
+  if (!location || !title || !imageUrl) {
     return NextResponse.json(createErrorResponse('Missing required fields', 'MISSING_REQUIRED_FIELDS'), { status: 400 });
   }
   
   const image = await prisma.eventImages.create({
-    data: { location, title, imageUrl, publicId, orderNumber: orderNumber || 0 }
+    data: { location, title, imageUrl, orderNumber: orderNumber || 0 }
   });
   
   return NextResponse.json(createSuccessResponse(image));
