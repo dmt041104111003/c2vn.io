@@ -46,28 +46,26 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
     setIsSaving(true);
 
     try {
-  
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("location", location);
-      formData.append("orderNumber", index.toString());
-      
-      if (selectedMedia) {
-        formData.append("imageUrl", selectedMedia.url);
-      }
-      
-      const res = await fetch(`/api/admin/event-images/${event.id}`, {
-        method: "PUT",
-        body: formData,
+      const payload = {
+        title,
+        location,
+        orderNumber: index,
+        imageUrl: selectedMedia?.url || event.imageUrl || "",
+      };
+
+      const res = await fetch(`/api/admin/event-images`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
         const data = await res.json();
         const updatedEvent: Partial<Event> = {
-          id: event.id,
+          id: (data?.data?.image?.id ?? event.id) as string,
           title,
           location,
-          imageUrl: selectedMedia?.url || event.imageUrl,
+          imageUrl: payload.imageUrl,
           orderNumber: index,
         };
         onSave(index, updatedEvent);
