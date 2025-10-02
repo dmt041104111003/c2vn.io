@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "~/lib/prisma";
 import { withAdmin } from "~/lib/api-wrapper";
-import { createSuccessResponse, createErrorResponse } from "~/lib/api-response";
+import { createErrorResponse, createSuccessResponse } from "~/lib/api-response";
 
 export const GET = withAdmin(async () => {
   try {
@@ -15,15 +15,84 @@ export const GET = withAdmin(async () => {
 });
 
 export const POST = withAdmin(async (req) => {
-  const { location, title, imageUrl, orderNumber } = await req.json();
-  
-  if (!location || !title || !imageUrl) {
-    return NextResponse.json(createErrorResponse('Missing required fields', 'MISSING_REQUIRED_FIELDS'), { status: 400 });
+  try {
+    const body = await req.json();
+    const { title, location, imageUrl, orderNumber } = body as {
+      title?: string;
+      location?: string;
+      imageUrl?: string;
+      orderNumber?: number;
+    };
+
+    if (
+      orderNumber === undefined ||
+      orderNumber === null ||
+      typeof orderNumber !== "number"
+    ) {
+      return NextResponse.json(
+        createErrorResponse("orderNumber is required", "MISSING_FIELDS"),
+        { status: 400 }
+      );
+    }
+
+    if (!title || !location) {
+      return NextResponse.json(
+        createErrorResponse("Title and location are required", "MISSING_FIELDS"),
+        { status: 400 }
+      );
+    }
+
+    const existing = await prisma.eventImages.findFirst({
+      where: { orderNumber }
+    });
+
+    if (existing) {
+      const updated = await prisma.eventImages.update({
+        where: { id: existing.id },
+        data: {
+          title,
+          location,
+          imageUrl: imageUrl ?? existing.imageUrl,
+          orderNumber,
+        },
+      });
+      return NextResponse.json(
+        createSuccessResponse({
+          image: {
+            id: updated.id,
+            title: updated.title,
+            location: updated.location,
+            imageUrl: updated.imageUrl,
+            orderNumber: updated.orderNumber,
+          },
+        })
+      );
+    }
+
+    const created = await prisma.eventImages.create({
+      data: {
+        title,
+        location,
+        imageUrl: imageUrl ?? "",
+        orderNumber,
+      },
+    });
+
+    return NextResponse.json(
+      createSuccessResponse({
+        image: {
+          id: created.id,
+          title: created.title,
+          location: created.location,
+          imageUrl: created.imageUrl,
+          orderNumber: created.orderNumber,
+        },
+      })
+    );
+  } catch (error) {
+    return NextResponse.json(
+      createErrorResponse("Failed to upsert event", "UPSERT_FAILED"),
+      { status: 500 }
+    );
   }
-  
-  const image = await prisma.eventImages.create({
-    data: { location, title, imageUrl, orderNumber: orderNumber || 0 }
-  });
-  
-  return NextResponse.json(createSuccessResponse(image));
 });
