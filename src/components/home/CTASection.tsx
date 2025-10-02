@@ -5,7 +5,6 @@ import { PenSquare } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import EventCard from "~/components/home/CTAEventCard";
-import CTALoadingGrid from "~/components/home/CTALoadingGrid";
 import EditModal from "~/components/home/CTAEditModal";
 import { Event } from "~/constants/events";
 
@@ -92,7 +91,7 @@ export default function CTASection() {
       (async () => {
         setLoadingEvents(true);
         try {
-          const res = await fetch("/api/admin/event-images");
+          const res = await fetch("/api/event-images");
           if (!res.ok) throw new Error("Failed to fetch events");
           const data = await res.json();
           setEvents(data?.data || []);
