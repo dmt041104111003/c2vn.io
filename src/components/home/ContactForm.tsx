@@ -158,6 +158,15 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               onChange={e => {
                 onInputChange(e);
                 if (onCourseChange) onCourseChange(e.target.value);
+                
+                const selectedCourse = courses?.find((course: any) => course.name === e.target.value);
+                if (selectedCourse?.location) {
+                  const locationSelect = document.querySelector('select[name="event-location"]') as HTMLSelectElement;
+                  if (locationSelect) {
+                    locationSelect.value = selectedCourse.location;
+                    locationSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                  }
+                }
               }}
               aria-label="Course"
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"

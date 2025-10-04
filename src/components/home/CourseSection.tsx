@@ -52,7 +52,7 @@ export default function CourseSection() {
     setSelectedCourse(null);
   };
 
-  const handleEnroll = (courseName: string) => {
+  const handleEnroll = (course: Course) => {
     const contactSection = document.getElementById('contact');
     if (contactSection) {
       contactSection.scrollIntoView({ 
@@ -63,9 +63,17 @@ export default function CourseSection() {
       setTimeout(() => {
         const courseSelect = document.querySelector('select[name="your-course"]') as HTMLSelectElement;
         if (courseSelect) {
-          courseSelect.value = courseName;
+          courseSelect.value = course.name;
           const event = new Event('change', { bubbles: true });
           courseSelect.dispatchEvent(event);
+        }
+        
+        if (course.location) {
+          const locationSelect = document.querySelector('select[name="event-location"]') as HTMLSelectElement;
+          if (locationSelect) {
+            locationSelect.value = course.location;
+            locationSelect.dispatchEvent(new Event('change', { bubbles: true }));
+          }
         }
       }, 500);
     }

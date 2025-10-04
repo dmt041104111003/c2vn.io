@@ -268,6 +268,13 @@ export default function ContactFormSection() {
     setSelectedCourse(selected || null);
     const imageUrl = selected?.image || '';
     setSelectedCourseImage(imageUrl);
+    
+    if (selected?.location) {
+      setFormData(prev => ({
+        ...prev,
+        "event-location": selected.location
+      }));
+    }
   }, [courses]);
 
   const handleSubmit = async (e: React.FormEvent) => {
