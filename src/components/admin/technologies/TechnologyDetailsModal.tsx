@@ -1,5 +1,6 @@
 import Modal from "~/components/admin/common/Modal";
 import { Technology, TechnologyDetailsModalProps } from "~/constants/technologies";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export default function TechnologyDetailsModal({ technology, isOpen, onClose }: TechnologyDetailsModalProps) {
   if (!technology) return null;
@@ -38,7 +39,9 @@ export default function TechnologyDetailsModal({ technology, isOpen, onClose }: 
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-          <p className="text-sm text-gray-900 leading-relaxed">{technology.description}</p>
+          <div className="text-sm text-gray-900 leading-relaxed">
+            <TipTapPreview content={technology.description} />
+          </div>
         </div>
         
         <div>

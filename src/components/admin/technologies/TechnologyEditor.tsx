@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import MediaInput from "~/components/ui/media-input";
 import { Technology, TechnologyEditorProps } from "~/constants/technologies";
 import { FeatureCard } from "~/constants/feature-cards";
+import { TipTapEditor } from "~/components/ui/tiptap-editor";
 
 export default function TechnologyEditor({ technology, onSave, onCancel }: TechnologyEditorProps) {
   const [title, setTitle] = useState(technology?.title || "");
@@ -134,14 +135,10 @@ export default function TechnologyEditor({ technology, onSave, onCancel }: Techn
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Description *
         </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+        <TipTapEditor
+          content={description}
+          onChange={setDescription}
           placeholder="Enter technology description"
-          rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          required
-          disabled={isSubmitting}
         />
       </div>
 

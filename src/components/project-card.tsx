@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ProjectCardProps } from '~/constants/projects';
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export default function ProjectCard({ project, onOpenModal }: ProjectCardProps & { onOpenModal: (project: any) => void }) {
 
@@ -34,9 +35,9 @@ export default function ProjectCard({ project, onOpenModal }: ProjectCardProps &
                   {project.fund && `${project.fund}: `}{project.title}
                 </h3>
               </div>
-              <p className="max-w-2xl text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
-                {project.description}
-              </p>
+              <div className="max-w-2xl text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
+                <TipTapPreview content={project.description} />
+              </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full min-w-[70px] justify-center ${getStatusColor(project.status)}`}>

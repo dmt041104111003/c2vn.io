@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AboutContent, AboutEditorProps } from "~/constants/about";
+import { TipTapEditor } from "~/components/ui/tiptap-editor";
 
 export default function AboutEditor({ onSave, onCancel, isLoading }: AboutEditorProps) {
   const [formData, setFormData] = useState<AboutContent>({
@@ -128,13 +129,10 @@ export default function AboutEditor({ onSave, onCancel, isLoading }: AboutEditor
 
       <div className="space-y-2">
         <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-        <textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        <TipTapEditor
+          content={formData.description}
+          onChange={(content) => setFormData({ ...formData, description: content })}
           placeholder="Enter description..."
-          rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 

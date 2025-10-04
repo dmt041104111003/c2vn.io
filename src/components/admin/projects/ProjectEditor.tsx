@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Save, Loader2 } from "lucide-react";
 import { Project, ProjectEditorProps } from "~/constants/projects";
+import { TipTapEditor } from "~/components/ui/tiptap-editor";
 
 export default function ProjectEditor({ project, onSave, onCancel }: ProjectEditorProps) {
   const [formData, setFormData] = useState<Partial<Project>>({
@@ -155,12 +156,9 @@ export default function ProjectEditor({ project, onSave, onCancel }: ProjectEdit
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Description *
               </label>
-              <textarea
-                required
-                rows={4}
-                value={formData.description || ""}
-                onChange={(e) => handleInputChange("description", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              <TipTapEditor
+                content={formData.description || ""}
+                onChange={(content) => handleInputChange("description", content)}
                 placeholder="Enter project description"
               />
             </div>

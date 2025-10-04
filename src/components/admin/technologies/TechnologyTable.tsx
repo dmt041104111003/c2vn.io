@@ -4,6 +4,7 @@ import { Edit, Trash2, Eye } from "lucide-react";
 import { useState } from 'react';
 import Modal from '../common/Modal';
 import { Technology, TechnologyTableProps } from "~/constants/technologies";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails }: TechnologyTableProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -86,7 +87,7 @@ export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails 
                     {technology.name}
                   </div>
                   <div className="text-sm text-gray-500 line-clamp-1 max-w-48">
-                    {technology.description}
+                    <TipTapPreview content={technology.description} />
                   </div>
                 </div>
               </td>

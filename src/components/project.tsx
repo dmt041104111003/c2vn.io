@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Result } from "~/constants/home";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export default function Project({
   title,
@@ -29,7 +30,9 @@ export default function Project({
     <section className="mb-16 flex flex-col items-center gap-12 rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 backdrop-blur-sm lg:flex-row">
       <div className="lg:w-1/2">
         <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">{title}</h2>
-        <p className="mb-8 text-lg text-gray-600 dark:text-gray-300">{description}</p>
+        <div className="mb-8 text-lg text-gray-600 dark:text-gray-300">
+          <TipTapPreview content={description} />
+        </div>
         <ul className="space-y-4">
           {results?.map((result, index) => (
             <Component key={index} Icon={result.Icon} title={result.title} description={result.description} />

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Metadata } from "next";
 import { ProjectModalProps, Project } from '~/constants/projects';
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export const generateProjectMetadata = (project: Project): Metadata => ({
   title: `${project.fund || 'Project'}: ${project.title}`,
@@ -104,7 +105,9 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
 
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Description</h4>
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{project.description}</p>
+                    <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                      <TipTapPreview content={project.description} />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-sm">

@@ -51,7 +51,7 @@ export default function LandingContentSection({ content }: LandingContentSection
     <section className="relative min-h-screen flex flex-col justify-center">
       <h1 className={`mb-4 lg:mb-6 font-bold ${fontSizes.title}`}>
         <span className="block tracking-tight text-gray-900 dark:text-white">{content.title}</span>
-        <span className="block bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300 bg-clip-text tracking-tight text-gray-900 dark:text-transparent drop-shadow-lg">
+        <span className="block text-gray-900 dark:text-white tracking-tight">
           {content.subtitle}
         </span>
         <div className={`mt-2 lg:mt-3 block font-normal text-gray-600 dark:text-gray-300 ${fontSizes.description}`}>
