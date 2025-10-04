@@ -300,7 +300,6 @@ model Course {
   id          String   @id @default(uuid())
   name        String   @unique
   image       String?
-  title       String?
   description String?
   publishStatus  ProjectPublishStatus @default(DRAFT)
   isActive    Boolean  @default(true)

@@ -99,7 +99,7 @@ export default function CourseModal({ course, isOpen, onClose, onEnroll }: Cours
                   
                   <div>
                     <CourseModalTitle
-                      title={course.title || course.name}
+                      title={course.name}
                       maxLength={50}
                     />
                     <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">

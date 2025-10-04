@@ -23,11 +23,11 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, name, image, title, description, publishStatus }: { id: string; name: string; image?: string; title?: string; description?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
+    mutationFn: async ({ id, name, image, description, publishStatus }: { id: string; name: string; image?: string; description?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
       const response = await fetch(`/api/admin/courses/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, image, title, description, publishStatus })
+        body: JSON.stringify({ name, image, description, publishStatus })
       });
       if (!response.ok) {
         const error = await response.json();
@@ -71,7 +71,7 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
     }
   });
 
-  const handleUpdate = (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED', image?: string, title?: string, description?: string) => {
+  const handleUpdate = (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED', image?: string, description?: string) => {
     if (!name.trim()) {
       showError('Name is required');
       return;
@@ -88,7 +88,7 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
       return;
     }
     
-    updateMutation.mutate({ id, name: name.trim(), image, title, description, publishStatus });
+    updateMutation.mutate({ id, name: name.trim(), image, description, publishStatus });
   };
 
   const handleDelete = (id: string) => {

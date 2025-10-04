@@ -17,16 +17,15 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const queryClient = useQueryClient();
   const [newName, setNewName] = useState('');
   const [newImage, setNewImage] = useState('');
-  const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
 
   const createMutation = useMutation({
-    mutationFn: async ({ name, image, title, description, publishStatus }: { name: string; image?: string; title?: string; description?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
+    mutationFn: async ({ name, image, description, publishStatus }: { name: string; image?: string; description?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
       const response = await fetch('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, image, title, description, publishStatus })
+        body: JSON.stringify({ name, image, description, publishStatus })
       });
       if (!response.ok) {
         const error = await response.json();
@@ -40,7 +39,6 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       queryClient.invalidateQueries({ queryKey: ['contact-form-courses'] });
       setNewName('');
       setNewImage('');
-      setNewTitle('');
       setNewDescription('');
       setPublishStatus('DRAFT');
       showSuccess('Course created successfully');
@@ -67,7 +65,7 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       return;
     }
     
-    createMutation.mutate({ name: newName.trim(), image: newImage, title: newTitle.trim(), description: newDescription.trim(), publishStatus: publishStatus });
+    createMutation.mutate({ name: newName.trim(), image: newImage, description: newDescription.trim(), publishStatus: publishStatus });
   };
 
   const handleMediaSelect = (media: { id: string; url: string; type: string }) => {
@@ -101,15 +99,6 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
           >
             {createMutation.isPending ? 'Adding...' : 'Add'}
           </button>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            placeholder="Course title (optional)"
-            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
         </div>
         <div>
           <TipTapEditor

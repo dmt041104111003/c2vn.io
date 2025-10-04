@@ -10,7 +10,7 @@ export const PUT = withAdmin(async (req) => {
   }
 
   const body = await req.json();
-  const { name, image, title, description, publishStatus } = body;
+  const { name, image, description, publishStatus } = body;
 
   if (!name) {
     return NextResponse.json(createErrorResponse('Name is required', 'MISSING_NAME'), { status: 400 });
@@ -32,7 +32,6 @@ export const PUT = withAdmin(async (req) => {
     data: {
       name,
       image,
-      title,
       description,
       publishStatus
     }
