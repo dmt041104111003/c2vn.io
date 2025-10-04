@@ -4,137 +4,10 @@ import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { SimpleRichEditor } from "~/components/ui/simple-rich-editor";
-import { Member, Tab, MemberEditorProps, MediaInputProps } from "~/constants/members";
+import { Member, Tab, MemberEditorProps } from "~/constants/members";
 import { useToastContext } from "~/components/toast-provider";
+import MediaInput from "~/components/ui/media-input";
 
-function MediaInput({ value, onChange, placeholder, accept }: MediaInputProps) {
-  const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload');
-  const [imageUrl, setImageUrl] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { showError } = useToastContext();
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    try {
-      const response = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      const result = await response.json();
-      console.log('MemberEditor upload response:', result);
-      
-      if (response.ok && result.data?.media?.url) {
-        onChange(result.data.media.url);
-      } else {
-        console.error('Upload failed:', result);
-        showError(result.error || 'Upload failed');
-      }
-    } catch (err) {
-      console.error('Upload error:', err);
-      showError('Upload error');
-    }
-  };
-
-  const handleImageUrl = async (url: string) => {
-    setImageUrl(url);
-    if (!url) return;
-    
-    try {
-      const response = await fetch('/api/admin/media', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, type: 'IMAGE' }),
-      });
-      
-      const result = await response.json();
-      if (response.ok && result.media?.url) {
-        onChange(result.media.url);
-      } else {
-        showError(result.error || 'Failed to add image URL');
-      }
-    } catch (err) {
-      showError('Error adding image URL');
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex gap-2 mb-2">
-        <button
-          type="button"
-          className={`px-3 py-1 rounded-t border-b-2 ${
-            activeTab === 'upload' 
-              ? 'border-blue-500 text-blue-600 bg-white' 
-              : 'border-transparent text-gray-500 bg-gray-50'
-          }`}
-          onClick={() => setActiveTab('upload')}
-        >
-          Upload
-        </button>
-        <button
-          type="button"
-          className={`px-3 py-1 rounded-t border-b-2 ${
-            activeTab === 'url' 
-              ? 'border-blue-500 text-blue-600 bg-white' 
-              : 'border-transparent text-gray-500 bg-gray-50'
-          }`}
-          onClick={() => setActiveTab('url')}
-        >
-          URL
-        </button>
-      </div>
-
-      {activeTab === 'upload' ? (
-        <div className="space-y-2">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={accept || "image/*"}
-            onChange={handleFileChange}
-            className="hidden"
-            aria-label="Upload file"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          >
-            Choose File
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <input
-            type="url"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="Enter image URL"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-          <button
-            type="button"
-            onClick={() => handleImageUrl(imageUrl)}
-            className="w-full px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Add URL
-          </button>
-        </div>
-      )}
-
-      {value && (
-        <div className="mt-4">
-          <img src={value} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function MemberEditor({ member, onSave, onCancel, isLoading }: MemberEditorProps) {
   const { showError } = useToastContext();
@@ -189,8 +62,8 @@ export default function MemberEditor({ member, onSave, onCancel, isLoading }: Me
     onSave(formData);
   };
 
-  const handleImageUpload = (imageUrl: string) => {
-    setFormData({ ...formData, image: imageUrl });
+  const handleMediaAdd = (media: { type: string; url: string; id: string }) => {
+    setFormData({ ...formData, image: media.url });
   };
 
   const addSkill = () => {
@@ -261,11 +134,9 @@ export default function MemberEditor({ member, onSave, onCancel, isLoading }: Me
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">Profile Image</label>
-          <MediaInput
-            value={formData.image}
-            onChange={handleImageUpload}
-            placeholder="Upload or enter image URL"
-            accept="image/*"
+          <MediaInput 
+            onMediaAdd={handleMediaAdd}
+            mediaType="image"
           />
         </div>
 
