@@ -36,7 +36,7 @@ export default function CourseSection() {
     )
     .slice(0, 3);
   
-  const allCourses = courses.sort((a: Course, b: Course) => a.order - b.order);
+  const allCourses = courses.sort((a: Course, b: Course) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const currentCourses = activeTab === "latest" ? latestCourses : allCourses;
   const displayCourses = [...currentCourses];

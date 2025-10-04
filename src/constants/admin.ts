@@ -54,7 +54,6 @@ export interface Course {
   startDate?: string;
   publishStatus: 'DRAFT' | 'PUBLISHED';
   isActive: boolean;
-  order: number;
   createdAt: string;
   updatedAt: string;
 }
