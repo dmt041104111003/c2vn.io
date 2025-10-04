@@ -10,10 +10,14 @@ export default function WalletList({ wallets }: WalletListProps) {
   const { connect, disconnect, isConnecting, error, walletUser, isAuthenticated, isWalletInstalled, hasLoggedIn } = useCardanoWallet();
   const { connect: connectMetaMask, disconnect: disconnectMetaMask, isConnecting: isConnectingMetaMask, error: metaMaskError, walletUser: metaMaskUser, isAuthenticated: isMetaMaskAuthenticated, hasLoggedIn: hasMetaMaskLoggedIn } = useMetaMask();
   const { showError, showSuccess, showInfo } = useToastContext();
-  const lastErrorRef = useRef<string>("");
   const lastSuccessRef = useRef<string>("");
-  const clickCountRef = useRef<number>(0);
   const [connectingWalletId, setConnectingWalletId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (error) {
+      showError("Connection Error", error);
+    }
+  }, [error, showError]);
 
   const handleWalletClick = async (walletId: string) => {
     if (walletId === "eternal" || walletId === "lace" || walletId === "yoroi" || walletId === "nufi" || walletId === "gero") {
@@ -21,7 +25,6 @@ export default function WalletList({ wallets }: WalletListProps) {
         await disconnect();
         showSuccess("Logout Successful", "Your Cardano wallet has been disconnected successfully.");
       } else {
-        clickCountRef.current += 1;
         setConnectingWalletId(walletId);
         showInfo("Connecting...", "Please wait while we connect to your Cardano wallet.");
         await connect(walletId);
@@ -57,16 +60,9 @@ export default function WalletList({ wallets }: WalletListProps) {
     }
   };
 
-  useEffect(() => {
-    if (error && clickCountRef.current > 0) {
-      showError("Connection Error", error);
-      clickCountRef.current = 0; 
-    }
-  }, [error, showError]);
 
   useEffect(() => {
-    if (metaMaskError && metaMaskError !== lastErrorRef.current) {
-      lastErrorRef.current = metaMaskError;
+    if (metaMaskError) {
       showError("MetaMask Connection Error", metaMaskError);
     }
   }, [metaMaskError, showError]);
