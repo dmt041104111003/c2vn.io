@@ -54,28 +54,25 @@ export default function LandingContentSection({ content }: LandingContentSection
         <div className={`mt-2 lg:mt-3 block font-normal text-gray-600 dark:text-gray-300 ${fontSizes.description}`}>
           <TipTapPreview content={content.description} />
         </div>
-      </h1>
-      
-      <div className="relative mb-4 lg:mb-6 border-l-2 border-gray-300 dark:border-white/20 pl-4 lg:pl-6">
-        <div className={`mb-2 lg:mb-3 leading-relaxed text-gray-600 dark:text-gray-300 ${fontSizes.mainText}`}>
+        <div className={`mb-2 lg:mb-3 leading-relaxed text-gray-600 dark:text-gray-300 relative mb-4 lg:mb-6 border-l-2 border-gray-300 dark:border-white/20 pl-4 lg:pl-6 font-normal ${fontSizes.mainText}`}>
           <TipTapPreview content={content.mainText} />
         </div>
-      </div>
-      
-      <div className="flex flex-col gap-4 lg:gap-6 sm:flex-row">
-        <Link
-          href={routers.ourService}
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success bg-blue-600 dark:bg-white px-6 lg:px-8 py-3 lg:py-4 font-semibold text-white dark:text-blue-900 shadow-xl hover:bg-blue-700 dark:hover:bg-gray-100 text-base lg:text-lg xl:text-xl"
-        >
-          Our Services
-        </Link>
-        <Link
-          href="/project?typeFilter=project"
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-white/50 px-6 lg:px-8 py-3 lg:py-4 font-semibold text-gray-900 dark:text-white shadow-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-sm lg:text-base xl:text-lg"
-        >
-          Our Projects
-        </Link>
-      </div>
+        <div className="flex flex-col sm:flex-row gap-4 mt-6 lg:mt-8">
+          <Link
+            href={routers.ourService}
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success bg-blue-600 dark:bg-white px-6 lg:px-8 py-3 lg:py-4 font-semibold text-white dark:text-blue-900 shadow-xl hover:bg-blue-700 dark:hover:bg-gray-100 text-base lg:text-lg xl:text-xl"
+          >
+            Our Services
+          </Link>
+          <Link
+            href="/project?typeFilter=project"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-white/50 px-6 lg:px-8 py-3 lg:py-4 font-semibold text-gray-900 dark:text-white shadow-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-sm lg:text-base xl:text-lg"
+          >
+            Our Projects
+          </Link>
+        </div>
+      </h1>
+    
     </section>
   );
 }
