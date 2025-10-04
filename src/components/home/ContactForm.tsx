@@ -33,6 +33,7 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
         throw new Error('Failed to fetch courses');
       }
       const data = await response.json();
+      console.log('ContactForm courses fetched:', data?.data);
       return data?.data || [];
     },
     staleTime: 5 * 60 * 1000,
@@ -172,11 +173,15 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
             >
               <option value="">Select Course</option>
-              {courses?.map((course: any) => (
-                <option key={course.id} value={course.name}>
-                  {course.name}
-                </option>
-              ))}
+              {coursesError && <option value="">Error loading courses</option>}
+              {courses?.map((course: any) => {
+                console.log('Rendering course option:', course);
+                return (
+                  <option key={course.id} value={course.name}>
+                    {course.name}
+                  </option>
+                );
+              })}
             </select>
             {selectedCourseImage && (
               <div className="mt-2">

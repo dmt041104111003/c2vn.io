@@ -289,11 +289,6 @@ export default function CourseSection() {
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                           {course.title || course.name}
                         </h3>
-                        {course.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
-                            {course.description}
-                          </p>
-                        )}
                         <div className="flex items-center mt-2 space-x-4 text-xs text-gray-500 dark:text-gray-400">
                                                      <span>
                              Created: {new Date(course.createdAt).toLocaleDateString("en-US", {

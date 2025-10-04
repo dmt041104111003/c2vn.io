@@ -70,7 +70,7 @@ export function CourseTable({
           {Array.isArray(courses) && courses.map((course) => (
             <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
               <td className="px-6 py-4">
-                <TruncatedText text={course.title} maxLength={30} />
+                <TruncatedText text={course.name} maxLength={30} />
               </td>
               <td className="px-6 py-4">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
