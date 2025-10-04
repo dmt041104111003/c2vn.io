@@ -56,122 +56,44 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
       <div className="mb-16 grid grid-cols-1 gap-6">
         {isLoading ? (
           <>
-            <motion.div 
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                show: { 
-                  opacity: 1, 
-                  y: 0,
-                  transition: {
-                    duration: 0.6,
-                    type: "spring",
-                    stiffness: 100
-                  }
-                }
-              }}
-              className="animate-pulse"
-            >
+            <div className="animate-pulse">
               <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded mb-4 w-1/3"></div>
               <div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div>
-            </motion.div>
-            <motion.div 
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                show: { 
-                  opacity: 1, 
-                  y: 0,
-                  transition: {
-                    duration: 0.6,
-                    type: "spring",
-                    stiffness: 100
-                  }
-                }
-              }}
-              className="animate-pulse"
-            >
+            </div>
+            <div className="animate-pulse">
               <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded mb-4 w-1/3"></div>
               <div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div>
-            </motion.div>
-            <motion.div 
-              variants={{
-                hidden: { opacity: 0, y: 30 },
-                show: { 
-                  opacity: 1, 
-                  y: 0,
-                  transition: {
-                    duration: 0.6,
-                    type: "spring",
-                    stiffness: 100
-                  }
-                }
-              }}
-              className="animate-pulse"
-            >
+            </div>
+            <div className="animate-pulse">
               <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded mb-4 w-1/3"></div>
               <div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div>
-            </motion.div>
+            </div>
           </>
         ) : filteredTechnologies.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.6, type: "spring", stiffness: 100 }}
-          >
+          <div>
             <NotFoundInline 
               onClearFilters={() => {
 
               }}
             />
-          </motion.div>
+          </div>
         ) : (
           <>
             {paginatedTechnologies.map((technology, index) => (
-              <motion.div
-                key={technology.id}
-                variants={{
-                  hidden: { 
-                    opacity: 0, 
-                    y: 40,
-                    scale: 0.95
-                  },
-                  show: { 
-                    opacity: 1, 
-                    y: 0,
-                    scale: 1,
-                    transition: {
-                      duration: 0.7,
-                      type: "spring",
-                      stiffness: 80,
-                      bounce: 0.2
-                    }
-                  }
-                }}
-                whileHover={{ 
-                  y: -5,
-                  scale: 1.02,
-                  transition: { duration: 0.3 }
-                }}
-              >
+              <div key={technology.id}>
                 <TechnologyItem technology={technology} />
-              </motion.div>
+              </div>
             ))}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.3 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="mt-8"
-              >
+              <div className="mt-8">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
                   setCurrentPage={setCurrentPage}
                 />
-              </motion.div>
+              </div>
             )}
           </>
         )}
@@ -212,86 +134,35 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
           ) : (
             <>
               {paginatedTechnologies.map((technology, index) => (
-                <motion.div
-                  key={technology.id}
-                  variants={{
-                    hidden: { 
-                      opacity: 0, 
-                      y: 40,
-                      scale: 0.95
-                    },
-                    show: { 
-                      opacity: 1, 
-                      y: 0,
-                      scale: 1,
-                      transition: {
-                        duration: 0.7,
-                        type: "spring",
-                        stiffness: 80,
-                        bounce: 0.2
-                      }
-                    }
-                  }}
-                  whileHover={{ 
-                    y: -5,
-                    scale: 1.02,
-                    transition: { duration: 0.3 }
-                  }}
-                >
+                <div key={technology.id}>
                   <TechnologyItem technology={technology} />
-                </motion.div>
+                </div>
               ))}
 
               {totalPages > 1 && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                  className="mt-8"
-                >
+                <div className="mt-8">
                   <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
                     setCurrentPage={setCurrentPage}
                   />
-                </motion.div>
+                </div>
               )}
             </>
           )}
           
-          <motion.section 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            whileHover={{ y: -3 }}
-            className="mt-16 rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 text-center backdrop-blur-sm"
-          >
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="mb-4 text-3xl font-bold text-gray-900 dark:text-white"
-            >
+          <section className="mt-16 rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 text-center backdrop-blur-sm">
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
               Start Your Cardano2vn Journey Today
-            </motion.h2>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+            </h2>
+            <div>
               <Link href="https://cardano2vn.io">
                 <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success p-1 text-md rounded-sm bg-blue-600 px-8 py-3 font-semibold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700">
                   Open Cardano2vn App
                 </button>
               </Link>
-            </motion.div>
-          </motion.section>
+            </div>
+          </section>
         </div>
       </div>
     </main>

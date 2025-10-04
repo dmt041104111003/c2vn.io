@@ -239,26 +239,11 @@ function ProjectPageContent() {
                       id="radix-:ri:-content-2023"
                       className="ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-0"
                     >
-                      <motion.div 
-                        className="mb-8 text-right"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: false, amount: 0.3 }}
-                        transition={{ 
-                          duration: 0.8, 
-                          delay: 0.6,
-                          type: "spring",
-                          stiffness: 100
-                        }}
-                        whileHover={{ 
-                          scale: 1.05,
-                          transition: { duration: 0.3 }
-                        }}
-                      >
+                      <div className="mb-8 text-right">
                         <h2 className="bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-6xl font-bold tracking-tight text-transparent">
                           {year}
                         </h2>
-                      </motion.div>
+                      </div>
                       
                       <div className="mb-16 grid grid-cols-1 gap-6">
                         {isLoading ? (
@@ -302,14 +287,9 @@ function ProjectPageContent() {
                       </div>
                     </div>
                   ) : (
-                    <motion.div
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: false, amount: 0.3 }}
-                      transition={{ duration: 0.6 }}
-                    >
+                    <div>
                       <TechnologyPageClient isEmbedded={true} searchTerm={searchTerm} />
-                    </motion.div>
+                    </div>
                   )}
                 </div>
               </div>

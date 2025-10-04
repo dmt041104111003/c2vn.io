@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ProjectCardProps } from '~/constants/projects';
 import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
@@ -21,9 +20,7 @@ export default function ProjectCard({ project, onOpenModal }: ProjectCardProps &
 
   return (
     <>
-      <motion.div
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+      <div
         className="group w-full rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 shadow-xl backdrop-blur-sm transition-all hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl cursor-pointer"
         onClick={() => onOpenModal(project)}
       >
@@ -69,7 +66,7 @@ export default function ProjectCard({ project, onOpenModal }: ProjectCardProps &
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </>
   );
 } 
