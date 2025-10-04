@@ -10,6 +10,7 @@ import NetworkSelector from "~/components/login/NetworkSelector";
 import WalletList from "~/components/login/WalletList";
 import LoginFooter from "~/components/login/LoginFooter";
 import FloatingWalletHelp from "~/components/ui/FloatingWalletHelp";
+import { ThemeToggle } from "~/components/ui/theme-toggle";
 import { NETWORKS, getWalletsByNetwork } from "~/constants/login";
 
 export default function LoginPage() {
@@ -32,7 +33,10 @@ export default function LoginPage() {
     return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="relative z-10 w-full flex flex-col items-center justify-center">
-        <LoginHeader />
+        <div className="flex items-center justify-between w-full max-w-4xl px-4 md:px-0 mb-8">
+          <LoginHeader />
+          <ThemeToggle />
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
