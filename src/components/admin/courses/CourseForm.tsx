@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToastContext } from '~/components/toast-provider';
 import MediaInput from '~/components/ui/media-input';
+import { TipTapEditor } from '~/components/ui/tiptap-editor';
 import { Course } from '~/constants/admin';
 
 interface CourseFormProps {
@@ -111,11 +112,10 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
           />
         </div>
         <div>
-          <textarea
-            value={newDescription}
-            onChange={(e) => setNewDescription(e.target.value)}
+          <TipTapEditor
+            content={newDescription}
+            onChange={setNewDescription}
             placeholder="Course description (optional)"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
           />
         </div>
         <div className="space-y-2">
@@ -125,6 +125,7 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
           <MediaInput
             onMediaAdd={handleMediaSelect}
             mediaType="image"
+            showVideoLibrary={false}
           />
           {newImage && (
             <div className="mt-2">

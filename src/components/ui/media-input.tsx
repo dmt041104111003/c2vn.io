@@ -234,8 +234,8 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                   type="button"
                   className={`px-3 py-1 rounded border ${
                     activeLibraryTab === 'images' 
-                      ? 'bg-blue-100 text-blue-700 border-blue-300' 
-                      : 'bg-gray-100 text-gray-600 border-gray-300'
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600' 
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600'
                   }`}
                   onClick={() => setActiveLibraryTab('images')}
                 >
@@ -246,8 +246,8 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                     type="button"
                     className={`px-3 py-1 rounded border ${
                       activeLibraryTab === 'videos' 
-                        ? 'bg-blue-100 text-blue-700 border-blue-300' 
-                        : 'bg-gray-100 text-gray-600 border-gray-300'
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600' 
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600'
                     }`}
                     onClick={() => setActiveLibraryTab('videos')}
                   >

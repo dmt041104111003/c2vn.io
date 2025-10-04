@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 interface CourseModalTextProps {
   text: string;
@@ -44,15 +45,15 @@ export default function CourseModalText({ text, maxLength, className = "" }: Cou
 
   return (
     <div className={className}>
-      <motion.p
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.4 }}
-        className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"
+        className="text-gray-700 dark:text-gray-300 leading-relaxed"
       >
-        {displayText}
+        <TipTapPreview content={displayText} />
         {shouldShowMore && "..."}
-      </motion.p>
+      </motion.div>
       
       {isLoading && (
         <motion.div

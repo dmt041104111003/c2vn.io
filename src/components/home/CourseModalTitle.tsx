@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 interface CourseModalTitleProps {
   title: string;
@@ -34,15 +35,15 @@ export default function CourseModalTitle({ title, maxLength, className = "" }: C
 
   return (
     <div className={className}>
-      <motion.h3
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.4 }}
         className="text-2xl font-bold text-gray-900 dark:text-white"
       >
-        {displayText}
+        <TipTapPreview content={displayText} />
         {shouldShowMore && "..."}
-      </motion.h3>
+      </motion.div>
       
       {isLoading && (
         <motion.div

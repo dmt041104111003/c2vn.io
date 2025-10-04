@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
 import { CourseEditModalProps } from '~/constants/admin';
 import MediaInput from '~/components/ui/media-input';
+import { TipTapEditor } from '~/components/ui/tiptap-editor';
 
 export default function CourseEditModal({ 
   course, 
@@ -78,11 +79,10 @@ export default function CourseEditModal({
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Course Description (Optional)
           </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+          <TipTapEditor
+            content={description}
+            onChange={setDescription}
             placeholder="Enter course description"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[60px]"
           />
         </div>
 
@@ -108,6 +108,7 @@ export default function CourseEditModal({
           <MediaInput
             onMediaAdd={handleMediaSelect}
             mediaType="image"
+            showVideoLibrary={false}
           />
           {image && (
             <div className="mt-2">
