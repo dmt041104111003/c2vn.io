@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import MediaInput from "~/components/ui/media-input";
+import { TipTapEditor } from "~/components/ui/tiptap-editor";
 import { WelcomeModalData } from "~/constants/admin";
 import WelcomeModalEditSkeleton from "./WelcomeModalEditSkeleton";
 
@@ -32,10 +33,9 @@ export default function WelcomeModalEdit({
   const currentDescriptionLength = formData.description?.length || 0;
   const isDescriptionLimitReached = currentDescriptionLength >= maxDescriptionLength;
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    if (value.length <= maxDescriptionLength) {
-      onInputChange('description', value);
+  const handleDescriptionChange = (content: string) => {
+    if (content.length <= maxDescriptionLength) {
+      onInputChange('description', content);
     }
   };
 
@@ -114,16 +114,10 @@ export default function WelcomeModalEdit({
             {currentDescriptionLength}/{maxDescriptionLength}
           </span>
         </div>
-        <textarea
-          value={formData.description}
+        <TipTapEditor
+          content={formData.description}
           onChange={handleDescriptionChange}
           placeholder="Discover the power of Cardano blockchain technology..."
-          maxLength={maxDescriptionLength}
-          className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px] text-justify ${
-            isDescriptionLimitReached 
-              ? 'border-red-300 dark:border-red-600' 
-              : 'border-gray-300 dark:border-gray-600'
-          }`}
         />
       </div>
 

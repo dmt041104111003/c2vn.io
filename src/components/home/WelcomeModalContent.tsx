@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { images } from "~/public/images";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 import WelcomeModalText from "./WelcomeModalText";
 
 interface WelcomeModalContentProps {
@@ -70,10 +71,14 @@ export default function WelcomeModalContent({ welcomeData, onButtonClick }: Welc
         )}
       </motion.div>
       
-      <WelcomeModalText
-        text={welcomeData?.data?.description || ""}
-        maxLength={200}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.4 }}
+        className="text-gray-700 dark:text-gray-300 text-justify"
+      >
+        <TipTapPreview content={welcomeData?.data?.description || ""} />
+      </motion.div>
       
       <motion.div
         initial={{ opacity: 0, y: 10 }}
