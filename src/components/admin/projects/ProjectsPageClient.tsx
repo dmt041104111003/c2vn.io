@@ -124,7 +124,7 @@ export default function ProjectsPageClient() {
         ]}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <AdminFilters
           searchTerm={searchTerm}
           filterType={statusFilter}
@@ -136,19 +136,6 @@ export default function ProjectsPageClient() {
           ]}
           onSearchChange={setSearchTerm}
           onFilterChange={setStatusFilter}
-        />
-
-        <AdminFilters
-          searchTerm=""
-          filterType={publishStatusFilter}
-          searchPlaceholder=""
-          filterOptions={[
-            { value: "all", label: "All Publish Status" },
-            { value: "DRAFT", label: "Draft" },
-            { value: "PUBLISHED", label: "Published" },
-          ]}
-          onSearchChange={() => {}}
-          onFilterChange={setPublishStatusFilter}
         />
       </div>
 

@@ -42,12 +42,6 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Fund
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Created
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Updated
-            </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
             </th>
@@ -60,9 +54,6 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
                 <div className="flex flex-col max-w-xs">
                   <div className="text-sm font-medium text-gray-900 line-clamp-1">
                     {project.fund && `${project.fund}: `}{project.title}
-                  </div>
-                  <div className="text-sm text-gray-500 line-clamp-1">
-                    {project.description}
                   </div>
                   <button
                     onClick={() => onViewDetails(project)}
@@ -94,24 +85,6 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {project.fund || '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {project.createdAt ? new Date(project.createdAt).toLocaleString('en-GB', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {project.updatedAt ? new Date(project.updatedAt).toLocaleString('en-GB', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : '-'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-end space-x-2">

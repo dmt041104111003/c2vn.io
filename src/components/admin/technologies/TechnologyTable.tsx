@@ -29,25 +29,13 @@ export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails 
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Image
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Project
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Publish Status
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Link
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Feature Cards
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Created
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Updated
             </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
@@ -57,27 +45,6 @@ export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails 
         <tbody className="bg-white divide-y divide-gray-200">
           {technologies.map((technology) => (
             <tr key={technology.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex-shrink-0 h-12 w-12">
-                  {technology.image ? (
-                    <img
-                      src={technology.image}
-                      alt={technology.title}
-                      className="h-12 w-12 rounded-lg object-cover border border-gray-200"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        target.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                  ) : null}
-                  {!technology.image && (
-                    <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
-                      <span className="text-gray-400 text-xs">No img</span>
-                    </div>
-                  )}
-                </div>
-              </td>
               <td className="px-6 py-4">
                 <div className="flex flex-col max-w-xs">
                   <div className="text-sm font-medium text-gray-900 line-clamp-1 max-w-48">
@@ -85,9 +52,6 @@ export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails 
                   </div>
                   <div className="text-sm text-gray-500 line-clamp-1 max-w-48">
                     {technology.name}
-                  </div>
-                  <div className="text-sm text-gray-500 line-clamp-1 max-w-48">
-                    <TipTapPreview content={technology.description} />
                   </div>
                 </div>
               </td>
@@ -99,16 +63,6 @@ export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails 
                   {technology.publishStatus}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <a 
-                  href={technology.href} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-900 truncate block max-w-xs"
-                >
-                  {technology.href}
-                </a>
-              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {technology.featureCardIds && technology.featureCardIds.length > 0 ? (
                   <div className="flex flex-wrap gap-1">
@@ -119,24 +73,6 @@ export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails 
                 ) : (
                   <span className="text-gray-400">None</span>
                 )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {technology.createdAt ? new Date(technology.createdAt).toLocaleString('en-GB', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : '-'}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {technology.updatedAt ? new Date(technology.updatedAt).toLocaleString('en-GB', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                }) : '-'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-end space-x-2">
