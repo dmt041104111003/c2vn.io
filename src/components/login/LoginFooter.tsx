@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function LoginFooter() {
   return (
@@ -23,6 +24,7 @@ export default function LoginFooter() {
         
       <div className="flex items-center justify-center gap-6 mb-6 mt-6">
         <button 
+          onClick={() => signIn("google", { callbackUrl: "/" })}
           className="w-12 h-12 flex items-center justify-center hover:opacity-80 transition-opacity"
           title="Login with Google"
         >
@@ -36,8 +38,9 @@ export default function LoginFooter() {
           />
         </button>
         <button 
+          onClick={() => window.open("https://t.me/cardano2vn", "_blank")}
           className="w-12 h-12 flex items-center justify-center hover:opacity-80 transition-opacity"
-          title="Login with Telegram"
+          title="Join Cardano2vn Telegram"
         >
           <Image
             src="/images/wallets/telegram.png"
@@ -51,7 +54,7 @@ export default function LoginFooter() {
       </div>
         
       <div className="space-y-3">
-        <Link href="/help" className="text-gray-900 dark:text-gray-100 underline text-sm hover:text-red-500 dark:hover:text-red-400 transition-colors">
+        <Link href="/about#contact" className="text-gray-900 dark:text-gray-100 underline text-sm hover:text-red-500 dark:hover:text-red-400 transition-colors">
           Help Center
         </Link>
         <p className="text-gray-500 dark:text-gray-400 text-xs">
