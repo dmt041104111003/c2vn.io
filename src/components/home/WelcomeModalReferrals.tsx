@@ -25,6 +25,7 @@ export default function WelcomeModalReferrals({ isOpen, onClose, isGenerateWarni
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -81,6 +82,51 @@ export default function WelcomeModalReferrals({ isOpen, onClose, isGenerateWarni
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
+
+  const SkeletonLoader = () => (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+      </div>
+      
+      <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+      
+      <div className="space-y-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-4 w-4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24 animate-pulse"></div>
+                  <div className="h-5 bg-gray-200 dark:bg-gray-600 rounded w-16 animate-pulse"></div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <div className="h-3 w-3 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-32 animate-pulse"></div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="h-3 w-3 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-20 animate-pulse"></div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="h-3 w-3 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-16 animate-pulse"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-16 animate-pulse mb-1"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-12 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   if (!mounted) return null;
 
@@ -162,6 +208,7 @@ export default function WelcomeModalReferrals({ isOpen, onClose, isGenerateWarni
                 <div className="flex justify-center">
                   <button
                     onClick={async () => {
+                      setIsGenerating(true);
                       try {
                         const response = await fetch('/api/user/referral-code', {
                           method: 'POST',
@@ -182,11 +229,18 @@ export default function WelcomeModalReferrals({ isOpen, onClose, isGenerateWarni
                         }
                       } catch (error) {
                         showSuccess('Failed to generate referral code');
+                      } finally {
+                        setIsGenerating(false);
                       }
                     }}
-                    className="px-6 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={isGenerating}
+                    className={`px-6 py-2 text-sm font-medium text-white border border-transparent rounded-lg transition-colors ${
+                      isGenerating 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
                   >
-                    Generate Code
+                    {isGenerating ? 'Generating...' : 'Generate Code'}
                   </button>
                 </div>
               </div>
@@ -236,10 +290,7 @@ export default function WelcomeModalReferrals({ isOpen, onClose, isGenerateWarni
                     className="text-gray-600 dark:text-gray-300 leading-relaxed text-base"
                   >
                     {loading ? (
-                      <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                        <span className="ml-4 text-gray-600 dark:text-gray-400">Loading referrals...</span>
-                      </div>
+                      <SkeletonLoader />
                     ) : error ? (
                       <div className="text-center py-12">
                         <div className="text-red-600 dark:text-red-400 mb-4 text-lg">Error</div>
