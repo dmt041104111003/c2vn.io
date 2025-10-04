@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 
 async function generateReferralCodes() {
   try {
-    console.log('Starting referral code generation for existing users...');
     const usersWithoutCodes = await prisma.user.findMany({
       where: {
         referralCode: null
@@ -17,7 +16,6 @@ async function generateReferralCodes() {
       }
     });
 
-    console.log(`Found ${usersWithoutCodes.length} users without referral codes`);
 
     let successCount = 0;
     let errorCount = 0;
@@ -50,21 +48,16 @@ async function generateReferralCodes() {
           data: { referralCode }
         });
 
-        console.log(`Generated code ${referralCode} for user ${user.name || user.email || user.wallet || user.id}`);
         successCount++;
 
       } catch (error) {
-        console.error(`✗ Failed to generate code for user ${user.id}:`, error.message);
         errorCount++;
       }
     }
 
-    console.log(`\nGeneration completed:`);
-    console.log(`Success: ${successCount}`);
-    console.log(`Errors: ${errorCount}`);
+
 
   } catch (error) {
-    console.error('Error during referral code generation:', error);
   } finally {
     await prisma.$disconnect();
   }
