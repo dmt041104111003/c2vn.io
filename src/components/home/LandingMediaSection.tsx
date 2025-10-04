@@ -44,11 +44,11 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
                 <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[0].url})` }}></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-800/40 to-transparent"></div>
                 <div className="relative flex h-full flex-col justify-end p-4">
-                  <div className="mb-3 h-8 w-full bg-gradient-to-r from-blue-500/20 to-transparent"></div>
+                  {/* <div className="mb-3 h-8 w-full bg-gradient-to-r from-blue-500/20 to-transparent"></div>
                   <div className="space-y-1">
                     <div className="h-1.5 w-2/3 bg-gray-300 dark:bg-white/20"></div>
                     <div className="h-1.5 w-1/2 bg-gray-200 dark:bg-white/10"></div>
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             )}
@@ -63,11 +63,11 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
                 <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[1].url})` }}></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/80 via-cyan-800/40 to-transparent"></div>
                 <div className="relative flex h-full flex-col justify-end p-4">
-                  <div className="mb-3 h-12 w-full bg-gradient-to-r from-cyan-500/20 to-transparent"></div>
+                  {/* <div className="mb-3 h-12 w-full bg-gradient-to-r from-cyan-500/20 to-transparent"></div>
                   <div className="space-y-2">
                     <div className="h-1.5 w-2/3 bg-gray-300 dark:bg-white/20"></div>
                     <div className="h-1.5 w-3/4 bg-gray-200 dark:bg-white/10"></div>
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             )}
@@ -82,11 +82,11 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
                 <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[2].url})` }}></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-800/40 to-transparent"></div>
                 <div className="relative flex h-full flex-col justify-end p-4">
-                  <div className="mb-3 h-12 w-full bg-gradient-to-r from-purple-500/20 to-transparent"></div>
+                  {/* <div className="mb-3 h-12 w-full bg-gradient-to-r from-purple-500/20 to-transparent"></div>
                   <div className="space-y-2">
                     <div className="h-1.5 w-1/2 bg-gray-300 dark:bg-white/20"></div>
                     <div className="h-1.5 w-2/3 bg-gray-200 dark:bg-white/10"></div>
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             )}
@@ -101,11 +101,11 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
                 <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[3].url})` }}></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-800/40 to-transparent"></div>
                 <div className="relative flex h-full flex-col justify-end p-4">
-                  <div className="mb-3 h-10 w-full bg-gradient-to-r from-green-500/20 to-transparent"></div>
+                  {/* <div className="mb-3 h-10 w-full bg-gradient-to-r from-green-500/20 to-transparent"></div>
                   <div className="space-y-1">
                     <div className="h-1.5 w-3/5 bg-gray-300 dark:bg-white/20"></div>
                     <div className="h-1.5 w-4/5 bg-gray-200 dark:bg-white/10"></div>
-                  </div>
+                  </div> */}
                 </div>
               </motion.div>
             )}

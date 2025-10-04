@@ -1,0 +1,170 @@
+{
+    "info": {
+      "name": "Event Images Admin (CTA Upload)",
+      "_postman_id": "f1b1b7f4-7d6e-4c0a-9f1f-evtimgscta",
+      "description": "Admin-only endpoints for managing Event Images, including file upload via Cloudinary. Set variables: baseUrl, sessionToken, eventId.",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "List Event Images (admin)",
+        "request": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Cookie",
+              "value": "next-auth.session-token={{sessionToken}}",
+              "type": "text"
+            }
+          ],
+          "url": {
+            "raw": "{{baseUrl}}/api/admin/event-images",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "admin",
+              "event-images"
+            ]
+          }
+        },
+        "response": []
+      },
+      {
+        "name": "Create or Upsert Event Image (JSON, admin)",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Cookie",
+              "value": "next-auth.session-token={{sessionToken}}",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"title\": \"Cardano Meetup HN\",\n  \"location\": \"Ha Noi\",\n  \"imageUrl\": \"https://res.cloudinary.com/{{cloudName}}/image/upload/v123/event.jpg\",\n  \"orderNumber\": 1\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/admin/event-images",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "admin",
+              "event-images"
+            ]
+          },
+          "description": "Creates a new record if orderNumber slot is empty; otherwise updates the existing one. orderNumber is required."
+        },
+        "response": []
+      },
+      {
+        "name": "Upload/Replace Image File (multipart, admin)",
+        "request": {
+          "method": "PUT",
+          "header": [
+            {
+              "key": "Cookie",
+              "value": "next-auth.session-token={{sessionToken}}",
+              "type": "text"
+            }
+          ],
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "title",
+                "value": "Cardano Meetup HN",
+                "type": "text"
+              },
+              {
+                "key": "location",
+                "value": "Ha Noi",
+                "type": "text"
+              },
+              {
+                "key": "orderNumber",
+                "value": "1",
+                "type": "text"
+              },
+              {
+                "key": "file",
+                "type": "file",
+                "src": []
+              }
+            ]
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/admin/event-images/{{eventId}}",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "admin",
+              "event-images",
+              "{{eventId}}"
+            ]
+          },
+          "description": "Send either file (preferred) or imageUrl in form-data. If both are present, imageUrl takes precedence."
+        },
+        "response": []
+      },
+      {
+        "name": "Delete Event Image (admin)",
+        "request": {
+          "method": "DELETE",
+          "header": [
+            {
+              "key": "Cookie",
+              "value": "next-auth.session-token={{sessionToken}}",
+              "type": "text"
+            }
+          ],
+          "url": {
+            "raw": "{{baseUrl}}/api/admin/event-images/{{eventId}}",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "admin",
+              "event-images",
+              "{{eventId}}"
+            ]
+          }
+        },
+        "response": []
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:3000"
+      },
+      {
+        "key": "sessionToken",
+        "value": "REPLACE_WITH_NEXTAUTH_SESSION_TOKEN"
+      },
+      {
+        "key": "eventId",
+        "value": "REPLACE_WITH_EVENT_ID"
+      },
+      {
+        "key": "cloudName",
+        "value": "dvw4ba58t"
+      }
+    ]
+  }
+  
+  
+  
+  
+  

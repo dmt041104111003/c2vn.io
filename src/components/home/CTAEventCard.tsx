@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { XIcon, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
 import EventImageModal from "./EventImageModal";
@@ -44,15 +43,24 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
       <div className="relative w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
         {event.imageUrl ? (
           <>
-            <Image
+            <img
               src={event.imageUrl}
               alt={event.title}
               className={`object-cover w-full h-full transition-all ${editMode ? "opacity-80" : ""}`}
-              fill
-              quality={90}
-              sizes="100vw"
               onClick={handleImageClick}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) {
+                  fallback.classList.remove('hidden');
+                  fallback.classList.add('flex');
+                }
+              }}
             />
+            <div className="hidden w-full h-full bg-gray-200 dark:bg-gray-700 items-center justify-center">
+              <span className="text-gray-500 dark:text-gray-400">Image not available</span>
+            </div>
             {editMode && (
               <div
                 onClick={(e) => {
