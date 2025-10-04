@@ -37,8 +37,14 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['contact-courses'] });
       queryClient.invalidateQueries({ queryKey: ['contact-form-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        query.queryKey.some(key => 
+          typeof key === 'string' && 
+          (key.includes('course') || key.includes('Course'))
+        )
+      });
       setNewName('');
       setNewImage('');
       setNewDescription('');
@@ -130,11 +136,11 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
               Start Date (Optional)
             </label>
             <input
-              type="datetime-local"
+              type="date"
               value={newStartDate}
               onChange={(e) => setNewStartDate(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              title="Select start date and time"
+              title="Select start date"
             />
           </div>
         </div>

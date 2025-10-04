@@ -138,9 +138,7 @@ export default function CourseModal({ course, isOpen, onClose, onEnroll }: Cours
                             <strong>Start Date:</strong> {new Date(course.startDate).toLocaleDateString("vi-VN", {
                               day: "2-digit",
                               month: "2-digit", 
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit"
+                              year: "numeric"
                             })}
                           </span>
                         </div>

@@ -37,8 +37,14 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['contact-courses'] });
       queryClient.invalidateQueries({ queryKey: ['contact-form-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        query.queryKey.some(key => 
+          typeof key === 'string' && 
+          (key.includes('course') || key.includes('Course'))
+        )
+      });
       setEditingCourse(null);
       showSuccess('Course updated successfully');
       onSuccess?.();
@@ -61,8 +67,14 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['contact-courses'] });
       queryClient.invalidateQueries({ queryKey: ['contact-form-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+      queryClient.invalidateQueries({ predicate: (query) => 
+        query.queryKey.some(key => 
+          typeof key === 'string' && 
+          (key.includes('course') || key.includes('Course'))
+        )
+      });
       showSuccess('Course deleted successfully');
       onSuccess?.();
     },

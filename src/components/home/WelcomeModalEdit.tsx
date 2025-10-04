@@ -129,10 +129,10 @@ export default function WelcomeModalEdit({
             Start Date (Optional - auto set to now when save)
           </label>
           <input
-            type="datetime-local"
+            type="date"
             value={formData.startDate || ""}
             onChange={handleStartDateChange}
-            min={new Date().toISOString().slice(0, 16)}
+            min={new Date().toISOString().slice(0, 10)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
             title="Start Date"
           />
@@ -142,10 +142,10 @@ export default function WelcomeModalEdit({
             End Date *
           </label>
           <input
-            type="datetime-local"
+            type="date"
             value={formData.endDate || ""}
             onChange={handleEndDateChange}
-            min={formData.startDate || new Date().toISOString().slice(0, 16)}
+            min={formData.startDate || new Date().toISOString().slice(0, 10)}
             required
             className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-center ${
               isEndDateRequired 
