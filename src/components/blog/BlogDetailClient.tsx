@@ -263,23 +263,6 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
 
   return (
     <main className="relative min-h-screen bg-white dark:bg-gray-950">
-      {/* Background Logo */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        whileInView={{ opacity: 0.15, scale: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="fixed left-[-200px] top-1/2 -translate-y-1/2 z-0 pointer-events-none select-none block"
-      >
-        <img
-          src="/images/common/loading.png"
-          alt="Cardano2VN Logo"
-          className="w-[1200px] h-[1200px] object-contain"
-          draggable={false}
-          style={{ objectPosition: 'left center' }}
-        />
-      </motion.div>
-      
       <Header />
       <div className="pt-20">
         <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">
