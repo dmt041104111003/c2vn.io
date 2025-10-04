@@ -5,9 +5,13 @@ import { MediaInputMedia, MediaInputProps } from '~/constants/media';
 
 export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'image', multiple = false }: MediaInputProps) {
   const [currentMedia, setCurrentMedia] = useState<MediaInputMedia | null>(null);
-  const [activeImageTab, setActiveImageTab] = useState<'upload' | 'url'>('upload');
+  const [activeImageTab, setActiveImageTab] = useState<'upload' | 'url' | 'library'>('upload');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState('');
+  
+  // Media library states
+  const [mediaList, setMediaList] = useState<any[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
 
   const clearMedia = () => {
     setCurrentMedia(null);
@@ -57,6 +61,31 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
     }
   };
 
+  const fetchMediaLibrary = async () => {
+    setMediaLoading(true);
+    try {
+      const response = await fetch('/api/admin/media');
+      if (response.ok) {
+        const data = await response.json();
+        setMediaList(data.data?.media || []);
+      }
+    } catch (error) {
+      console.error('Error fetching media:', error);
+    } finally {
+      setMediaLoading(false);
+    }
+  };
+
+  const handleSelectFromLibrary = (mediaItem: any) => {
+    const media: MediaInputMedia = {
+      id: mediaItem.id,
+      url: mediaItem.path,
+      type: "image"
+    };
+    setCurrentMedia(media);
+    if (onMediaAdd) onMediaAdd(media);
+  };
+
   const handleImageUrl = async (url: string) => {
     setImageUrl(url);
     if (!url) return;
@@ -103,6 +132,18 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
             >
               Paste URL
             </button>
+            <button
+              type="button"
+              className={`px-3 py-1 rounded-t border-b-2 ${activeImageTab === 'library' ? 'border-emerald-500 text-emerald-600 bg-white dark:bg-gray-700 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800'}`}
+              onClick={() => {
+                setActiveImageTab('library');
+                if (mediaList.length === 0) {
+                  fetchMediaLibrary();
+                }
+              }}
+            >
+              Library
+            </button>
           </div>
           {activeImageTab === 'upload' && (
             <div className="flex flex-col items-center gap-2">
@@ -120,7 +161,7 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                 multiple={multiple}
                 onChange={handleFileChange}
                 ref={fileInputRef}
-                style={{ display: 'none' }}
+                className="hidden"
                 title="Upload image from your computer"
                 placeholder="Choose image file..."
               />
@@ -138,6 +179,89 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
               />
             </div>
           )}
+          {activeImageTab === 'library' && (
+            <div className="space-y-4">
+              {mediaLoading ? (
+                <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg scrollbar-hide">
+                  <div className="animate-pulse">
+                    <div className="bg-gray-200 dark:bg-gray-700 h-8 rounded-t-lg"></div>
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-600">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                        </div>
+                        <div className="w-16 h-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg scrollbar-hide">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Image
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Name
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                          Action
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                      {mediaList
+                        .filter(item => item.mimeType?.startsWith('image/'))
+                        .slice(0, 10)
+                        .map((item) => (
+                        <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <td className="px-4 py-2">
+                            <div className="flex-shrink-0 h-10 w-10">
+                              <img
+                                className="h-10 w-10 rounded-lg object-cover"
+                                src={item.path}
+                                alt={item.originalName}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-4 py-2">
+                            <div className="text-sm text-gray-900 dark:text-white truncate max-w-32" title={item.originalName}>
+                              {item.originalName}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-32" title={item.path}>
+                              {item.path.split('/').pop()}
+                            </div>
+                          </td>
+                          <td className="px-4 py-2">
+                            <button
+                              type="button"
+                              onClick={() => handleSelectFromLibrary(item)}
+                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+                            >
+                              Select
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {mediaList.filter(item => item.mimeType?.startsWith('image/')).length === 0 && (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 dark:text-gray-400">No images found in library</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
           {currentMedia?.type === 'image' && currentMedia.url && (
             <div className="flex flex-col items-center gap-2">
               <img
@@ -147,10 +271,14 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
-                  target.nextElementSibling?.classList.remove('hidden');
+                  const fallback = target.nextElementSibling as HTMLElement;
+                  if (fallback) {
+                    fallback.classList.remove('hidden');
+                    fallback.classList.add('flex');
+                  }
                 }}
               />
-              <div className="hidden max-w-full max-h-48 rounded-lg shadow-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              <div className="hidden max-w-full max-h-48 rounded-lg shadow-md bg-gray-100 dark:bg-gray-700 items-center justify-center">
                 <span className="text-gray-400 dark:text-gray-500">Image not available</span>
               </div>
               <button
