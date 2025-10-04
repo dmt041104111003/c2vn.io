@@ -134,7 +134,6 @@ export function TabsTable({ tabs, onEdit, onDelete, onView }: TabsTableProps) {
              <div className="bg-gray-50 rounded-lg p-3">
                <p className="text-sm text-gray-500">Tab to delete:</p>
                <p className="font-medium text-gray-900">{selectedTabToDelete.name}</p>
-               <p className="text-sm text-gray-500">Order: {selectedTabToDelete.order}</p>
                <p className="text-sm text-gray-500">{selectedTabToDelete.members?.length || 0} members</p>
              </div>
            )}

@@ -106,7 +106,6 @@ export default function CourseModal({ course, isOpen, onClose, onEnroll }: Cours
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {course.name}
                       </span>
-                      <span>Order: {course.order}</span>
                       <span>
                         Created: {new Date(course.createdAt).toLocaleDateString("en-US", {
                           day: "2-digit",

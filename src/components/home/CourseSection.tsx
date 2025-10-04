@@ -298,7 +298,6 @@ export default function CourseSection() {
                              })}
                            </span>
                            <span>•</span>
-                           <span>Order: {course.order}</span>
                         </div>
                       </div>
                       <div className="flex-shrink-0">
