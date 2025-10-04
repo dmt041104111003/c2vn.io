@@ -22,7 +22,6 @@ export default function LandingSection() {
     subtitle: '',
     description: '',
     mainText: '',
-    subText: '',
     media1Url: '',
     media2Url: '',
     media3Url: '',
@@ -79,7 +78,6 @@ export default function LandingSection() {
         subtitle: firstContent.subtitle || '',
         description: firstContent.description || '',
         mainText: firstContent.mainText || '',
-        subText: firstContent.subText || '',
         media1Url: firstContent.media1Url || '',
         media2Url: firstContent.media2Url || '',
         media3Url: firstContent.media3Url || '',
@@ -148,7 +146,6 @@ export default function LandingSection() {
       subtitle: formData.subtitle || "", 
       description: formData.description || "",
       mainText: formData.mainText || "",
-      subText: formData.subText || ""
     };
   };
 

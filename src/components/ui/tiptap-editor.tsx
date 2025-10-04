@@ -175,13 +175,13 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
 
   return (
     <>
-      <div className="border-b border-gray-200 p-3 flex flex-wrap gap-2 bg-gray-50">
+      <div className="border-b border-gray-200 dark:border-gray-700 p-3 flex flex-wrap gap-2 bg-gray-50 dark:bg-gray-700">
         <div className="flex items-center gap-1">
           <button
             onClick={() => editor.chain().focus().toggleBold().run()}
             disabled={!editor.can().chain().focus().toggleBold().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('bold') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('bold') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Bold"
           >
@@ -190,8 +190,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           <button
             onClick={() => editor.chain().focus().toggleItalic().run()}
             disabled={!editor.can().chain().focus().toggleItalic().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('italic') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Italic"
           >
@@ -199,8 +199,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('underline') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('underline') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Underline"
           >
@@ -208,8 +208,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('strike') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('strike') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Strikethrough"
           >
@@ -217,8 +217,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleHighlight().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('highlight') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('highlight') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Highlight"
           >
@@ -226,15 +226,15 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={toggleCase}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
             title="Toggle Case (UPPERCASE/lowercase)"
           >
             <Type className="h-4 w-4" />
           </button>
           <button
             onClick={() => editor.chain().focus().toggleSubscript().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('subscript') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('subscript') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Subscript"
           >
@@ -242,8 +242,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleSuperscript().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('superscript') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('superscript') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Superscript"
           >
@@ -251,20 +251,20 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className="p-2 rounded hover:bg-gray-200 transition-colors text-gray-600"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-gray-600 dark:text-gray-300"
             title="Insert Horizontal Rule"
           >
-            <span className="block w-6 border-t-2 border-gray-400" style={{ margin: 0 }} />
+            <span className="block w-6 border-t-2 border-gray-400 dark:border-gray-500 m-0" />
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-300"></div>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('heading', { level: 1 }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('heading', { level: 1 }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Heading 1"
           >
@@ -272,8 +272,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('heading', { level: 2 }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('heading', { level: 2 }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Heading 2"
           >
@@ -281,8 +281,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('heading', { level: 3 }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('heading', { level: 3 }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Heading 3"
           >
@@ -290,8 +290,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('heading', { level: 4 }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('heading', { level: 4 }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Heading 4"
           >
@@ -299,8 +299,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('heading', { level: 5 }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('heading', { level: 5 }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Heading 5"
           >
@@ -308,8 +308,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('heading', { level: 6 }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('heading', { level: 6 }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Heading 6"
           >
@@ -317,13 +317,13 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-300"></div>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('bulletList') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Bullet List"
           >
@@ -331,8 +331,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('orderedList') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('orderedList') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Ordered List"
           >
@@ -340,13 +340,13 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-300"></div>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('blockquote') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('blockquote') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Blockquote"
           >
@@ -354,8 +354,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive('codeBlock') ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive('codeBlock') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Code Block"
           >
@@ -363,20 +363,20 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={addTable}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
             title="Insert Table"
           >
             <TableIcon className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-300"></div>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => setTextAlign('left')}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'left' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive({ textAlign: 'left' }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Align Left"
           >
@@ -384,8 +384,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => setTextAlign('center')}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'center' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive({ textAlign: 'center' }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Align Center"
           >
@@ -393,8 +393,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => setTextAlign('right')}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'right' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive({ textAlign: 'right' }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Align Right"
           >
@@ -402,8 +402,8 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
           <button
             onClick={() => setTextAlign('justify')}
-            className={`p-2 rounded hover:bg-gray-200 transition-colors ${
-              editor.isActive({ textAlign: 'justify' }) ? 'bg-gray-200 text-blue-600' : 'text-gray-600'
+            className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+              editor.isActive({ textAlign: 'justify' }) ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-300'
             }`}
             title="Justify"
           >
@@ -411,32 +411,32 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-300"></div>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={addLink}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
             title="Add Link"
           >
             <LinkIcon className="h-4 w-4" />
           </button>
           <button
             onClick={addImage}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
             title="Add Image"
           >
             <ImageIcon className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-300"></div>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => editor.chain().focus().undo().run()}
             disabled={!editor.can().chain().focus().undo().run()}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors disabled:opacity-50"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors disabled:opacity-50"
             title="Undo"
           >
             <Undo className="h-4 w-4" />
@@ -444,14 +444,14 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
           <button
             onClick={() => editor.chain().focus().redo().run()}
             disabled={!editor.can().chain().focus().redo().run()}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600 transition-colors disabled:opacity-50"
+            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors disabled:opacity-50"
             title="Redo"
           >
             <Redo className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="w-px h-6 bg-gray-300"></div>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
         <div className="flex items-center gap-1">
           <TooltipButton editor={editor} />
@@ -651,36 +651,36 @@ export function TipTapEditor({ content, onChange, placeholder }: TipTapEditorPro
 
   if (!isClient) {
     return (
-      <div className="border border-gray-300 rounded-md overflow-hidden bg-white" suppressHydrationWarning>
-        <div className="border-b border-gray-200 p-3 flex flex-wrap gap-2 bg-gray-50">
-          <div className="p-2 rounded bg-gray-100 animate-pulse">
-            <div className="h-4 w-4 bg-gray-300 rounded"></div>
+      <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden bg-white dark:bg-gray-800" suppressHydrationWarning>
+        <div className="border-b border-gray-200 dark:border-gray-700 p-3 flex flex-wrap gap-2 bg-gray-50 dark:bg-gray-700">
+          <div className="p-2 rounded bg-gray-100 dark:bg-gray-600 animate-pulse">
+            <div className="h-4 w-4 bg-gray-300 dark:bg-gray-500 rounded"></div>
           </div>
-          <div className="p-2 rounded bg-gray-100 animate-pulse">
-            <div className="h-4 w-4 bg-gray-300 rounded"></div>
+          <div className="p-2 rounded bg-gray-100 dark:bg-gray-600 animate-pulse">
+            <div className="h-4 w-4 bg-gray-300 dark:bg-gray-500 rounded"></div>
           </div>
-          <div className="p-2 rounded bg-gray-100 animate-pulse">
-            <div className="h-4 w-4 bg-gray-300 rounded"></div>
+          <div className="p-2 rounded bg-gray-100 dark:bg-gray-600 animate-pulse">
+            <div className="h-4 w-4 bg-gray-300 dark:bg-gray-500 rounded"></div>
           </div>
         </div>
-        <div className="p-4 min-h-[400px] bg-gray-50 animate-pulse">
-          <div className="h-4 bg-gray-200 rounded mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="p-4 min-h-[400px] bg-gray-50 dark:bg-gray-800 animate-pulse">
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="border border-gray-300 rounded-md overflow-hidden bg-white" suppressHydrationWarning>
+    <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden bg-white dark:bg-gray-800" suppressHydrationWarning>
       <TooltipHandler />
       <MenuBar editor={editor} />
       <FloatingTableToolbar editor={editor} isClient={isClient} />
       <EditorContent 
         editor={editor} 
-        className="p-4 min-h-[400px] focus:outline-none prose prose-sm max-w-none"
+        className="p-4 min-h-[400px] focus:outline-none prose prose-sm max-w-none dark:prose-invert"
         placeholder={placeholder}
       />
       <style jsx global>{tiptapStyles}</style>

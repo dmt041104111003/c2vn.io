@@ -4,6 +4,7 @@ import React from 'react';
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { routers } from "~/constants/routers";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 interface LandingContentSectionProps {
   content: {
@@ -11,12 +12,11 @@ interface LandingContentSectionProps {
     subtitle: string;
     description: string;
     mainText: string;
-    subText: string;
   };
 }
 
 export default function LandingContentSection({ content }: LandingContentSectionProps) {
-  const totalLength = content.title.length + content.subtitle.length + content.description.length + content.mainText.length + content.subText.length;
+  const totalLength = content.title.length + content.subtitle.length + content.description.length + content.mainText.length;
   const getFontSizes = () => {
     if (totalLength > 500) {
       return {
@@ -54,18 +54,15 @@ export default function LandingContentSection({ content }: LandingContentSection
         <span className="block bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300 bg-clip-text tracking-tight text-gray-900 dark:text-transparent drop-shadow-lg">
           {content.subtitle}
         </span>
-        <span className={`mt-2 lg:mt-3 block font-normal text-gray-600 dark:text-gray-300 ${fontSizes.description}`}>
-          {content.description}
-        </span>
+        <div className={`mt-2 lg:mt-3 block font-normal text-gray-600 dark:text-gray-300 ${fontSizes.description}`}>
+          <TipTapPreview content={content.description} />
+        </div>
       </h1>
       
       <div className="relative mb-4 lg:mb-6 border-l-2 border-gray-300 dark:border-white/20 pl-4 lg:pl-6">
-        <p className={`mb-2 lg:mb-3 leading-relaxed text-gray-600 dark:text-gray-300 ${fontSizes.mainText}`}>
-          {content.mainText}
-        </p>
-        <p className={`text-gray-500 dark:text-gray-400 ${fontSizes.subText}`}>
-          {content.subText}
-        </p>
+        <div className={`mb-2 lg:mb-3 leading-relaxed text-gray-600 dark:text-gray-300 ${fontSizes.mainText}`}>
+          <TipTapPreview content={content.mainText} />
+        </div>
       </div>
       
       <div className="flex flex-col gap-4 lg:gap-6 sm:flex-row">

@@ -14,7 +14,6 @@ interface LandingContentManagerProps {
     subtitle: string;
     description: string;
     mainText: string;
-    subText: string;
     media1Url: string;
     media2Url: string;
     media3Url: string;
@@ -27,7 +26,6 @@ interface LandingContentManagerProps {
     subtitle: string;
     description: string;
     mainText: string;
-    subText: string;
     media1Url: string;
     media2Url: string;
     media3Url: string;
@@ -67,7 +65,6 @@ export default function LandingContentManager({ formData, setFormData }: Landing
             subtitle: firstContent.subtitle || '',
             description: firstContent.description || '',
             mainText: firstContent.mainText || '',
-            subText: firstContent.subText || '',
             media1Url: firstContent.media1Url || '',
             media2Url: firstContent.media2Url || '',
             media3Url: firstContent.media3Url || '',
@@ -87,7 +84,6 @@ export default function LandingContentManager({ formData, setFormData }: Landing
             subtitle: '',
             description: '',
             mainText: '',
-            subText: '',
             media1Url: '',
             media2Url: '',
             media3Url: '',
@@ -107,7 +103,6 @@ export default function LandingContentManager({ formData, setFormData }: Landing
       subtitle?: string;
       description?: string;
       mainText?: string;
-      subText?: string;
       media1Url: string;
       media2Url: string;
       media3Url: string;
@@ -153,7 +148,6 @@ export default function LandingContentManager({ formData, setFormData }: Landing
       subtitle: formData.subtitle,
       description: formData.description,
       mainText: formData.mainText,
-      subText: formData.subText,
       publishStatus: formData.publishStatus,
       media1Url: formData.media1Url || '',
       media2Url: formData.media2Url || '',

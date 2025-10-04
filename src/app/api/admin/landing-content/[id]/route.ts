@@ -10,7 +10,7 @@ export const PUT = withAdmin(async (req, user) => {
   }
 
   const body = await req.json();
-  const { section, title, subtitle, description, mainText, subText, media1Url, media2Url, media3Url, media4Url, publishStatus } = body;
+  const { section, title, subtitle, description, mainText, media1Url, media2Url, media3Url, media4Url, publishStatus } = body;
 
   if (!section) {
     return NextResponse.json(createErrorResponse('Section is required', 'MISSING_SECTION'), { status: 400 });
@@ -43,7 +43,6 @@ export const PUT = withAdmin(async (req, user) => {
       subtitle,
       description,
       mainText,
-      subText,
       media1Url,
       media2Url,
       media3Url,

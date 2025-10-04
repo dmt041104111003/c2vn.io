@@ -1,7 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { LandingContentFormData } from '~/constants/admin';
+import { TipTapEditor } from '~/components/ui/tiptap-editor';
 
 interface ContentSectionProps {
   formData: LandingContentFormData;
@@ -9,6 +10,8 @@ interface ContentSectionProps {
 }
 
 export default function ContentSection({ formData, setFormData }: ContentSectionProps) {
+  const [activeTab, setActiveTab] = useState<'description' | 'mainText'>('description');
+
   return (
     <div className="space-y-6">
       <h4 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
@@ -46,47 +49,59 @@ export default function ContentSection({ formData, setFormData }: ContentSection
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Description
-          </label>
-          <textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Enter description..."
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="mainText" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        {/* Tab System for Description and Main Text */}
+        <div className="space-y-4">
+          <div className="flex gap-2 mb-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('description')}
+              className={`px-3 py-1 rounded-t border-b-2 ${
+                activeTab === 'description' 
+                  ? 'border-emerald-500 text-emerald-600 bg-white dark:bg-gray-700 dark:text-emerald-400' 
+                  : 'border-transparent text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800'
+              }`}
+            >
+              Description
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('mainText')}
+              className={`px-3 py-1 rounded-t border-b-2 ${
+                activeTab === 'mainText' 
+                  ? 'border-emerald-500 text-emerald-600 bg-white dark:bg-gray-700 dark:text-emerald-400' 
+                  : 'border-transparent text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800'
+              }`}
+            >
               Main Text
-            </label>
-            <textarea
-              id="mainText"
-              value={formData.mainText}
-              onChange={(e) => setFormData({ ...formData, mainText: e.target.value })}
-              placeholder="Enter main text..."
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-            />
+            </button>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="subText" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Sub Text
-            </label>
-            <textarea
-              id="subText"
-              value={formData.subText}
-              onChange={(e) => setFormData({ ...formData, subText: e.target.value })}
-              placeholder="Enter sub text..."
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-            />
+            {activeTab === 'description' && (
+              <>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Description
+                </label>
+                <TipTapEditor
+                  content={formData.description}
+                  onChange={(content) => setFormData({ ...formData, description: content })}
+                  placeholder="Enter description..."
+                />
+              </>
+            )}
+
+            {activeTab === 'mainText' && (
+              <>
+                <label htmlFor="mainText" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Main Text
+                </label>
+                <TipTapEditor
+                  content={formData.mainText}
+                  onChange={(content) => setFormData({ ...formData, mainText: content })}
+                  placeholder="Enter main text..."
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

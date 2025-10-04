@@ -3,10 +3,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { LandingContentProps } from '~/constants/admin';
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export default function LandingContent({ content }: LandingContentProps) {
   // Calculate content length to determine font sizes
-  const totalLength = content.title.length + content.subtitle.length + content.description.length + content.mainText.length + content.subText.length;
+  const totalLength = content.title.length + content.subtitle.length + content.description.length + content.mainText.length;
   
   // Dynamic font sizing based on content length
   const getFontSizes = () => {
@@ -63,15 +64,15 @@ export default function LandingContent({ content }: LandingContentProps) {
           </motion.span>
         </h1>
         
-        <motion.p
+        <motion.div
           className={`mb-6 lg:mb-8 text-gray-600 dark:text-gray-300 ${fontSizes.description}`}
           variants={{
             hidden: { opacity: 0, y: 20 },
             show: { opacity: 1, y: 0 },
           }}
         >
-          {content.description}
-        </motion.p>
+          <TipTapPreview content={content.description} />
+        </motion.div>
         
         <motion.div
           className="space-y-3 lg:space-y-4"
@@ -80,12 +81,9 @@ export default function LandingContent({ content }: LandingContentProps) {
             show: { opacity: 1, y: 0 },
           }}
         >
-          <p className={`text-gray-700 dark:text-gray-200 ${fontSizes.mainText}`}>
-            {content.mainText}
-          </p>
-          <p className={`text-gray-600 dark:text-gray-400 ${fontSizes.subText}`}>
-            {content.subText}
-          </p>
+          <div className={`text-gray-700 dark:text-gray-200 ${fontSizes.mainText}`}>
+            <TipTapPreview content={content.mainText} />
+          </div>
         </motion.div>
       </section>
     </div>

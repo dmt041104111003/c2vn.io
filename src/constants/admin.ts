@@ -101,7 +101,6 @@ export interface LandingContentFormData {
   subtitle: string;
   description: string;
   mainText: string;
-  subText: string;
   media1Url: string;
   media2Url: string;
   media3Url: string;
@@ -115,7 +114,6 @@ export interface LandingContentProps {
     subtitle: string;
     description: string;
     mainText: string;
-    subText: string;
   };
 }
 
