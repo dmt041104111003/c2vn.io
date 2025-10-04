@@ -103,10 +103,10 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
                     }}
                     className="absolute rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-white shadow-2xl cursor-pointer hover:scale-105 transition-all duration-300"
                     style={{
-                      left: '-140px', 
-                      top: '-100px', 
-                      width: '280px',
-                      height: '200px',
+                      left: '-200px', 
+                      top: '-150px', 
+                      width: '400px',
+                      height: '300px',
                       zIndex: zIndex,
                     }}
                     onClick={() => handleImageClick(item)}
