@@ -137,6 +137,7 @@ export default function MemberEditor({ member, onSave, onCancel, isLoading }: Me
           <MediaInput 
             onMediaAdd={handleMediaAdd}
             mediaType="image"
+            showVideoLibrary={false}
           />
         </div>
 

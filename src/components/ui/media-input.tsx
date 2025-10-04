@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import { MediaInputMedia, MediaInputProps } from '~/constants/media';
 
-export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'image', multiple = false }: MediaInputProps) {
+export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'image', multiple = false, showVideoLibrary = true, showYouTubeInput = false }: MediaInputProps) {
   const [currentMedia, setCurrentMedia] = useState<MediaInputMedia | null>(null);
   const [activeImageTab, setActiveImageTab] = useState<'upload' | 'url' | 'library'>('upload');
+  const [activeLibraryTab, setActiveLibraryTab] = useState<'images' | 'videos'>('images');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
   
   // Media library states
   const [mediaList, setMediaList] = useState<any[]>([]);
@@ -16,6 +18,7 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
   const clearMedia = () => {
     setCurrentMedia(null);
     setImageUrl('');
+    setYoutubeUrl('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -177,10 +180,82 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                 onChange={e => setImageUrl(e.target.value)}
                 onBlur={() => handleImageUrl(imageUrl)}
               />
+              
+              {showYouTubeInput && (
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Or paste YouTube video link:
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="Paste YouTube video link here..."
+                    value={youtubeUrl}
+                    onChange={e => {
+                      const url = e.target.value;
+                      setYoutubeUrl(url);
+                      if (url && onMediaAdd) {
+                        const youtubeId = getYoutubeIdFromUrl(url);
+                        if (youtubeId) {
+                          const media: MediaInputMedia = {
+                            type: 'youtube',
+                            url: url,
+                            id: youtubeId
+                          };
+                          setCurrentMedia(media);
+                          onMediaAdd(media);
+                        }
+                      }
+                    }}
+                  />
+                  {currentMedia?.type === 'youtube' && currentMedia.id && (
+                    <div className="mt-2">
+                      <div className="youtube-video">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${currentMedia.id}`}
+                          title="YouTube video player"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-48 rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
           {activeImageTab === 'library' && (
             <div className="space-y-4">
+              {/* Library sub-tabs */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className={`px-3 py-1 rounded border ${
+                    activeLibraryTab === 'images' 
+                      ? 'bg-blue-100 text-blue-700 border-blue-300' 
+                      : 'bg-gray-100 text-gray-600 border-gray-300'
+                  }`}
+                  onClick={() => setActiveLibraryTab('images')}
+                >
+                  Images
+                </button>
+                {showVideoLibrary && (
+                  <button
+                    type="button"
+                    className={`px-3 py-1 rounded border ${
+                      activeLibraryTab === 'videos' 
+                        ? 'bg-blue-100 text-blue-700 border-blue-300' 
+                        : 'bg-gray-100 text-gray-600 border-gray-300'
+                    }`}
+                    onClick={() => setActiveLibraryTab('videos')}
+                  >
+                    Videos
+                  </button>
+                )}
+              </div>
+
               {mediaLoading ? (
                 <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg scrollbar-hide">
                   <div className="animate-pulse">
@@ -203,7 +278,7 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                     <thead className="bg-gray-50 dark:bg-gray-700">
                       <tr>
                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                          Image
+                          {activeLibraryTab === 'images' ? 'Image' : 'Video'}
                         </th>
                         <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Name
@@ -215,21 +290,33 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                     </thead>
                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
                       {mediaList
-                        .filter(item => item.mimeType?.startsWith('image/'))
+                        .filter(item => {
+                          if (activeLibraryTab === 'images') {
+                            return item.mimeType?.startsWith('image/');
+                          } else {
+                            return item.mimeType?.startsWith('video/') || item.type === 'YOUTUBE';
+                          }
+                        })
                         .slice(0, 10)
                         .map((item) => (
                         <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                           <td className="px-4 py-2">
                             <div className="flex-shrink-0 h-10 w-10">
-                              <img
-                                className="h-10 w-10 rounded-lg object-cover"
-                                src={item.path}
-                                alt={item.originalName}
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                }}
-                              />
+                              {activeLibraryTab === 'images' ? (
+                                <img
+                                  className="h-10 w-10 rounded-lg object-cover"
+                                  src={item.path}
+                                  alt={item.originalName}
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded-lg bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                                  <span className="text-xs">🎥</span>
+                                </div>
+                              )}
                             </div>
                           </td>
                           <td className="px-4 py-2">
@@ -253,9 +340,17 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                       ))}
                     </tbody>
                   </table>
-                  {mediaList.filter(item => item.mimeType?.startsWith('image/')).length === 0 && (
+                  {mediaList.filter(item => {
+                    if (activeLibraryTab === 'images') {
+                      return item.mimeType?.startsWith('image/');
+                    } else {
+                      return item.mimeType?.startsWith('video/') || item.type === 'YOUTUBE';
+                    }
+                  }).length === 0 && (
                     <div className="text-center py-8">
-                      <p className="text-gray-500 dark:text-gray-400">No images found in library</p>
+                      <p className="text-gray-500 dark:text-gray-400">
+                        No {activeLibraryTab} found in library
+                      </p>
                     </div>
                   )}
                 </div>
@@ -291,51 +386,6 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
             </div>
           )}
         </>
-      )}
-      {mediaType === 'youtube' && (
-        <div className="flex flex-col items-center gap-2">
-          <input
-            type="text"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            placeholder="Paste YouTube video link here..."
-            onChange={e => {
-              const url = e.target.value;
-              if (url && onMediaAdd) {
-                const youtubeId = getYoutubeIdFromUrl(url);
-                if (youtubeId) {
-                  const media: MediaInputMedia = {
-                    type: 'youtube',
-                    url: url,
-                    id: youtubeId
-                  };
-                  setCurrentMedia(media);
-                  onMediaAdd(media);
-                }
-              }
-            }}
-          />
-          {currentMedia?.type === 'youtube' && currentMedia.id && (
-            <div className="flex flex-col items-center gap-2">
-              <div className="youtube-video">
-                <iframe
-                  src={`https://www.youtube.com/embed/${currentMedia.id}`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-48 rounded-lg"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={clearMedia}
-                className="px-3 py-1 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-              >
-                Remove Video
-              </button>
-            </div>
-          )}
-        </div>
       )}
     </div>
   );

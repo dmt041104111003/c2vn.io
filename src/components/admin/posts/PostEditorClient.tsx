@@ -328,40 +328,11 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
               </label>
               {isClient && (
                 <>
-                  <div className="flex gap-2 mb-2">
-                    <button
-                      type="button"
-                      className={`px-4 py-2 rounded-t-md border-b-2 text-sm font-medium focus:outline-none transition-all duration-150 ${mediaType === 'image' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-600 bg-gray-100 hover:bg-gray-200'}`}
-                      onClick={() => {
-                        setMediaType('image');
-                        handleRemoveMedia();
-                      }}
-                    >
-                      Image
-                    </button>
-                    <button
-                      type="button"
-                      className={`px-4 py-2 rounded-t-md border-b-2 text-sm font-medium focus:outline-none transition-all duration-150 ${mediaType === 'youtube' ? 'border-blue-600 text-blue-600 bg-blue-50' : 'border-transparent text-gray-600 bg-gray-100 hover:bg-gray-200'}`}
-                      onClick={() => {
-                        setMediaType('youtube');
-                        handleRemoveMedia();
-                      }}
-                    >
-                      YouTube video
-                    </button>
-                  </div>
-                  {mediaType === 'image' && (
-                    <MediaInput
-                      onMediaAdd={handleMediaAdd}
-                      mediaType="image"
-                    />
-                  )}
-                  {mediaType === 'youtube' && (
-                    <MediaInput
-                      onMediaAdd={handleMediaAdd}
-                      mediaType="youtube"
-                    />
-                  )}
+                  <MediaInput
+                    onMediaAdd={handleMediaAdd}
+                    mediaType="image"
+                    showYouTubeInput={true}
+                  />
                 </>
               )}
             </div>

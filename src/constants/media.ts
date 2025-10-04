@@ -54,4 +54,6 @@ export interface MediaInputProps {
   onMediaAddMany?: (medias: MediaInputMedia[]) => void;
   mediaType?: 'image' | 'youtube';
   multiple?: boolean;
+  showVideoLibrary?: boolean;
+  showYouTubeInput?: boolean;
 } 

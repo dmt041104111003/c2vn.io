@@ -142,6 +142,7 @@ export default function EditModal({ isOpen, onClose, event, index, onSave }: Edi
                     <MediaInput 
                       onMediaAdd={handleMediaAdd}
                       mediaType="image"
+                      showVideoLibrary={false}
                     />
                   </div>
                 </div>

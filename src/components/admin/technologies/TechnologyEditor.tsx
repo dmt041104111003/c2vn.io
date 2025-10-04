@@ -167,6 +167,7 @@ export default function TechnologyEditor({ technology, onSave, onCancel }: Techn
           <MediaInput
             mediaType="image"
             onMediaAdd={(media) => setImage(media.url)}
+            showVideoLibrary={false}
           />
           {image && (
             <div className="mt-2 p-3 bg-gray-50 rounded-md">
