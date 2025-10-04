@@ -5,7 +5,6 @@ import { baseOptions } from "~/app/layout.config";
 import { source } from "~/app/lib/source";
 import { DocsThemeHandler } from "~/components/docs/docs-theme-handler";
 import { DocsRouteHandler } from "~/components/docs/docs-route-handler";
-import BackgroundMotion from "~/components/ui/BackgroundMotion";
 import "fumadocs-ui/css/ocean.css";
 import "fumadocs-ui/css/preset.css";
 
@@ -19,7 +18,15 @@ export default function Layout({ children }: { children: ReactNode }) {
     <>
       <DocsRouteHandler />
       <div className="docs-isolated-container relative">
-        <BackgroundMotion />
+        <div className="fixed left-[-200px] top-1/2 -translate-y-1/2 z-0 opacity-3 pointer-events-none select-none block">
+          <img
+            src="/images/common/loading.png"
+            alt="Cardano2VN Logo"
+            className="w-[1200px] h-[1200px] object-contain"
+            draggable={false}
+            style={{ objectPosition: "left center" }}
+          />
+        </div>
 
         <DocsThemeHandler />
         <RootProvider>

@@ -82,6 +82,7 @@ export default function WelcomeModalEdit({
         </label>
         <MediaInput
           onMediaAdd={onImageChange}
+          showVideoLibrary={false}
         />
         {previewImage && (
           <div className="mt-4">
