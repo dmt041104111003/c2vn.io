@@ -11,7 +11,6 @@ interface LandingManageSectionProps {
     subtitle: string;
     description: string;
     mainText: string;
-    subText: string;
     media1Url: string;
     media2Url: string;
     media3Url: string;
@@ -24,7 +23,6 @@ interface LandingManageSectionProps {
     subtitle: string;
     description: string;
     mainText: string;
-    subText: string;
     media1Url: string;
     media2Url: string;
     media3Url: string;

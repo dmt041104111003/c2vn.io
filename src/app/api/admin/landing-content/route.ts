@@ -15,7 +15,7 @@ export const GET = withAdmin(async () => {
 });
 
 export const POST = withAdmin(async (req) => {
-  const { section, title, subtitle, description, mainText, subText, media1Url, media2Url, media3Url, media4Url, publishStatus } = await req.json();
+  const { section, title, subtitle, description, mainText, media1Url, media2Url, media3Url, media4Url, publishStatus } = await req.json();
   
   if (!section) {
     return NextResponse.json(createErrorResponse('Section is required', 'MISSING_SECTION'), { status: 400 });
@@ -36,7 +36,6 @@ export const POST = withAdmin(async (req) => {
       subtitle,
       description,
       mainText,
-      subText,
       media1Url,
       media2Url,
       media3Url,

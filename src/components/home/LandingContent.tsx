@@ -17,7 +17,6 @@ export default function LandingContent({ content }: LandingContentProps) {
         subtitle: "text-2xl lg:text-4xl xl:text-5xl", 
         description: "text-base lg:text-lg xl:text-xl",
         mainText: "text-sm lg:text-base xl:text-lg",
-        subText: "text-xs lg:text-sm xl:text-base"
       };
     } else if (totalLength > 300) {
       return {
@@ -25,7 +24,6 @@ export default function LandingContent({ content }: LandingContentProps) {
         subtitle: "text-3xl lg:text-5xl xl:text-6xl",
         description: "text-lg lg:text-xl xl:text-2xl", 
         mainText: "text-base lg:text-lg xl:text-xl",
-        subText: "text-sm lg:text-base xl:text-lg"
       };
     } else {
       return {
@@ -33,7 +31,6 @@ export default function LandingContent({ content }: LandingContentProps) {
         subtitle: "text-4xl lg:text-6xl xl:text-7xl",
         description: "text-xl lg:text-2xl xl:text-3xl",
         mainText: "text-lg lg:text-xl xl:text-2xl", 
-        subText: "text-base lg:text-lg xl:text-xl"
       };
     }
   };

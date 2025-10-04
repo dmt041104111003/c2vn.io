@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 // import Modal from '~/components/admin/common/Modal';
 
@@ -17,6 +17,7 @@ interface LandingMediaSectionProps {
 export default function LandingMediaSection({ mediaItems }: LandingMediaSectionProps) {
   const [selectedImage, setSelectedImage] = useState<MediaItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleImageClick = (mediaItem: MediaItem) => {
     setSelectedImage(mediaItem);
@@ -28,87 +29,99 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
     setSelectedImage(null);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % mediaItems.length);
+    }, 4000); 
+    
+    return () => clearInterval(interval);
+  }, [mediaItems.length]);
+
   return (
     <>
       <section className="relative hidden lg:block">
         <div className="relative">
-          <div className="relative h-[55vh] w-full">
-            {mediaItems[0] && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, rotate: -2 }}
-                animate={{ opacity: 1, scale: 1, rotate: -2 }}
-                transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute left-12 top-0 z-10 h-48 w-56 transform overflow-hidden border-8 border-gray-200 dark:border-white shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-200"
-                onClick={() => handleImageClick(mediaItems[0])}
-              >
-                <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[0].url})` }}></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-800/40 to-transparent"></div>
-                <div className="relative flex h-full flex-col justify-end p-4">
-                  {/* <div className="mb-3 h-8 w-full bg-gradient-to-r from-blue-500/20 to-transparent"></div>
-                  <div className="space-y-1">
-                    <div className="h-1.5 w-2/3 bg-gray-300 dark:bg-white/20"></div>
-                    <div className="h-1.5 w-1/2 bg-gray-200 dark:bg-white/10"></div>
-                  </div> */}
-                </div>
-              </motion.div>
-            )}
-            {mediaItems[1] && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, rotate: 1 }}
-                animate={{ opacity: 1, scale: 1, rotate: 1 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute right-8 top-8 z-20 h-64 w-64 transform overflow-hidden border-8 border-gray-200 dark:border-white shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-200"
-                onClick={() => handleImageClick(mediaItems[1])}
-              >
-                <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[1].url})` }}></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/80 via-cyan-800/40 to-transparent"></div>
-                <div className="relative flex h-full flex-col justify-end p-4">
-                  {/* <div className="mb-3 h-12 w-full bg-gradient-to-r from-cyan-500/20 to-transparent"></div>
-                  <div className="space-y-2">
-                    <div className="h-1.5 w-2/3 bg-gray-300 dark:bg-white/20"></div>
-                    <div className="h-1.5 w-3/4 bg-gray-200 dark:bg-white/10"></div>
-                  </div> */}
-                </div>
-              </motion.div>
-            )}
-            {mediaItems[2] && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, rotate: -1 }}
-                animate={{ opacity: 1, scale: 1, rotate: -1 }}
-                transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute bottom-24 left-4 z-30 h-60 w-72 transform overflow-hidden border-8 border-gray-200 dark:border-white shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-200"
-                onClick={() => handleImageClick(mediaItems[2])}
-              >
-                <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[2].url})` }}></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-800/40 to-transparent"></div>
-                <div className="relative flex h-full flex-col justify-end p-4">
-                  {/* <div className="mb-3 h-12 w-full bg-gradient-to-r from-purple-500/20 to-transparent"></div>
-                  <div className="space-y-2">
-                    <div className="h-1.5 w-1/2 bg-gray-300 dark:bg-white/20"></div>
-                    <div className="h-1.5 w-2/3 bg-gray-200 dark:bg-white/10"></div>
-                  </div> */}
-                </div>
-              </motion.div>
-            )}
-            {mediaItems[3] && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, rotate: 3 }}
-                animate={{ opacity: 1, scale: 1, rotate: 3 }}
-                transition={{ duration: 0.6, delay: 0.6, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute bottom-12 right-12 z-40 h-52 w-52 transform overflow-hidden border-8 border-gray-200 dark:border-white shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-200"
-                onClick={() => handleImageClick(mediaItems[3])}
-              >
-                <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${mediaItems[3].url})` }}></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-800/40 to-transparent"></div>
-                <div className="relative flex h-full flex-col justify-end p-4">
-                  {/* <div className="mb-3 h-10 w-full bg-gradient-to-r from-green-500/20 to-transparent"></div>
-                  <div className="space-y-1">
-                    <div className="h-1.5 w-3/5 bg-gray-300 dark:bg-white/20"></div>
-                    <div className="h-1.5 w-4/5 bg-gray-200 dark:bg-white/10"></div>
-                  </div> */}
-                </div>
-              </motion.div>
-            )}
+          <div className="relative h-[55vh] w-full flex items-center justify-center overflow-hidden">
+            <div className="relative w-full h-full">
+              {mediaItems.map((item, index) => {
+                const isActive = index === currentIndex;
+                const isNext = index === (currentIndex + 1) % mediaItems.length;
+                const isPrev = index === (currentIndex - 1 + mediaItems.length) % mediaItems.length;
+                const isNext2 = index === (currentIndex + 2) % mediaItems.length;
+                
+                let x, y, scale, opacity, zIndex;
+                
+                if (isActive) {
+                  // Active card - center
+                  x = '50%';
+                  y = '50%';
+                  scale = 1;
+                  opacity = 1;
+                  zIndex = 10;
+                } else if (isNext) {
+                  // Next card - right side
+                  x = '120%';
+                  y = '50%';
+                  scale = 0.8;
+                  opacity = 0.7;
+                  zIndex = 8;
+                } else if (isPrev) {
+                  // Previous card - left side
+                  x = '-20%';
+                  y = '50%';
+                  scale = 0.8;
+                  opacity = 0.7;
+                  zIndex = 8;
+                } else if (isNext2) {
+                  // Next+2 card - far right
+                  x = '180%';
+                  y = '50%';
+                  scale = 0.6;
+                  opacity = 0.4;
+                  zIndex = 5;
+                } else {
+                  // Other cards - far left
+                  x = '-60%';
+                  y = '50%';
+                  scale = 0.6;
+                  opacity = 0.4;
+                  zIndex = 5;
+                }
+                
+                return (
+                  <motion.div
+                    key={index}
+                    animate={{ 
+                      x: x,
+                      y: y,
+                      scale: scale,
+                      opacity: opacity
+                    }}
+                    transition={{ 
+                      duration: 0.8, 
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
+                    className="absolute rounded-2xl overflow-hidden border-4 border-gray-200 dark:border-white shadow-2xl cursor-pointer hover:scale-105 transition-all duration-300"
+                    style={{
+                      left: '-140px', 
+                      top: '-100px', 
+                      width: '280px',
+                      height: '200px',
+                      zIndex: zIndex,
+                    }}
+                    onClick={() => handleImageClick(item)}
+                  >
+                    <div 
+                      className="w-full h-full bg-cover bg-center bg-no-repeat"
+                      style={{ backgroundImage: `url(${item.url})` }}
+                    ></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    
+                    
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
