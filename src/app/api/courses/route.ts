@@ -9,7 +9,7 @@ export async function GET() {
         isActive: true,
         publishStatus: 'PUBLISHED'
       },
-      orderBy: { order: 'asc' },
+      orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(createSuccessResponse(courses));
   } catch (error) {

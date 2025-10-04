@@ -29,9 +29,9 @@ export const POST = withAdmin(async (req) => {
   const course = await prisma.course.create({
     data: { 
       name, 
-      image, 
-      description, 
-      location,
+      image: image || null, 
+      description: description || null, 
+      location: location || null,
       startDate: startDate ? new Date(startDate) : null,
       publishStatus 
     }

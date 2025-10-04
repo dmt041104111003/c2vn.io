@@ -14,13 +14,17 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
   const { data: courses, error: coursesError } = useQuery({
     queryKey: ['contact-form-courses'],
     queryFn: async () => {
-      const response = await fetch('/api/courses');
-      if (!response.ok) {
-        throw new Error('Failed to fetch courses');
+      try {
+        const response = await fetch('/api/courses');
+        if (!response.ok) {
+          throw new Error('Failed to fetch courses');
+        }
+        const data = await response.json();
+        console.log('ContactForm courses fetched:', data?.data);
+        return data?.data || [];
+      } catch (error) {
+        return []; 
       }
-      const data = await response.json();
-      console.log('ContactForm courses fetched:', data?.data);
-      return data?.data || [];
     },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000, 
@@ -122,7 +126,7 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
             >
               <option value="">Select Course Location</option>
-              {courses?.filter((course: any) => course.location).map((course: any) => (
+              {courses?.filter((course: any) => course.location && course.location.trim()).map((course: any) => (
                 <option key={course.id} value={course.location}>
                   {course.location}
                 </option>

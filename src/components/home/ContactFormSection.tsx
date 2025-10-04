@@ -170,10 +170,14 @@ export default function ContactFormSection() {
   const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useQuery({
     queryKey: ['contact-form-courses'],
     queryFn: async () => {
-      const response = await fetch('/api/courses');
-      if (!response.ok) throw new Error('Failed to fetch courses');
-      const data = await response.json();
-      return data?.data || [];
+      try {
+        const response = await fetch('/api/courses');
+        if (!response.ok) throw new Error('Failed to fetch courses');
+        const data = await response.json();
+        return data?.data || [];
+      } catch (error) {
+        return []; 
+      }
     },
     staleTime: 5 * 60 * 1000, 
     gcTime: 10 * 60 * 1000, 

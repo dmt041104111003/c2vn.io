@@ -31,9 +31,9 @@ export const PUT = withAdmin(async (req) => {
     where: { id },
     data: {
       name,
-      image,
-      description,
-      location,
+      image: image || null,
+      description: description || null,
+      location: location || null,
       startDate: startDate ? new Date(startDate) : null,
       publishStatus
     }
