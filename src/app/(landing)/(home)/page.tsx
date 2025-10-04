@@ -16,6 +16,7 @@ import ContactFormSection from "~/components/home/ContactFormSection";
 // import WaveFooterSection from "~/components/home/WaveFooterSection";
 // import StatsSection from "~/components/home/StatsSection";
 import { useNotifications } from "~/hooks/useNotifications";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -134,22 +135,7 @@ export default function HomePage() {
   if (loading) return <Loading />;
   return (
     <main className="bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
-      {/* Background Logo */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        whileInView={{ opacity: 0.15, scale: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="fixed left-[-200px] top-1/2 -translate-y-1/2 z-0 pointer-events-none select-none block"
-      >
-        <img
-          src="/images/common/loading.png"
-          alt="Cardano2VN Logo"
-          className="w-[1200px] h-[1200px] object-contain object-left"
-          draggable={false}
-        />
-      </motion.div>
-
+      <BackgroundMotion />
       <LandingSection />
       {/* <StatsSection /> */}
       <ProtocolSection />

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Title from "~/components/title";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 
 const cards = [
   {
@@ -31,22 +32,7 @@ const cards = [
 export default function ServiceHubClient() {
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 min-h-screen">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        whileInView={{ opacity: 0.12, scale: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="fixed left-[-200px] top-1/2 -translate-y-1/2 z-0 pointer-events-none select-none"
-      >
-        <img
-          src="/images/common/loading.png"
-          alt="Background Logo"
-          className="w-[1200px] h-[1200px] object-contain"
-          draggable={false}
-          style={{ objectPosition: "left center" }}
-        />
-      </motion.div>
-
+      <BackgroundMotion />
       <section className="relative z-10 mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import TechnologyItem from "./TechnologyItem";
 import Pagination from "~/components/pagination";
 import NotFoundInline from "~/components/ui/not-found-inline";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 import { TechnologyPageClientProps, Technology } from '~/constants/technologies';
 
 export default function TechnologyPageClient({ isEmbedded = false, searchTerm = "" }: TechnologyPageClientProps) {
@@ -102,6 +103,7 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
 
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+      <BackgroundMotion />
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <div className="pb-20">
           

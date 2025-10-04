@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 import { useNotifications } from "~/hooks/useNotifications";
 // import WaveFooterSection from "~/components/home/WaveFooterSection";
 
@@ -9,6 +10,7 @@ export default function PrivacyPageClient() {
   
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+      <BackgroundMotion />
       <div className="mx-auto max-w-4xl px-6 py-20 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

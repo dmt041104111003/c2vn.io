@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { BlogPostDetail, BlogTag } from '~/constants/posts';
 import { Comment } from '~/constants/comment';
 import { scrollToCommentWithRetry } from '~/lib/mention-highlight';
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 
 export default function BlogDetailClient({ slug }: { slug: string }) {
   const { data: session } = useSession();
@@ -263,6 +264,7 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
 
   return (
     <main className="relative min-h-screen bg-white dark:bg-gray-950">
+      <BackgroundMotion />
       <Header />
       <div className="pt-20">
         <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">

@@ -11,6 +11,7 @@ import Title from "~/components/title";
 import TechnologyPageClient from "~/components/technology/TechnologyPageClient";
 import NotFoundInline from "~/components/ui/not-found-inline";
 import Loading from "~/components/ui/Loading";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 import { useNotifications } from "~/hooks/useNotifications";
 
 function ProjectPageContent() {
@@ -166,6 +167,7 @@ function ProjectPageContent() {
   
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+      <BackgroundMotion />
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <div>
           <Title

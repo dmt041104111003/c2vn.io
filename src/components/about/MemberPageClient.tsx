@@ -13,6 +13,7 @@ import { ContactFormData, FormErrors } from "~/constants/contact";
 import { useNotifications } from "~/hooks/useNotifications";
 // import { Pagination } from "~/components/ui/pagination";
 import Pagination from "../pagination";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 
 interface MemberType {
   id: string;
@@ -551,6 +552,7 @@ export default function MemberPageClient() {
   if (isLoading) {
     return (
       <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+        <BackgroundMotion />
         <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <Title title="Founding Team" description="" />
           <div className="mx-auto pb-20">
@@ -595,6 +597,7 @@ export default function MemberPageClient() {
 
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900" suppressHydrationWarning>
+      <BackgroundMotion />
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="about-top">
         <div id="founding-team" className="scroll-mt-28 md:scroll-mt-40">
           <Title title="Founding Team" description="" />

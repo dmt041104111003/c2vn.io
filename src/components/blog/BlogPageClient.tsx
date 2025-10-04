@@ -9,6 +9,7 @@ import BlogCardSkeleton from "~/components/blog/BlogCardSkeleton";
 import Pagination from "~/components/pagination";
 import { useQuery } from '@tanstack/react-query';
 import NotFoundInline from "~/components/ui/not-found-inline";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
 import { BlogPost, BlogMedia, BlogTag } from '~/constants/posts';
 import { useNotifications } from "~/hooks/useNotifications";
 
@@ -71,6 +72,7 @@ export default function BlogPageClient() {
 
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
+      <BackgroundMotion />
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
