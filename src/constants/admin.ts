@@ -42,30 +42,6 @@ export interface ModalProps {
   maxWidth?: string;
 }
 
-// Event Location interfaces
-export interface EventLocation {
-  id: string;
-  name: string;
-  publishStatus: 'DRAFT' | 'PUBLISHED';
-  isActive: boolean;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface EventLocationTableProps {
-  eventLocations: EventLocation[];
-  onEdit: (location: EventLocation) => void;
-  onDelete: (id: string) => void;
-}
-
-export interface EventLocationEditModalProps {
-  eventLocation: EventLocation | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED') => void;
-  isSaving: boolean;
-}
 
 // Course interfaces
 export interface Course {
@@ -74,6 +50,8 @@ export interface Course {
   image?: string;
   title?: string;
   description?: string;
+  location?: string;
+  startDate?: string;
   publishStatus: 'DRAFT' | 'PUBLISHED';
   isActive: boolean;
   order: number;
@@ -91,7 +69,7 @@ export interface CourseEditModalProps {
   course: Course | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED', image?: string, title?: string, description?: string) => void;
+  onSave: (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED', image?: string, description?: string, location?: string, startDate?: string) => void;
   isSaving: boolean;
 }
 

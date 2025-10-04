@@ -18,14 +18,16 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const [newName, setNewName] = useState('');
   const [newImage, setNewImage] = useState('');
   const [newDescription, setNewDescription] = useState('');
+  const [newLocation, setNewLocation] = useState('');
+  const [newStartDate, setNewStartDate] = useState('');
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
 
   const createMutation = useMutation({
-    mutationFn: async ({ name, image, description, publishStatus }: { name: string; image?: string; description?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
+    mutationFn: async ({ name, image, description, location, startDate, publishStatus }: { name: string; image?: string; description?: string; location?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
       const response = await fetch('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, image, description, publishStatus })
+        body: JSON.stringify({ name, image, description, location, startDate, publishStatus })
       });
       if (!response.ok) {
         const error = await response.json();
@@ -40,6 +42,8 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       setNewName('');
       setNewImage('');
       setNewDescription('');
+      setNewLocation('');
+      setNewStartDate('');
       setPublishStatus('DRAFT');
       showSuccess('Course created successfully');
       onSuccess?.();
@@ -65,7 +69,14 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       return;
     }
     
-    createMutation.mutate({ name: newName.trim(), image: newImage, description: newDescription.trim(), publishStatus: publishStatus });
+    createMutation.mutate({ 
+      name: newName.trim(), 
+      image: newImage, 
+      description: newDescription.trim(), 
+      location: newLocation.trim() || undefined,
+      startDate: newStartDate || undefined,
+      publishStatus: publishStatus 
+    });
   };
 
   const handleMediaSelect = (media: { id: string; url: string; type: string }) => {
@@ -99,6 +110,33 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
           >
             {createMutation.isPending ? 'Adding...' : 'Add'}
           </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Location (Optional)
+            </label>
+            <input
+              type="text"
+              value={newLocation}
+              onChange={(e) => setNewLocation(e.target.value)}
+              placeholder="Enter course location"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Start Date (Optional)
+            </label>
+            <input
+              type="datetime-local"
+              value={newStartDate}
+              onChange={(e) => setNewStartDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              title="Select start date and time"
+            />
+          </div>
         </div>
         <div>
           <TipTapEditor

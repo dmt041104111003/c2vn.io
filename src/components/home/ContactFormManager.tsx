@@ -3,7 +3,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import EventLocationManager from '~/components/admin/event-locations/EventLocationManager';
 import CourseManager from '~/components/admin/courses/CourseManager';
 
 function ContactFormManager() {
@@ -149,18 +148,14 @@ function ContactFormManager() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-32">
+    <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-          Event Locations
+          Course Management
         </h3>
-        <EventLocationManager />
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-          Courses
-        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          Manage courses with location and start date information
+        </p>
         <CourseManager />
       </div>
     </div>

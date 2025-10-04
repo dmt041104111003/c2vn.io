@@ -8,20 +8,6 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
   const typedErrors: FormErrors = errors;
   const [selectedCourseImage, setSelectedCourseImage] = useState<string>('');
 
-  const { data: eventLocations, error: eventLocationsError } = useQuery({
-    queryKey: ['contact-form-event-locations'],
-    queryFn: async () => {
-      const response = await fetch('/api/event-locations');
-      if (!response.ok) {
-        throw new Error('Failed to fetch event locations');
-      }
-      const data = await response.json();
-      return data?.data || [];
-    },
-    staleTime: 5 * 60 * 1000, 
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
 
 
 
@@ -126,19 +112,19 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
           
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Event Location
+              Course Location
             </label>
             <select
               name="event-location"
               value={typedFormData["event-location"]}
               onChange={onInputChange}
-              aria-label="Event Location"
+              aria-label="Course Location"
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
             >
-              <option value="">Select Event Location</option>
-              {eventLocations?.map((location: any) => (
-                <option key={location.id} value={location.name}>
-                  {location.name}
+              <option value="">Select Course Location</option>
+              {courses?.filter((course: any) => course.location).map((course: any) => (
+                <option key={course.id} value={course.location}>
+                  {course.location}
                 </option>
               ))}
             </select>

@@ -281,26 +281,14 @@ enum MediaType {
   VIDEO
 }
 
-model EventLocation {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  publishStatus  ProjectPublishStatus @default(DRAFT)
-  isActive    Boolean  @default(true)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([isActive])
-  @@index([order])
-  @@index([createdAt])
-  @@index([publishStatus])
-}
 
 model Course {
   id          String   @id @default(uuid())
   name        String   @unique
   image       String?
   description String?
+  location    String?
+  startDate   DateTime?
   publishStatus  ProjectPublishStatus @default(DRAFT)
   isActive    Boolean  @default(true)
   order       Int      @default(0)
