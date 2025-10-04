@@ -12,6 +12,7 @@ export default function WalletList({ wallets }: WalletListProps) {
   const { showError, showSuccess, showInfo } = useToastContext();
   const lastErrorRef = useRef<string>("");
   const lastSuccessRef = useRef<string>("");
+  const clickCountRef = useRef<number>(0);
   const [connectingWalletId, setConnectingWalletId] = useState<string | null>(null);
 
   const handleWalletClick = async (walletId: string) => {
@@ -20,13 +21,11 @@ export default function WalletList({ wallets }: WalletListProps) {
         await disconnect();
         showSuccess("Logout Successful", "Your Cardano wallet has been disconnected successfully.");
       } else {
+        clickCountRef.current += 1;
         setConnectingWalletId(walletId);
         showInfo("Connecting...", "Please wait while we connect to your Cardano wallet.");
-        try {
-          await connect(walletId);
-        } finally {
-          setConnectingWalletId(null);
-        }
+        await connect(walletId);
+        setConnectingWalletId(null);
       }
     } else if (walletId === "metamask") {
       if (isMetaMaskAuthenticated) {
@@ -59,9 +58,9 @@ export default function WalletList({ wallets }: WalletListProps) {
   };
 
   useEffect(() => {
-    if (error && error !== lastErrorRef.current) {
-      lastErrorRef.current = error;
+    if (error && clickCountRef.current > 0) {
       showError("Connection Error", error);
+      clickCountRef.current = 0; 
     }
   }, [error, showError]);
 

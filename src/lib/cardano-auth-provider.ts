@@ -1,4 +1,5 @@
 import CredentialsProvider from "next-auth/providers/credentials";
+import { isMainnetAddress } from "./mainnet";
 
 export function CardanoWalletProvider() {
   return CredentialsProvider({
@@ -11,6 +12,11 @@ export function CardanoWalletProvider() {
     },
     async authorize(credentials) {
       if (!credentials?.address || !credentials?.signature || !credentials?.message) {
+        return null;
+      }
+
+      if (!isMainnetAddress(credentials.address)) {
+       
         return null;
       }
 

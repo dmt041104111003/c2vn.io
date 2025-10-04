@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { cardanoWallet, WALLET_NAMES } from "~/lib/cardano-wallet";
+import { isMainnetAddress } from "~/lib/mainnet";
 import { CardanoWalletUser } from "~/constants/wallet";
 
 export function useCardanoWallet() {
@@ -17,8 +18,8 @@ export function useCardanoWallet() {
   const isAuthenticated = !!(session?.user && (session.user as { address?: string }).address);
 
   const connect = useCallback(async (walletName: string = 'eternal') => {
+    console.log("Starting connection to:", walletName);
     setIsConnecting(true);
-    setError(null);
     setHasLoggedIn(false);
     try {
       const actualWalletName = WALLET_NAMES[walletName as keyof typeof WALLET_NAMES] || walletName;
@@ -28,6 +29,11 @@ export function useCardanoWallet() {
        }
       
       const user = await cardanoWallet.connect(actualWalletName);
+      
+      if (!isMainnetAddress(user.address)) {
+        await cardanoWallet.disconnect();
+        throw new Error("Only Cardano mainnet wallets are supported. Please switch to mainnet in your wallet settings.");
+      }
       
       setWalletUser(user);
       const message = `Sign this message to authenticate with Cardano2VN\n\nTimestamp: ${Date.now()}`;
