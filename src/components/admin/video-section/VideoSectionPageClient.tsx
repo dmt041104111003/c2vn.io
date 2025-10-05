@@ -5,8 +5,6 @@ import { useToastContext } from "~/components/toast-provider";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AdminHeader } from "../common/AdminHeader";
 import { AdminFilters } from "../common/AdminFilters";
-import { Button } from "~/components/ui/button";
-import { Save } from "lucide-react";
 import { VideoSectionTable } from "./VideoSectionTable";
 import { VideoSectionPagination } from "./VideoSectionPagination";
 import { VideoSectionStats } from "./VideoSectionStats";
@@ -38,7 +36,7 @@ export function VideoSectionPageClient() {
   const [newChannelName, setNewChannelName] = React.useState("");
   const [isValidUrl, setIsValidUrl] = React.useState<boolean | null>(null);
   const [isAdding, setIsAdding] = React.useState(false);
-  const [modifiedVideos, setModifiedVideos] = React.useState<{ [id: string]: Partial<VideoItem> }>({});
+  // Save-less flow: no modifiedVideos tracking needed
   const [newThumbnailUrl, setNewThumbnailUrl] = React.useState("");
 
   const queryClient = useQueryClient();
@@ -102,61 +100,37 @@ export function VideoSectionPageClient() {
     }
   }
 
-  async function handleSaveChanges() {
+
+  const handleCheckboxChange = async (videoId: string, field: "isFeatured", value: boolean) => {
     try {
-      if (Object.keys(modifiedVideos).length === 0) {
-        showError("No changes to save.");
-        return;
-      }
-
-      const updates = Object.entries(modifiedVideos).map(([id, updates]) => {
-        return fetch(`/api/admin/video-section/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updates),
-        });
-      });
-      
-      const responses = await Promise.all(updates);
-      const allSuccessful = responses.every((res) => res.ok);
-
-      if (allSuccessful) {
-        showSuccess("Changes saved successfully!");
-        setModifiedVideos({});
-        refetch(); 
-        queryClient.invalidateQueries({ queryKey: ["video-section"] });
-        queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
-      } else {
-        showError("Failed to save some changes.");
-      }
-    } catch (err) {
-      showError("Error saving changes.");
-    }
-  }
-
-  const handleCheckboxChange = (videoId: string, field: "isFeatured", value: boolean) => {
-    setModifiedVideos((prev) => {
-      const newState = { ...prev };
-      
-      if (field === "isFeatured" && value === true) {
-        Object.keys(newState).forEach(id => {
-          if (id !== videoId && newState[id].isFeatured) {
-            newState[id] = { ...newState[id], isFeatured: false };
+      if (field === "isFeatured" && value === true && Array.isArray(videos)) {
+        const updates: Promise<Response>[] = [];
+        videos.forEach(v => {
+          if (v.id === videoId) return;
+          if (v.isFeatured) {
+            updates.push(fetch(`/api/admin/video-section/${v.id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ isFeatured: false }),
+            }));
           }
         });
-        
-        if (Array.isArray(videos)) {
-          videos.forEach(video => {
-            if (video.id !== videoId && video.isFeatured && !newState[video.id]) {
-              newState[video.id] = { isFeatured: false };
-            }
-          });
-        }
+        if (updates.length > 0) await Promise.all(updates);
       }
-      
-      newState[videoId] = { ...newState[videoId], [field]: value };
-      return newState;
-    });
+
+      const res = await fetch(`/api/admin/video-section/${videoId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: value }),
+      });
+      if (!res.ok) throw new Error("Failed to update video");
+      showSuccess("Updated", field === "isFeatured" ? (value ? "Set as featured" : "Unset featured") : "Updated");
+      refetch();
+      queryClient.invalidateQueries({ queryKey: ["video-section"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
+    } catch (err) {
+      showError((err as Error).message || "Error updating video");
+    }
   };
 
   const handleVideoUrlChange = (url: string) => {
@@ -275,14 +249,6 @@ export function VideoSectionPageClient() {
       />
 
       <div className="space-y-4">
-        {Object.keys(modifiedVideos).length > 0 && (
-          <div className="flex justify-end">
-            <Button onClick={handleSaveChanges}>
-              <Save className="w-4 h-4 mr-1" />
-              Save Changes
-            </Button>
-          </div>
-        )}
 
         {isLoading ? (
           <AdminTableSkeleton columns={5} rows={5} />
@@ -297,7 +263,7 @@ export function VideoSectionPageClient() {
           <div className="bg-white rounded-lg shadow">
             <VideoSectionTable
               videos={paginatedVideos}
-              modifiedVideos={modifiedVideos}
+              modifiedVideos={{}}
               onCheckboxChange={handleCheckboxChange}
               onDeleteVideo={handleDeleteVideo}
               onViewDetails={(video) => {

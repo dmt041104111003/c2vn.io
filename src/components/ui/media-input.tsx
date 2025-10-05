@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { MediaInputMedia, MediaInputProps } from '~/constants/media';
+import { useToastContext } from '~/components/toast-provider';
 
 export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'image', multiple = false, showVideoLibrary = true, showYouTubeInput = false, showImageLibrary = true, showImageInputs = true }: MediaInputProps) {
   const [currentMedia, setCurrentMedia] = useState<MediaInputMedia | null>(null);
@@ -10,6 +11,8 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { showSuccess } = useToastContext();
   
   // Media library states
   const [mediaList, setMediaList] = useState<any[]>([]);
@@ -348,11 +351,33 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
                             </div>
                           </td>
                           <td className="px-4 py-2">
-                            <div className="text-sm text-gray-900 dark:text-white truncate max-w-32" title={item.originalName}>
+                            <div
+                              className="text-sm text-gray-900 dark:text-white truncate max-w-32 cursor-pointer hover:underline"
+                              title="Click to copy URL"
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(item.path);
+                                  setCopiedId(item.id);
+                                  showSuccess('Copied', 'URL copied to clipboard');
+                                  setTimeout(() => setCopiedId(null), 1200);
+                                } catch {}
+                              }}
+                            >
                               {item.originalName}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-32" title={item.path}>
-                              {item.path.split('/').pop()}
+                            <div
+                              className="text-xs truncate max-w-32 cursor-pointer hover:underline text-blue-600 dark:text-blue-400"
+                              title={copiedId === item.id ? 'Copied!' : item.path}
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(item.path);
+                                  setCopiedId(item.id);
+                                  showSuccess('Copied', 'URL copied to clipboard');
+                                  setTimeout(() => setCopiedId(null), 1200);
+                                } catch {}
+                              }}
+                            >
+                              {copiedId === item.id ? 'Copied!' : item.path.split('/').pop()}
                             </div>
                           </td>
                           <td className="px-4 py-2">
