@@ -35,7 +35,7 @@ export default function ContactFormQuoteBlock({ title, description, hasSelectedC
   return (
     <div className="bg-blue-50/80 dark:bg-gray-800/80 rounded-xl p-8 shadow-lg flex flex-col items-center w-full max-w-2xl mx-auto">
       <div className="mb-4 flex items-center gap-4 w-full">
-        <StarIcon />
+        <StarIcon size="lg" className="w-16 h-16" />
         <div className="flex-1">
           <h2 className="text-3xl lg:text-4xl font-bold text-blue-800 dark:text-blue-200">
             {truncatedTitle}

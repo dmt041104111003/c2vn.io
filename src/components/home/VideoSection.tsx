@@ -171,7 +171,7 @@ export default function VideoSection() {
               className="mb-8 lg:mb-16"
             >
               <div className="mb-4 lg:mb-6 flex items-center gap-2 lg:gap-4">
-                <StarIcon />
+                <StarIcon size="lg" className="w-16 h-16" />
                 <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">The Cardano2vn Videos</h2>
               </div>
             </motion.div>
@@ -199,7 +199,7 @@ export default function VideoSection() {
               className="mb-8 lg:mb-16"
             >
               <div className="mb-4 lg:mb-6 flex items-center gap-2 lg:gap-4">
-                <div className="h-1 w-8 lg:w-12 bg-gradient-to-r from-blue-500 to-transparent"></div>
+                <StarIcon size="lg" className="w-16 h-16" />
                 <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">The Cardano2vn Videos</h2>
               </div>
               <p className="max-w-3xl text-base lg:text-xl text-gray-700 dark:text-gray-300">Watch our latest videos and memorable moments.</p>
@@ -227,7 +227,7 @@ export default function VideoSection() {
             className="mb-8 lg:mb-16"
           >
             <div className="mb-4 lg:mb-6 flex items-center gap-2 lg:gap-4">
-              <div className="h-1 w-8 lg:w-12 bg-gradient-to-r from-blue-500 to-transparent"></div>
+              <StarIcon size="lg" className="w-16 h-16" />
               <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">The Cardano2vn Videos</h2>
             </div>
             <p className="max-w-3xl text-base lg:text-xl text-gray-700 dark:text-gray-300">Watch our latest videos and memorable moments.</p>

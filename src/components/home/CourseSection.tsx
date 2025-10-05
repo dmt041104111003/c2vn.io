@@ -103,7 +103,7 @@ export default function CourseSection() {
         <div className="relative">
           <div className="mb-8">
             <div className="mb-4 flex items-center gap-4">
-              <StarIcon />
+              <StarIcon size="lg" className="w-16 h-16" />
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white lg:text-4xl">C2VN Courses</h2>
             </div>
   

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { images } from "~/public/images";
 import { ThemeToggle } from "./ui/theme-toggle";
+import StarIcon from "./ui/StarIcon";
 
 export default function Footer() {
   return (
@@ -11,9 +12,11 @@ export default function Footer() {
         <div className="flex flex-col">
           <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2">
             <div className="relative">
-              <div className="absolute -top-2 left-0 h-1 w-8 bg-gradient-to-r from-blue-500 to-transparent opacity-60"></div>
-              <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Cardano2VN</h3>
-                             <ul className="space-y-4">
+              <div className="mb-6 flex items-center gap-4">
+                <StarIcon />
+                <h3 className="text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Cardano2VN</h3>
+              </div>
+              <ul className="space-y-4 ml-12">
                  <li>
                                       <Link
                       className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"
@@ -49,9 +52,11 @@ export default function Footer() {
                </ul>
             </div>
             <div className="relative">
-              <div className="absolute -top-2 left-0 h-1 w-8 bg-gradient-to-r from-blue-500 to-transparent opacity-60"></div>
-              <h3 className="mb-6 text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Follow Us</h3>
-              <ul className="space-y-4">
+              <div className="mb-6 flex items-center gap-4">
+                <StarIcon />
+                <h3 className="text-lg font-bold uppercase tracking-wider text-gray-900 dark:text-white">Follow Us</h3>
+              </div>
+              <ul className="space-y-4 ml-12">
                 <li>
                   <Link
                     className="group flex items-center text-gray-900 dark:text-white transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400"

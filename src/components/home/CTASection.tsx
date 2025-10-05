@@ -125,7 +125,7 @@ export default function CTASection() {
         <div className="mb-8 lg:mb-16 flex flex-wrap justify-between items-center gap-4">
           <div>
             <div className="mb-4 lg:mb-6 flex items-center gap-2 lg:gap-4">
-              <StarIcon />
+              <StarIcon size="lg" className="w-16 h-16" />
               <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">Events</h2>
             </div>
       

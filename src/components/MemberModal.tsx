@@ -54,7 +54,6 @@ export default function MemberModal({ member, isOpen, onClose }: MemberModalProp
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
   
                   <div className="absolute top-4 left-4">
                     <div className="w-8 h-0.5 bg-gray-400/60 dark:bg-white/60 rounded-full"></div>

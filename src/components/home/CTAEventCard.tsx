@@ -61,9 +61,6 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
             <div className="hidden w-full h-full bg-gray-200 dark:bg-gray-700 items-center justify-center">
               <span className="text-gray-500 dark:text-gray-400">Image not available</span>
             </div>
-            {!editMode && (
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent dark:from-black/70 dark:via-black/45 dark:to-transparent pointer-events-none" />
-            )}
             {editMode && (
               <div
                 onClick={(e) => {
@@ -76,14 +73,17 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
               </div>
             )}
             {!editMode && (
-              <div className="absolute bottom-4 left-4 right-4 text-white z-10 space-y-1">
-                <h4 className="inline-block max-w-full text-lg font-semibold truncate text-white drop-shadow-xl">
-                  {event.title.length > maxChars ? event.title.slice(0, maxChars) + "..." : event.title}
-                </h4>
-                <p className="inline-block text-sm text-white/90 drop-shadow">
-                  {event.location}
-                </p>
-              </div>
+              <>
+                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/85 via-black/55 to-transparent dark:from-black/70 dark:via-black/45 dark:to-transparent pointer-events-none" />
+                <div className="absolute bottom-4 left-4 right-4 text-white z-10">
+                  <h4 className="block max-w-full text-lg font-semibold truncate text-white drop-shadow-xl mb-1">
+                    {event.title.length > maxChars ? event.title.slice(0, maxChars) + "..." : event.title}
+                  </h4>
+                  <p className="block text-sm text-white/90 drop-shadow">
+                    {event.location}
+                  </p>
+                </div>
+              </>
             )}
           </>
         ) : editMode ? (

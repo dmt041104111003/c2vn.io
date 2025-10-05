@@ -78,14 +78,14 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
             <div className="bg-white dark:bg-gray-800 backdrop-blur-xl border border-gray-200 dark:border-gray-600 rounded-[40px] shadow-2xl">
               <div className="p-8">
                 <div className="space-y-6">
-                  <div className="relative h-64 rounded-xl overflow-hidden">
+                  {/* <div className="relative h-64 rounded-xl overflow-hidden">
                     <img
                       src={'/images/common/loading.png'}
                       alt={project ? project.title : 'Catalyst'}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  </div>
+                  </div> */}
                   
                   <div>
                     {project ? (
