@@ -14,6 +14,7 @@ interface FloatingNotificationProps {
 
 export default function FloatingNotification({ children }: FloatingNotificationProps) {
   const [showModal, setShowModal] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { data: session } = useSession();
   const { showError } = useToastContext();
 
@@ -53,6 +54,15 @@ export default function FloatingNotification({ children }: FloatingNotificationP
     }
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.pageYOffset > 300);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handleOpenModal = () => {
     const isAdmin = userData?.data?.role?.name === 'ADMIN';
     
@@ -72,9 +82,16 @@ export default function FloatingNotification({ children }: FloatingNotificationP
     <>
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1,
+          y: isScrolled ? -20 : 0 
+        }}
         transition={{ duration: 0.3 }}
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed right-6 z-50"
+        style={{ 
+          bottom: isScrolled ? '7rem' : '2rem'
+        }}
         onClick={handleOpenModal}
       >
         <div className="relative w-14 h-14">

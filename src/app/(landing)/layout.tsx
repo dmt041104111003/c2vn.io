@@ -6,6 +6,7 @@ import Footer from "~/components/footer";
 
 // seo basic -- start
 import Header from "~/components/header";
+import BackToTop from "~/components/ui/BackToTop";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default function LandingLayout({
         <Header />
         <div>{children}</div>
         <Footer />
+        <BackToTop />
       </div>
     </div>
   );
