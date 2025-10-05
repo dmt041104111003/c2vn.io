@@ -3,7 +3,7 @@ export const metadata = {
   description: 'Admin catalyst and project management page for Cardano2vn',
 };
 
-import TechnologiesPageClient from "~/components/admin/technologies/TechnologiesPageClient";
+import TechnologiesPageClient from "~/components/admin/project/ProjectPageClient";
 
 export default function TechnologiesPage() {
   return <TechnologiesPageClient />;

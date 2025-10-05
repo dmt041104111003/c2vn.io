@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Save, Loader2 } from "lucide-react";
-import { Project, ProjectEditorProps } from "~/constants/projects";
+import { Project, ProjectEditorProps } from "~/constants/catalyst";
 import { TipTapEditor } from "~/components/ui/tiptap-editor";
 
 export default function ProjectEditor({ project, onSave, onCancel }: ProjectEditorProps) {

@@ -2,7 +2,7 @@ import Skill from "~/components/skill";
 import Project from "~/components/project";
 import FeatureCards from "./FeatureCards";
 // import { Verify, Onboarding, Decentralized } from "~/components/icons";
-import { Technology } from '~/constants/technologies';
+import { Technology } from '~/constants/project';
 
 interface TechnologyItemProps {
   technology: Technology;

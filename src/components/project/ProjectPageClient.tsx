@@ -1,302 +1,154 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import ProjectCard from "~/components/project-card";
-import ProjectModal from "~/components/project-modal";
-import ProjectSkeleton from "~/components/project/ProjectSkeleton";
-import Pagination from "~/components/pagination";
-import Navigation from "~/components/navigation";
-import Title from "~/components/title";
-import TechnologyPageClient from "~/components/technology/TechnologyPageClient";
-import NotFoundInline from "~/components/ui/not-found-inline";
-import Loading from "~/components/ui/Loading";
-import BackgroundMotion from "~/components/ui/BackgroundMotion";
-import { useNotifications } from "~/hooks/useNotifications";
 
-function ProjectPageContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [year, setYear] = useState<number | null>(null); 
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import TechnologyItem from "./ProjectItem";
+import Pagination from "~/components/pagination";
+import NotFoundInline from "~/components/ui/not-found-inline";
+import BackgroundMotion from "~/components/ui/BackgroundMotion";
+import { TechnologyPageClientProps, Technology } from '~/constants/project';
+
+export default function TechnologyPageClient({ isEmbedded = false, searchTerm = "" }: TechnologyPageClientProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [fundFilter, setFundFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("catalyst");
-  const [selectedProject, setSelectedProject] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const ITEMS_PER_PAGE = 6;
-  
-  useNotifications();
-  
-  const { data, isLoading } = useQuery({
-    queryKey: ['projects'],
+  const ITEMS_PER_PAGE = 1;
+
+  const {
+    data: queryData,
+    isLoading,
+    error: technologiesError,
+  } = useQuery({
+    queryKey: ['technologies'],
     queryFn: async () => {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/technologies');
       if (!response.ok) {
-        throw new Error('Failed to fetch projects');
+        throw new Error('Failed to fetch technologies');
       }
       return response.json();
-    },
+    }
   });
-  
-  const projects = data?.data || [];
-  const years = Array.from(new Set(projects.map((p: any) => p.year))).sort((a: unknown, b: unknown) => (a as number) - (b as number)) as number[];
-  
+
   useEffect(() => {
-    if (years.length > 0 && year === null) {
-      setYear(years[0]);
+    if (technologiesError) {
+
     }
-  }, [years, year]);
-  useEffect(() => {
-    const urlTypeFilter = searchParams.get('typeFilter');
-    const urlYear = searchParams.get('year');
-    const urlSearch = searchParams.get('search');
-    const urlStatus = searchParams.get('status');
-    const urlFund = searchParams.get('fund');
-    if (!urlTypeFilter && !isInitialized) {
-      setTypeFilter("catalyst");
-      setIsInitialized(true);
-      const params = new URLSearchParams();
-      params.set('typeFilter', 'catalyst');
-      router.push(`${pathname}?${params.toString()}`);
-      return;
-    }
-    
-    if (urlTypeFilter && (urlTypeFilter === 'catalyst' || urlTypeFilter === 'project')) {
-      setTypeFilter(urlTypeFilter);
-    }
-    
-    if (urlYear) {
-      const yearNum = parseInt(urlYear);
-      if (!isNaN(yearNum)) {
-        setYear(yearNum);
-      }
-    }
-    
-    if (urlSearch) {
-      setSearchTerm(urlSearch);
-    }
-    
-    if (urlStatus) {
-      setStatusFilter(urlStatus);
-    }
-    
-    if (urlFund) {
-      setFundFilter(urlFund);
-    }
-    
-    setCurrentPage(1);
-    setIsInitialized(true);
-  }, [searchParams, router, pathname, isInitialized]);
-  
-  const filteredProjects = projects.filter((proposal: any) => {
-    const matchesYear = year === null || proposal.year === year;
-    const matchesSearch = proposal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         proposal.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatusFilter = statusFilter === 'all' || proposal.status === statusFilter;
-    const matchesFundFilter = fundFilter === 'all' || proposal.fund === fundFilter;
-    return matchesYear && matchesSearch && matchesStatusFilter && matchesFundFilter;
+  }, [technologiesError]);
+
+  const technologies: Technology[] = queryData?.data || [];
+
+  const filteredTechnologies = technologies.filter(technology => {
+    const matchesSearch = technology.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         technology.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         technology.description.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
-  
-  const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+
+  const totalPages = Math.ceil(filteredTechnologies.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProjects = filteredProjects.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  
+  const paginatedTechnologies = filteredTechnologies.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  
-  const handleFilterChange = () => {
+  if (searchTerm && currentPage > 1) {
     setCurrentPage(1);
-  };
-  
-  const updateURL = (newTypeFilter?: string, newYear?: number, newSearch?: string, newStatus?: string, newFund?: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    
-    if (newTypeFilter !== undefined) {
-      params.set('typeFilter', newTypeFilter);
-    }
-    if (newYear !== undefined) {
-      params.set('year', newYear.toString());
-    }
-    if (newSearch !== undefined) {
-      if (newSearch) {
-        params.set('search', newSearch);
-      } else {
-        params.delete('search');
-      }
-    }
-    if (newStatus !== undefined) {
-      if (newStatus && newStatus !== 'all') {
-        params.set('status', newStatus);
-      } else {
-        params.delete('status');
-      }
-    }
-    if (newFund !== undefined) {
-      if (newFund && newFund !== 'all') {
-        params.set('fund', newFund);
-      } else {
-        params.delete('fund');
-      }
-    }
-    
-    router.push(`${pathname}?${params.toString()}`);
-  };
+  }
 
-  const handleYearChange = (newYear: number) => {
-    setYear(newYear);
-    setCurrentPage(1);
-    setSearchTerm("");
-    setStatusFilter("all");
-    setFundFilter("all");
-    setTypeFilter("catalyst");
-    updateURL("catalyst", newYear, "", "all", "all");
-  };
+  if (isEmbedded) {
+    return (
+      <div className="mb-16 grid grid-cols-1 gap-6">
+        {isLoading ? (
+          <>
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded mb-4 w-1/3"></div>
+              <div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div>
+            </div>
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded mb-4 w-1/3"></div>
+              <div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div>
+            </div>
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded mb-4 w-1/3"></div>
+              <div className="h-64 bg-gray-300 dark:bg-gray-700 rounded"></div>
+            </div>
+          </>
+        ) : filteredTechnologies.length === 0 ? (
+          <div>
+            <NotFoundInline 
+              onClearFilters={() => {
 
-  const handleOpenModal = (project: any) => {
-    setSelectedProject(project);
-    setIsModalOpen(true);
-  };
+              }}
+            />
+          </div>
+        ) : (
+          <>
+            {paginatedTechnologies.map((technology, index) => (
+              <div key={technology.id}>
+                <TechnologyItem technology={technology} />
+              </div>
+            ))}
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedProject(null);
-  };
-  
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  setCurrentPage={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
       <BackgroundMotion />
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-        <div>
-          <Title
-            title="Catalyst Cardano2vn Roadmap"
-            description="Our journey of building the Andamio platform and ecosystem, from founding to the present day and beyond."
-          />
-        </div>
-        
-        <div className="relative">
-          <div className="relative z-10">
-            <div className="mb-8 mt-2">
-              <div dir="ltr" data-orientation="vertical" className="flex flex-col md:flex-row">
-                <div>
-                  <Navigation 
-                    searchTerm={searchTerm}
-                    statusFilter={statusFilter}
-                    fundFilter={fundFilter}
-                    typeFilter={typeFilter}
-                    projects={projects}
-                    years={years}
-                    selectedYear={year || 0}
-                    onSearchChange={(value) => {
-                      setSearchTerm(value);
-                      updateURL(undefined, undefined, value);
-                      handleFilterChange();
-                    }}
-                    onStatusChange={(value) => {
-                      setStatusFilter(value);
-                      updateURL(undefined, undefined, undefined, value);
-                      handleFilterChange();
-                    }}
-                    onFundChange={(value) => {
-                      setFundFilter(value);
-                      updateURL(undefined, undefined, undefined, undefined, value);
-                      handleFilterChange();
-                    }}
-                    onTypeChange={(value) => {
-                      setTypeFilter(value);
-                      updateURL(value);
-                      handleFilterChange();
-                    }}
-                    onYearChange={handleYearChange}
+        <div className="pb-20">
+          
+          {filteredTechnologies.length === 0 ? (
+            <div>
+              <NotFoundInline 
+                onClearFilters={() => {
+
+                }}
+              />
+            </div>
+          ) : (
+            <>
+              {paginatedTechnologies.map((technology, index) => (
+                <div key={technology.id}>
+                  <TechnologyItem technology={technology} />
+                </div>
+              ))}
+
+              {totalPages > 1 && (
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    setCurrentPage={setCurrentPage}
                   />
                 </div>
-                
-                <div className="mt-6 flex-1 md:-mt-12">
-                  {typeFilter === "catalyst" ? (
-                    <div
-                      data-state="active"
-                      data-orientation="vertical"
-                      role="tabpanel"
-                      aria-labelledby="radix-:ri:-trigger-2023"
-                      id="radix-:ri:-content-2023"
-                      className="ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-0"
-                    >
-                      <div className="mb-8 text-right">
-                        <h2 className="bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-300 bg-clip-text text-6xl font-bold tracking-tight text-transparent">
-                          {year}
-                        </h2>
-                      </div>
-                      
-                      <div className="mb-16 grid grid-cols-1 gap-6">
-                        {isLoading ? (
-                          <>
-                            {[...Array(5)].map((_, idx) => (
-                              <div key={idx}>
-                                <ProjectSkeleton />
-                              </div>
-                            ))}
-                          </>
-                        ) : filteredProjects.length === 0 ? (
-                          <div>
-                            <NotFoundInline 
-                              onClearFilters={() => {
-                                setSearchTerm('');
-                                setStatusFilter('all');
-                                setFundFilter('all');
-                                updateURL(undefined, undefined, '', 'all', 'all');
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <>
-                            {paginatedProjects.map((proposal: any, index: number) => (
-                              <div key={index}>
-                                <ProjectCard project={proposal} onOpenModal={handleOpenModal} />
-                              </div>
-                            ))}
-
-                            {totalPages > 1 && (
-                              <div className="mt-8">
-                                <Pagination
-                                  currentPage={currentPage}
-                                  totalPages={totalPages}
-                                  setCurrentPage={setCurrentPage}
-                                />
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <TechnologyPageClient isEmbedded={true} searchTerm={searchTerm} />
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
+            </>
+          )}
+          
+          <section className="mt-16 rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 text-center backdrop-blur-sm">
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
+              Start Your Cardano2vn Journey Today
+            </h2>
+            <div>
+              <Link href="https://cardano2vn.io">
+                <button className="inline-flex items-center justify-center whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success p-1 text-md rounded-sm bg-blue-600 px-8 py-3 font-semibold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700">
+                  Open Cardano2vn App
+                </button>
+              </Link>
             </div>
-          </div>
+          </section>
         </div>
       </div>
-      
-      {selectedProject && (
-        <ProjectModal
-          project={selectedProject}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-        />
-      )}
     </main>
-  );
-}
-
-export default function ProjectPageClient() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <ProjectPageContent />
-    </Suspense>
   );
 } 

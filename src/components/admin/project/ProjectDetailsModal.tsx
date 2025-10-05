@@ -1,5 +1,5 @@
 import Modal from "~/components/admin/common/Modal";
-import { Technology, TechnologyDetailsModalProps } from "~/constants/technologies";
+import { Technology, TechnologyDetailsModalProps } from "~/constants/project";
 import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export default function TechnologyDetailsModal({ technology, isOpen, onClose }: TechnologyDetailsModalProps) {

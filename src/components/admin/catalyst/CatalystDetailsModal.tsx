@@ -1,5 +1,5 @@
 import Modal from "~/components/admin/common/Modal";
-import { Project, ProjectDetailsModalProps } from "~/constants/projects";
+import { Project, ProjectDetailsModalProps } from "~/constants/catalyst";
 
 export function ProjectDetailsModal({ project, isOpen, onClose }: ProjectDetailsModalProps) {
   if (!project) return null;

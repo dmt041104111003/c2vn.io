@@ -4,16 +4,16 @@ import { useState } from "react";
 import { AdminHeader } from "~/components/admin/common/AdminHeader";
 import { AdminStats } from "~/components/admin/common/AdminStats";
 import { AdminFilters } from "~/components/admin/common/AdminFilters";
-import ProjectEditor from "~/components/admin/projects/ProjectEditor";
-import { ProjectTable } from "~/components/admin/projects/ProjectTable";
-import { ProjectDetailsModal } from "~/components/admin/projects/ProjectDetailsModal";
+import ProjectEditor from "~/components/admin/catalyst/CatalystEditor";
+import { ProjectTable } from "~/components/admin/catalyst/CatalystTable";
+import { ProjectDetailsModal } from "~/components/admin/catalyst/CatalystDetailsModal";
 import Modal from "~/components/admin/common/Modal";
 import { Pagination } from "~/components/ui/pagination";
 import { useToastContext } from "~/components/toast-provider";
 import { useQuery } from "@tanstack/react-query";
 import AdminTableSkeleton from "~/components/admin/common/AdminTableSkeleton";
 import NotFoundInline from "~/components/ui/not-found-inline";
-import { Project } from "~/constants/projects";
+import { Project } from "~/constants/catalyst";
 
 export default function ProjectsPageClient() {
   const [searchTerm, setSearchTerm] = useState("");

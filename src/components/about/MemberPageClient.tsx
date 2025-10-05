@@ -3,7 +3,7 @@
 import Member from "~/components/member";
 import MemberModal from "~/components/MemberModal";
 import Title from "~/components/title";
-import AboutSection from "~/components/technology/AboutSection";
+import AboutSection from "~/components/project/AboutSection";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";

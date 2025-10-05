@@ -1,24 +1,25 @@
 "use client";
 
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { useState } from 'react';
 import Modal from '../common/Modal';
-import { Project, ProjectTableProps } from "~/constants/projects";
+import { Technology, TechnologyTableProps } from "~/constants/project";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
-export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: ProjectTableProps) {
+export function TechnologyTable({ technologies, onEdit, onDelete, onViewDetails }: TechnologyTableProps) {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedProjectToDelete, setSelectedProjectToDelete] = useState<Project | null>(null);
+  const [selectedTechnologyToDelete, setSelectedTechnologyToDelete] = useState<Technology | null>(null);
 
-  const handleDeleteClick = (project: Project) => {
-    setSelectedProjectToDelete(project);
+  const handleDeleteClick = (technology: Technology) => {
+    setSelectedTechnologyToDelete(technology);
     setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    if (selectedProjectToDelete) {
-      onDelete(selectedProjectToDelete);
+    if (selectedTechnologyToDelete) {
+      onDelete(selectedTechnologyToDelete);
       setIsDeleteModalOpen(false);
-      setSelectedProjectToDelete(null);
+      setSelectedTechnologyToDelete(null);
     }
   };
 
@@ -31,16 +32,10 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
               Project
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Project Status
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Publish Status
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Year/Quarter
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Fund
+              Feature Cards
             </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
@@ -48,57 +43,57 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {projects.map((project) => (
-            <tr key={project.id} className="hover:bg-gray-50">
+          {technologies.map((technology) => (
+            <tr key={technology.id} className="hover:bg-gray-50">
               <td className="px-6 py-4">
                 <div className="flex flex-col max-w-xs">
-                  <div className="text-sm font-medium text-gray-900 line-clamp-1">
-                    {project.fund && `${project.fund}: `}{project.title}
+                  <div className="text-sm font-medium text-gray-900 line-clamp-1 max-w-48">
+                    {technology.title}
                   </div>
-                  <button
-                    onClick={() => onViewDetails(project)}
-                    className="text-blue-600 hover:text-blue-900 text-xs mt-1 text-left"
-                  >
-                    View Details
-                  </button>
+                  <div className="text-sm text-gray-500 line-clamp-1 max-w-48">
+                    {technology.name}
+                  </div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                  project.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                  project.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {project.status.replace('_', ' ')}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                  project.publishStatus === 'PUBLISHED' ? 'bg-green-100 text-green-800' :
+                  technology.publishStatus === 'PUBLISHED' ? 'bg-green-100 text-green-800' :
                   'bg-yellow-100 text-yellow-800'
                 }`}>
-                  {project.publishStatus}
+                  {technology.publishStatus}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {project.year} {project.quarterly}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {project.fund || '-'}
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {technology.featureCardIds && technology.featureCardIds.length > 0 ? (
+                  <div className="flex flex-wrap gap-1">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {technology.featureCardIds.length} card{technology.featureCardIds.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-gray-400">None</span>
+                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-end space-x-2">
                   <button
-                    onClick={() => onEdit(project)}
-                    className="text-blue-600 hover:text-blue-900"
-                    title="Edit project"
+                    onClick={() => onViewDetails(technology)}
+                    className="text-green-600 hover:text-green-900"
+                    title="View details"
                   >
-                                          <Edit className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => handleDeleteClick(project)}
+                    onClick={() => onEdit(technology)}
+                    className="text-blue-600 hover:text-blue-900"
+                    title="Edit technology"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(technology)}
                     className="text-red-600 hover:text-red-900"
-                    title="Delete project"
+                    title="Delete technology"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -112,7 +107,7 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title="Delete Project"
+        title="Delete Technology"
       >
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -120,17 +115,17 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
               <Trash2 className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete Project</h3>
-              <p className="text-sm text-gray-600">Are you sure you want to delete this project?</p>
+              <h3 className="text-lg font-semibold text-gray-900">Delete Technology</h3>
+              <p className="text-sm text-gray-600">Are you sure you want to delete this technology?</p>
             </div>
           </div>
           
-          {selectedProjectToDelete && (
+          {selectedTechnologyToDelete && (
             <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm text-gray-500">Project to delete:</p>
-              <p className="font-medium text-gray-900">{selectedProjectToDelete.title}</p>
-              <p className="text-sm text-gray-500">{selectedProjectToDelete.description}</p>
-              <p className="text-sm text-gray-500">Status: {selectedProjectToDelete.status}</p>
+              <p className="text-sm text-gray-500">Technology to delete:</p>
+              <p className="font-medium text-gray-900">{selectedTechnologyToDelete.title}</p>
+              <p className="text-sm text-gray-500">{selectedTechnologyToDelete.name}</p>
+              <p className="text-sm text-gray-500">{selectedTechnologyToDelete.description}</p>
             </div>
           )}
           

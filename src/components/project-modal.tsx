@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Metadata } from "next";
-import { ProjectModalProps, Project } from '~/constants/projects';
+import { ProjectModalProps, Project } from '~/constants/catalyst';
 import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export const generateProjectMetadata = (project: Project): Metadata => ({

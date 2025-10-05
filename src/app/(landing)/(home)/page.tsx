@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import LandingSection from "~/components/home/LandingSection";
 // import TrustSection from "~/components/home/TrustSection";
-import ProtocolSection from "~/components/home/ProtocolSection";
+import ProtocolSection from "~/components/home/BlogHomeSection";
 import CourseSection from "~/components/home/CourseSection";
 // import CardanoSection from "~/components/home/CardanoSection";
 import CTASection from "~/components/home/CTASection";

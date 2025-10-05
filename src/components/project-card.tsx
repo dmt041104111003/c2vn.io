@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ProjectCardProps } from '~/constants/projects';
+import { ProjectCardProps } from '~/constants/catalyst';
 import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export default function ProjectCard({ project, onOpenModal }: ProjectCardProps & { onOpenModal: (project: any) => void }) {

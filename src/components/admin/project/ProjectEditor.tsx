@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Copy, Check } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import MediaInput from "~/components/ui/media-input";
-import { Technology, TechnologyEditorProps } from "~/constants/technologies";
+import { Technology, TechnologyEditorProps } from "~/constants/project";
 import { FeatureCard } from "~/constants/feature-cards";
 import { TipTapEditor } from "~/components/ui/tiptap-editor";
 

@@ -9,7 +9,7 @@ export const metadata = {
   },
 };
 
-import ProjectPageClient from "~/components/project/ProjectPageClient";
+import ProjectPageClient from "~/components/catalyst/CatalystPageClient";
 
 export default function ProjectPage() {
   return <ProjectPageClient />;

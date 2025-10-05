@@ -103,6 +103,7 @@ export default function WalletList({ wallets }: WalletListProps) {
       return Object.keys(injected).some((k) => k.toLowerCase() === injectedKey.toLowerCase());
     }
     return ["google", "github", "metamask"].includes(walletId);
+    // return ["google", "github"].includes(walletId);
   };
 
   const isCardanoWalletId = (walletId: string) => {
@@ -115,13 +116,17 @@ export default function WalletList({ wallets }: WalletListProps) {
         {wallets.map((wallet) => {
           const isActive = isActiveWallet(wallet.id);
           
+          // const isBeta = wallet.id === "metamask";
+          // const disabled = ((((wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "metamask") && connectingWalletId === wallet.id)) || !isActive) || isBeta;
           return (
             <button
               key={wallet.id}
               onClick={() => handleWalletClick(wallet.id)}
               disabled={(((wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "metamask") && connectingWalletId === wallet.id)) || !isActive}
+              // disabled={disabled}
               className={`w-full p-3 rounded-lg border transition-all duration-200 flex items-center gap-3 ${
                 isActive 
+                // isActive && !isBeta
                   ? "border-gray-200 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm bg-white dark:border-white/10 dark:bg-gray-900 dark:hover:bg-gray-800 dark:hover:border-white/20" 
                   : "border-gray-100 bg-gray-50 cursor-not-allowed opacity-60 dark:border-white/5 dark:bg-gray-900/40"
                              } ${
@@ -130,13 +135,18 @@ export default function WalletList({ wallets }: WalletListProps) {
             >
               <span className={`text-sm font-medium flex-1 ${
                 isActive ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"
+                // isActive && !isBeta ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"
+
               }`}>
                 {wallet.name}
               </span>
               
               {!isActive && (
+              //  {(!isActive || isBeta) && (
                 <span className="text-xs bg-gray-400 text-white px-2 py-1 rounded-full dark:bg-gray-600">
                   {isCardanoWalletId(wallet.id) ? "Not installed" : "BETA"}
+                  {/* {isBeta ? "BETA" : isCardanoWalletId(wallet.id) ? "Not installed" : "BETA"} */}
+
                 </span>
               )}
               
