@@ -181,7 +181,9 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Image Preview</h2>
                   </div>
                   <div className="flex flex-col items-center">
-                    <img src={selectedImage?.url} alt={selectedImage?.title} className="w-full h-auto max-h-[70vh] object-contain rounded-lg" />
+                    <div className="w-full h-auto max-h-[70vh] flex items-center justify-center rounded-lg text-3xl font-bold text-gray-900 dark:text-white">
+                      {'{Cardano2vn}'}
+                    </div>
                   </div>
                 </div>
               </div>
