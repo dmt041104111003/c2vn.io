@@ -17,6 +17,7 @@ export class CardanoWalletProvider {
   private rawWallet: any | null = null;
   private user: CardanoWalletUser | null = null;
   private currentWalletName: string = '';
+  private clickLockUntilMs: number = 0;
 
   constructor(config: CardanoWalletConfig) {
     this.config = config;
@@ -24,44 +25,41 @@ export class CardanoWalletProvider {
 
   async connect(walletName: string = 'eternl'): Promise<CardanoWalletUser> {
     try {
+      if (Date.now() < this.clickLockUntilMs) {
+        const remaining = Math.max(0, this.clickLockUntilMs - Date.now());
+        throw new Error(`Please wait ${Math.ceil(remaining / 1000)}s before retrying.`);
+      }
       const candidateNames = (WALLET_ALIASES[walletName] || [walletName]).map(n => n.toLowerCase());
       const injected = typeof window !== 'undefined' ? (window as any).cardano : null;
       if (injected && typeof injected === 'object') {
         const injectedKeys: string[] = Object.keys(injected);
         const matchedInjectedKey = injectedKeys.find(key => candidateNames.includes(key.toLowerCase()));
         if (matchedInjectedKey) {
-          const provider = injected[matchedInjectedKey];
-          if (!provider || typeof provider.enable !== 'function') {
-            throw new Error(`Wallet ${matchedInjectedKey} does not support CIP-30 enable()`);
+          const availableWallets = await BrowserWallet.getAvailableWallets();
+          const normalizedName = availableWallets.find(w => w.name.toLowerCase() === matchedInjectedKey.toLowerCase())?.name || matchedInjectedKey;
+
+          this.wallet = await BrowserWallet.enable(normalizedName);
+          this.rawWallet = null;
+          this.currentWalletName = normalizedName;
+
+          if (!this.wallet) {
+            throw new Error(`Failed to enable wallet ${normalizedName}`);
           }
-          const api = await provider.enable();
-          this.wallet = null;
-          this.rawWallet = api;
-          this.currentWalletName = matchedInjectedKey;
 
-          let address: string = '';
-          try {
-            if (this.rawWallet?.getRewardAddresses) {
-              const rewards = await this.rawWallet.getRewardAddresses();
-              if (Array.isArray(rewards) && rewards.length > 0) {
-                address = rewards[0];
-              }
-            }
-            if (!address && this.rawWallet?.getUnusedAddresses) {
-              const unused = await this.rawWallet.getUnusedAddresses();
-              if (Array.isArray(unused) && unused.length > 0) {
-                address = unused[0];
-              }
-            }
-            if (!address && this.rawWallet?.getChangeAddress) {
-              address = await this.rawWallet.getChangeAddress();
-            }
-          } catch {}
+          const networkId = await this.wallet.getNetworkId();
+          if (this.config.network === 'mainnet' && networkId !== 1) {
+            this.clickLockUntilMs = Date.now() + 5000;
+            throw new Error('Please switch your wallet to Mainnet. Test networks are not supported.');
+          }
 
+          const unused = await this.wallet.getUnusedAddresses();
+          const bech32 = (unused && unused.length > 0) ? unused[0] : await this.wallet.getChangeAddress();
+
+          const meta = availableWallets.find(w => w.name === normalizedName);
           this.user = {
-            address,
-            name: matchedInjectedKey,
-            image: provider.icon || ''
+            address: bech32,
+            name: meta?.name || normalizedName,
+            image: meta?.icon || ''
           };
 
           return this.user;
@@ -90,8 +88,14 @@ export class CardanoWalletProvider {
         throw new Error(`Failed to enable wallet ${selectedName}`);
       }
 
+      const networkId = await this.wallet.getNetworkId();
+      if (this.config.network === 'mainnet' && networkId !== 1) {
+        this.clickLockUntilMs = Date.now() + 5000;
+        throw new Error('Please switch your wallet to Mainnet. Test networks are not supported.');
+      }
+
       const addresses = await this.wallet.getUnusedAddresses();
-      const address = addresses[0];
+      const address = (addresses && addresses.length > 0) ? addresses[0] : await this.wallet.getChangeAddress();
 
       this.user = {
         address,
@@ -112,6 +116,35 @@ export class CardanoWalletProvider {
     this.currentWalletName = '';
   }
 
+  async validateNetwork(): Promise<void> {
+    if (this.config.network !== 'mainnet') return;
+    if (this.wallet && typeof this.wallet.getNetworkId === 'function') {
+      const id = await this.wallet.getNetworkId();
+      if (id !== 1) {
+        this.clickLockUntilMs = Date.now() + 5000;
+        throw new Error('Please switch your wallet to Mainnet. Test networks are not supported.');
+      }
+      return;
+    }
+    const injected = typeof window !== 'undefined' ? (window as any).cardano : null;
+    const provider = injected && this.currentWalletName ? injected[this.currentWalletName] : null;
+    if (provider && typeof provider.isEnabled === 'function' && typeof provider.enable === 'function') {
+      const enabled = await provider.isEnabled();
+      if (enabled) {
+        const api = this.rawWallet || await provider.enable();
+        const id = await api.getNetworkId();
+        if (id !== 1) {
+          this.clickLockUntilMs = Date.now() + 5000;
+          throw new Error('Please switch your wallet to Mainnet. Test networks are not supported.');
+        }
+      }
+    }
+  }
+
+  getCooldownRemainingMs(): number {
+    return Math.max(0, this.clickLockUntilMs - Date.now());
+  }
+
   async signMessage(message: string): Promise<string> {
     if ((!this.wallet && !this.rawWallet) || !this.user) {
       throw new Error('Wallet not connected');
@@ -124,6 +157,18 @@ export class CardanoWalletProvider {
           .join('');
 
       const payloadHex = toHex(message);
+
+      const injected = typeof window !== 'undefined' ? (window as any).cardano : null;
+      const provider = injected && this.currentWalletName ? injected[this.currentWalletName] : null;
+      if (provider && typeof provider.enable === 'function') {
+        const api = this.rawWallet || await provider.enable();
+        let addr = this.user.address;
+        if (!addr || (!addr.startsWith('addr') && !addr.startsWith('stake'))) {
+          addr = await api.getChangeAddress();
+        }
+        const sig = await api.signData(addr, payloadHex);
+        return (sig as any)?.signature || (sig as any)?.sig || (sig as any);
+      }
 
       if (this.wallet) {
         let signAddress = this.user.address;

@@ -11,10 +11,12 @@ export default function WalletList({ wallets }: WalletListProps) {
   const { connect: connectMetaMask, disconnect: disconnectMetaMask, isConnecting: isConnectingMetaMask, error: metaMaskError, walletUser: metaMaskUser, isAuthenticated: isMetaMaskAuthenticated, hasLoggedIn: hasMetaMaskLoggedIn } = useMetaMask();
   const { showError, showSuccess, showInfo } = useToastContext();
   const lastSuccessRef = useRef<string>("");
+  const lastErrorRef = useRef<string>("");
   const [connectingWalletId, setConnectingWalletId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (error) {
+    if (error && error !== lastErrorRef.current) {
+      lastErrorRef.current = error;
       showError("Connection Error", error);
     }
   }, [error, showError]);
