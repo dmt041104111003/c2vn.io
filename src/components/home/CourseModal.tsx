@@ -6,7 +6,6 @@ import { createPortal } from "react-dom";
 import { useState } from "react";
 import { Course } from "~/constants/admin";
 import CourseModalText from "./CourseModalText";
-import CourseModalTitle from "./CourseModalTitle";
 
 interface CourseModalProps {
   course: Course | null;
@@ -94,14 +93,12 @@ export default function CourseModal({ course, isOpen, onClose, onEnroll }: Cours
                         target.src = "/images/common/loading.png";
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                   </div>
                   
                   <div>
-                    <CourseModalTitle
-                      title={course.name}
-                      maxLength={50}
-                    />
+                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                      {course.name}
+                    </h3>
                     <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {course.name}

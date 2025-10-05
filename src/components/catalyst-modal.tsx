@@ -90,7 +90,9 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                   <div>
                     {project ? (
                       <>
-                        <CourseModalTitle title={project.title} maxLength={50} />
+                        <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                          {project.title}
+                        </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                             {project.fund || project.status}
