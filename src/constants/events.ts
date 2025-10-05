@@ -12,6 +12,7 @@ export interface EventCardProps {
   editMode: boolean;
   onEditClick?: (index: number) => void;
   onUpload?: (file: File, index: number) => void;
+  onImageClick?: (index: number) => void;
   className?: string;
 }
 

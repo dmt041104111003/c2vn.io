@@ -3,12 +3,10 @@
 import { motion } from "framer-motion";
 import { XIcon, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
-import EventImageModal from "./EventImageModal";
 import { Event, EventCardProps } from "~/constants/events";
 
-export default function EventCard({ event, index, editMode, onEditClick, onUpload, className }: EventCardProps) {
+export default function EventCard({ event, index, editMode, onEditClick, onUpload, className, onImageClick }: EventCardProps) {
   const [maxChars, setMaxChars] = useState(30);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const updateMaxChars = () => {
@@ -24,13 +22,9 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
   }, []);
 
   const handleImageClick = () => {
-    if (!editMode && event.imageUrl) {
-      setIsModalOpen(true);
+    if (!editMode && event.imageUrl && onImageClick) {
+      onImageClick(index);
     }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
   };
 
   return (
@@ -106,11 +100,6 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
       </div>
     </motion.div>
 
-    <EventImageModal
-      event={event}
-      isOpen={isModalOpen}
-      onClose={handleCloseModal}
-    />
     </>
   );
 }

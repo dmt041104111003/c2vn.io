@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import EventCard from "~/components/home/CTAEventCard";
 import EditModal from "~/components/home/CTAEditModal";
+import CTAImageSliderModal from "~/components/home/CTAImageSliderModal";
 import { Event } from "~/constants/events";
 import StarIcon from "../ui/StarIcon";
 
@@ -14,6 +15,8 @@ export default function CTASection() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(null);
+  const [sliderModalOpen, setSliderModalOpen] = useState(false);
+  const [sliderInitialIndex, setSliderInitialIndex] = useState(0);
 
   const { data: userData, error: userDataError } = useQuery({
     queryKey: ["user-role"],
@@ -67,6 +70,11 @@ export default function CTASection() {
   const handleEditClick = (index: number) => {
     setSelectedEventIndex(index);
     setModalOpen(true);
+  };
+
+  const handleImageClick = (index: number) => {
+    setSliderInitialIndex(index);
+    setSliderModalOpen(true);
   };
 
   const handleSaveEvent = (index: number, updatedEvent: Partial<Event>) => {
@@ -159,6 +167,7 @@ export default function CTASection() {
               editMode={editMode}
               onEditClick={handleEditClick}
               onUpload={handleImageUpload}
+              onImageClick={handleImageClick}
               className="lg:w-[70%] h-70"
             />
             <EventCard
@@ -167,6 +176,7 @@ export default function CTASection() {
               editMode={editMode}
               onEditClick={handleEditClick}
               onUpload={handleImageUpload}
+              onImageClick={handleImageClick}
               className="lg:w-[30%] h-70"
             />
           </div>
@@ -179,6 +189,7 @@ export default function CTASection() {
                 editMode={editMode}
                 onEditClick={handleEditClick}
                 onUpload={handleImageUpload}
+                onImageClick={handleImageClick}
                 className="sm:w-1/2 h-70"
               />
               <EventCard
@@ -187,6 +198,7 @@ export default function CTASection() {
                 editMode={editMode}
                 onEditClick={handleEditClick}
                 onUpload={handleImageUpload}
+                onImageClick={handleImageClick}
                 className="sm:w-1/2 h-70"
               />
             </div>
@@ -198,6 +210,7 @@ export default function CTASection() {
                 editMode={editMode}
                 onEditClick={handleEditClick}
                 onUpload={handleImageUpload}
+                onImageClick={handleImageClick}
                 className="h-32"
               />
               <EventCard
@@ -206,13 +219,14 @@ export default function CTASection() {
                 editMode={editMode}
                 onEditClick={handleEditClick}
                 onUpload={handleImageUpload}
+                onImageClick={handleImageClick}
                 className="h-32"
               />
             </div>
           </div>
         </div>
 
-        {/* MODAL */}
+        {/* MODALS */}
         {selectedEventIndex !== null && modalEvent && (
           <EditModal
             isOpen={modalOpen}
@@ -225,6 +239,13 @@ export default function CTASection() {
             onSave={handleSaveEvent}
           />
         )}
+
+        <CTAImageSliderModal
+          isOpen={sliderModalOpen}
+          onClose={() => setSliderModalOpen(false)}
+          events={events}
+          initialIndex={sliderInitialIndex}
+        />
       </div>
     </section>
   );
