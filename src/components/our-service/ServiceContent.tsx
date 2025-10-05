@@ -179,7 +179,6 @@ export default function ServiceContent() {
     try {
       const walletProvider = getSelectedWalletProvider(preferredKey);
       const walletApi = await walletProvider.enable();
-      const CardanoWasm: any = await import("@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib");
       // const CardanoWasm: any = await import("@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib");
       const hexToBytes = (hex: string): Uint8Array => {
         const clean = hex.startsWith("0x") ? hex.slice(2) : hex;
@@ -284,7 +283,6 @@ export default function ServiceContent() {
     try {
       const walletProvider = getSelectedWalletProvider(preferredKey);
       const walletApi = await walletProvider.enable();
-      const { Lucid, Blockfrost } = await import("lucid-cardano");
       // const { Lucid, Blockfrost } = await import("lucid-cardano");
       const lucid = await Lucid.new(
         new Blockfrost(BLOCKFROST_API, BLOCKFROST_KEY),
