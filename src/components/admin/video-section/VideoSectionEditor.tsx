@@ -4,6 +4,7 @@ import * as React from "react";
 import Modal from "../common/Modal";
 import { Play } from "lucide-react";
 import { VideoSectionEditorProps } from "~/constants/video-section";
+import MediaInput from "~/components/ui/media-input";
 
 export function VideoSectionEditor({
   isOpen,
@@ -38,13 +39,22 @@ export function VideoSectionEditor({
     >
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">YouTube Video URL</label>
+          <label className="block text-sm font-medium mb-2">YouTube Video</label>
+          <MediaInput
+            showYouTubeInput={true}
+            showVideoLibrary={false}
+            onMediaAdd={(media) => {
+              if (media?.type === 'youtube' && media.url) {
+                onVideoUrlChange(media.url);
+              }
+            }}
+          />
           <input
             type="text"
             placeholder="https://www.youtube.com/watch?v=..."
             value={videoUrl}
             onChange={(e) => onVideoUrlChange(e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md ${
+            className={`w-full mt-2 px-3 py-2 border rounded-md ${
               isValidUrl === false ? "border-red-500 focus:ring-red-500" : isValidUrl ? "border-green-500 focus:ring-green-500" : ""
             }`}
           />
