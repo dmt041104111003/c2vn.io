@@ -80,11 +80,33 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
   };
 
   const handleSelectFromLibrary = (mediaItem: any) => {
-    const media: MediaInputMedia = {
-      id: mediaItem.id,
-      url: mediaItem.path,
-      type: "image"
-    };
+    const isImage = mediaItem?.mimeType?.startsWith('image/');
+    const isYouTube = mediaItem?.type === 'YOUTUBE' || String(mediaItem?.mimeType || '').toLowerCase().includes('youtube');
+    const isVideoFile = mediaItem?.mimeType?.startsWith('video/');
+
+    let media: MediaInputMedia;
+    if (isYouTube || isVideoFile) {
+      const url = mediaItem.path || mediaItem.url;
+      const youtubeId = getYoutubeIdFromUrl(url || '');
+      media = {
+        id: youtubeId || mediaItem.id,
+        url: url,
+        type: 'youtube'
+      };
+    } else if (isImage) {
+      media = {
+        id: mediaItem.id,
+        url: mediaItem.path,
+        type: 'image'
+      };
+    } else {
+      media = {
+        id: mediaItem.id,
+        url: mediaItem.path,
+        type: 'image'
+      };
+    }
+
     setCurrentMedia(media);
     if (onMediaAdd) onMediaAdd(media);
   };
