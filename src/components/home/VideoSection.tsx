@@ -34,7 +34,6 @@ export default function VideoSection() {
   const [showAllVideos, setShowAllVideos] = useState(false);
   const playerRef = useRef<any>(null);
   const [ytReady, setYtReady] = useState(false);
-  const [showEndOverlay, setShowEndOverlay] = useState(false);
 
   const {
     data: videos = [],
@@ -114,13 +113,10 @@ export default function VideoSection() {
     const handleStateChange = (event: any) => {
       const PlayerState = YT?.PlayerState || {};
       if (event?.data === PlayerState.ENDED) {
-        setShowEndOverlay(true);
         const list = Array.isArray(sortedVideos) ? sortedVideos : [];
         const idx = list.findIndex(v => v.id === currentVideo.id);
         const next = idx >= 0 && idx + 1 < list.length ? list[idx + 1] : list[0];
         if (next && next.id !== currentVideo.id) setCurrentVideo(next);
-      } else if (event?.data === PlayerState.PLAYING) {
-        setShowEndOverlay(false);
       }
     };
 
@@ -252,33 +248,6 @@ export default function VideoSection() {
             >
               <div className="relative w-full aspect-video rounded-lg lg:rounded-xl overflow-hidden mb-4 lg:mb-6 shadow-lg lg:shadow-2xl">
                 <div id="video-player" className="w-full h-full"></div>
-                {showEndOverlay && (
-                  <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-4 p-4">
-                    <h4 className="text-white text-lg lg:text-xl font-semibold">Up next</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-xl">
-                      {(() => {
-                        const suggestions = (Array.isArray(sortedVideos) ? sortedVideos : []).filter(v => v.id !== currentVideo.id).slice(0, 3);
-                        if (suggestions.length === 0) {
-                          return (
-                            <div className="flex items-center gap-3 bg-white/10 rounded-lg p-2">
-                              <img src="/images/common/loading.png" alt="placeholder" className="w-20 h-12 object-cover rounded" />
-                              <div className="text-white text-sm">More videos coming soon</div>
-                            </div>
-                          );
-                        }
-                        return suggestions.map(s => (
-                          <button key={s.id} className="flex items-center gap-3 bg-white/10 rounded-lg p-2 text-left hover:bg-white/20" onClick={() => { setShowEndOverlay(false); setCurrentVideo(s); }}>
-                            <img src={getThumbnail(s)} alt={s.title} className="w-20 h-12 object-cover rounded" />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-white text-sm font-medium truncate" title={s.title}>{s.title}</div>
-                              <div className="text-gray-300 text-xs truncate" title={s.channelName}>{s.channelName}</div>
-                            </div>
-                          </button>
-                        ));
-                      })()}
-                    </div>
-                  </div>
-                )}
               </div>
               <h3 className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white mb-1 lg:mb-2 line-clamp-2">{currentVideo.title}</h3>
               <p className="text-sm lg:text-lg text-gray-600 dark:text-gray-400 font-medium">{currentVideo.channelName}</p>
