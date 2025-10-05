@@ -78,6 +78,44 @@ export default function FloatingNotification({ children }: FloatingNotificationP
     setShowModal(false);
   };
 
+  const getTooltipText = () => {
+    if (!welcomeData?.data) {
+      return "No event available";
+    }
+
+    const event = welcomeData.data;
+    const now = new Date();
+    
+    if (event.startDate || event.endDate) {
+      const startDate = event.startDate ? new Date(event.startDate) : null;
+      const endDate = event.endDate ? new Date(event.endDate) : null;
+      
+      if (startDate && endDate) {
+        if (now >= startDate && now <= endDate) {
+          return `Event active until ${endDate.toLocaleDateString()}`;
+        } else if (now < startDate) {
+          return `Event starts ${startDate.toLocaleDateString()}`;
+        } else {
+          return "Event has ended";
+        }
+      } else if (startDate && !endDate) {
+        if (now >= startDate) {
+          return "Event is active (no end date)";
+        } else {
+          return `Event starts ${startDate.toLocaleDateString()}`;
+        }
+      } else if (!startDate && endDate) {
+        if (now <= endDate) {
+          return `Event active until ${endDate.toLocaleDateString()}`;
+        } else {
+          return "Event has ended";
+        }
+      }
+    }
+    
+    return "Event is active";
+  };
+
   return (
     <>
       <motion.div
@@ -88,12 +126,19 @@ export default function FloatingNotification({ children }: FloatingNotificationP
           y: isScrolled ? -20 : 0 
         }}
         transition={{ duration: 0.3 }}
-        className="fixed right-6 z-50"
+        className="fixed right-6 z-50 group"
         style={{ 
           bottom: isScrolled ? '7rem' : '2rem'
         }}
         onClick={handleOpenModal}
       >
+        {/* Tooltip */}
+        <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-nowrap relative max-w-xs">
+            {getTooltipText()}
+            <div className="absolute left-full top-1/2 -translate-y-1/2 border-l-4 border-l-gray-900 dark:border-l-gray-100 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+          </div>
+        </div>
         <div className="relative w-14 h-14">
           {/* Ripple effect */}
           <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"></span>
