@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Copy, Trash2, Eye } from "lucide-react";
+import { Trash2, Eye } from "lucide-react";
 import { useToastContext } from "~/components/toast-provider";
 import Modal from "../common/Modal";
 import { VideoItem, VideoSectionTableProps } from "~/constants/video-section";
@@ -19,13 +19,11 @@ export function VideoSectionTable({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [selectedVideoToDelete, setSelectedVideoToDelete] = React.useState<VideoItem | null>(null);
 
-  const handleCopyVideoId = async (videoId: string) => {
+  const handleCopyChannel = async (channelUrl: string) => {
     try {
-      await navigator.clipboard.writeText(videoId);
-      showSuccess("YouTube Video ID copied to clipboard!");
-    } catch (error) {
-      console.error("Failed to copy video ID:", error);
-    }
+      await navigator.clipboard.writeText(channelUrl);
+      showSuccess("Copied", "Channel URL copied to clipboard");
+    } catch {}
   };
 
   const handleViewDetails = (video: VideoItem) => {
@@ -76,12 +74,19 @@ export function VideoSectionTable({
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {video.title.length > 60 ? `${video.title.slice(0, 60)}...` : video.title}
+                    <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={video.title}>
+                      {video.title}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{video.channelName}</div>
+                    <button
+                      type="button"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline max-w-sm truncate text-left"
+                      title={video.channelName}
+                      onClick={() => handleCopyChannel(video.channelName)}
+                    >
+                      {video.channelName}
+                    </button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Checkbox
@@ -91,14 +96,6 @@ export function VideoSectionTable({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopyVideoId(video.videoId)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
