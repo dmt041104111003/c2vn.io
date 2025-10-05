@@ -25,6 +25,8 @@ export interface VideoSectionEditorProps {
   onChannelNameChange: (channel: string) => void;
   onAddVideo: () => void;
   thumbnailUrl?: string;
+  submitLabel?: string;
+  title?: string;
 }
 
 // VideoSectionPagination interfaces
@@ -49,6 +51,7 @@ export interface VideoSectionTableProps {
   onCheckboxChange: (videoId: string, field: "isFeatured", value: boolean) => void;
   onDeleteVideo: (videoId: string) => void;
   onViewDetails?: (video: VideoItem) => void;
+  onEditVideo?: (video: VideoItem) => void;
 }
 
 // Video Types from types.ts

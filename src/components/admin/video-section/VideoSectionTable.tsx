@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Trash2, Eye } from "lucide-react";
+import { Trash2, Eye, Edit } from "lucide-react";
 import { useToastContext } from "~/components/toast-provider";
 import Modal from "../common/Modal";
 import { VideoItem, VideoSectionTableProps } from "~/constants/video-section";
@@ -13,7 +13,8 @@ export function VideoSectionTable({
   modifiedVideos, 
   onCheckboxChange, 
   onDeleteVideo,
-  onViewDetails
+  onViewDetails,
+  onEditVideo
 }: VideoSectionTableProps) {
   const { showSuccess } = useToastContext();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
@@ -96,6 +97,15 @@ export function VideoSectionTable({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEditVideo && onEditVideo(video)}
+                        className="h-8 w-8 p-0"
+                        title="Edit"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"

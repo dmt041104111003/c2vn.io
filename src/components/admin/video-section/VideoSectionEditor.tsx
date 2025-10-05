@@ -19,6 +19,8 @@ export function VideoSectionEditor({
   onChannelNameChange,
   onAddVideo,
   thumbnailUrl,
+  submitLabel,
+  title,
 }: VideoSectionEditorProps) {
   const [videoId, setVideoId] = React.useState<string | null>(null);
 
@@ -35,7 +37,7 @@ export function VideoSectionEditor({
     <Modal 
       isOpen={isOpen} 
       onClose={onClose} 
-      title="Add New Video"
+      title={title || "Add New Video"}
     >
       <div className="space-y-4">
         <div>
@@ -130,7 +132,7 @@ export function VideoSectionEditor({
             onClick={onAddVideo} 
             disabled={!isValidUrl || isAdding || !videoTitle.trim() || !channelName.trim()}
           >
-            {isAdding ? "Adding..." : "Add Video"}
+            {isAdding ? "Saving..." : (submitLabel || "Add Video")}
           </button>
         </div>
       </div>

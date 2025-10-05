@@ -38,6 +38,7 @@ export function VideoSectionPageClient() {
   const [isAdding, setIsAdding] = React.useState(false);
   // Save-less flow: no modifiedVideos tracking needed
   const [newThumbnailUrl, setNewThumbnailUrl] = React.useState("");
+  const [editingVideo, setEditingVideo] = React.useState<VideoItem | null>(null);
 
   const queryClient = useQueryClient();
   
@@ -58,8 +59,11 @@ export function VideoSectionPageClient() {
 
     setIsAdding(true);
     try {
-      const res = await fetch("/api/admin/video-section", {
-        method: "POST",
+      const isEditing = !!editingVideo?.id;
+      const endpoint = isEditing ? `/api/admin/video-section/${editingVideo!.id}` : "/api/admin/video-section";
+      const method = isEditing ? "PATCH" : "POST";
+      const res = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           videoUrl: newVideoUrl,
@@ -74,13 +78,13 @@ export function VideoSectionPageClient() {
         throw new Error(error.error || "Failed to add video");
       }
 
-      showSuccess("Video added successfully!");
+      showSuccess(editingVideo ? "Video updated successfully!" : "Video added successfully!");
       handleCloseModal();
       refetch();
       queryClient.invalidateQueries({ queryKey: ["video-section"] });
       queryClient.invalidateQueries({ queryKey: ["admin-videos"] });
     } catch (err) {
-      showError((err as Error).message || "Error adding video.");
+      showError((err as Error).message || "Error saving video.");
       setIsValidUrl(false);
     } finally {
       setIsAdding(false);
@@ -154,6 +158,7 @@ export function VideoSectionPageClient() {
 
   const handleCloseModal = () => {
     setShowAddModal(false);
+    setEditingVideo(null);
     setNewVideoUrl("");
     setNewVideoTitle("");
     setNewChannelName("");
@@ -269,6 +274,14 @@ export function VideoSectionPageClient() {
               onViewDetails={(video) => {
                 window.open(`https://www.youtube.com/watch?v=${video.videoId}`, '_blank');
               }}
+              onEditVideo={(video) => {
+                setEditingVideo(video);
+                setShowAddModal(true);
+                setNewVideoUrl(`https://www.youtube.com/watch?v=${video.videoId}`);
+                setNewVideoTitle(video.title);
+                setNewChannelName(video.channelName);
+                setIsValidUrl(true);
+              }}
             />
             
             <VideoSectionPagination
@@ -296,6 +309,8 @@ export function VideoSectionPageClient() {
         onChannelNameChange={handleChannelNameChange}
         onAddVideo={handleAddVideo}
         thumbnailUrl={newThumbnailUrl}
+        submitLabel={editingVideo ? "Save Changes" : "Add Video"}
+        title={editingVideo ? "Edit Video" : "Add New Video"}
       />
     </div>
   );
