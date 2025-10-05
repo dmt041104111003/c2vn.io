@@ -48,6 +48,12 @@ export default function CourseSection() {
     setIsModalOpen(true);
   };
 
+  // Find the index of the selected course in the current courses list
+  const getSelectedCourseIndex = () => {
+    if (!selectedCourse) return 0;
+    return currentCourses.findIndex((c: Course | null) => c && c.id === selectedCourse.id);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedCourse(null);
@@ -338,6 +344,8 @@ export default function CourseSection() {
 
       <CourseModal
         course={selectedCourse}
+        courses={currentCourses}
+        initialIndex={getSelectedCourseIndex()}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onEnroll={handleEnroll}
