@@ -15,7 +15,7 @@ const cards = [
   },
   {
     href: "/project",
-    title: "Our Technology",
+    title: "Our project catalyst",
     description:
       "Discover how we leverage blockchain and innovative tools to build trust, governance, and contribution management.",
     cta: "Learn More",

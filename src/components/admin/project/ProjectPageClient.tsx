@@ -8,7 +8,7 @@ import TechnologyEditor from "~/components/admin/project/ProjectEditor";
 
 import { TechnologyTable } from "~/components/admin/project/ProjectTable";
 import TechnologyDetailsModal from "~/components/admin/project/ProjectDetailsModal";
-import ProjectsPageClient from "~/components/admin/catalyst/CatalystPageClient";
+import CatalystPageClient from "~/components/admin/catalyst/CatalystPageClient";
 import Modal from "~/components/admin/common/Modal";
 import { Pagination } from "~/components/ui/pagination";
 import { useToastContext } from "~/components/toast-provider";
@@ -246,7 +246,7 @@ export default function TechnologiesPageClient() {
           )}
         </>
       ) : activeTab === 'projects' ? (
-        <ProjectsPageClient />
+        <CatalystPageClient />
       ) : activeTab === 'feature-cards' ? (
         <>
           <AdminHeader 

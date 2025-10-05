@@ -2,8 +2,8 @@
 import { useState, useEffect, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import ProjectCard from "~/components/project-card";
-import ProjectModal from "~/components/project-modal";
+import ProjectCard from "~/components/catalyst-card";
+import ProjectModal from "~/components/catalyst-modal";
 import ProjectSkeleton from "~/components/catalyst/CatalystSkeleton";
 import Pagination from "~/components/pagination";
 import Navigation from "~/components/navigation";
@@ -32,11 +32,11 @@ function ProjectPageContent() {
   useNotifications();
   
   const { data, isLoading } = useQuery({
-    queryKey: ['projects'],
+    queryKey: ['catalyst'],
     queryFn: async () => {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/catalyst');
       if (!response.ok) {
-        throw new Error('Failed to fetch projects');
+        throw new Error('Failed to fetch catalyst');
       }
       return response.json();
     },

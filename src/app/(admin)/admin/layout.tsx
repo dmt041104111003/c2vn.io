@@ -42,7 +42,7 @@ const adminNavItems = [
   },
   {
     title: "Catalyst & Project",
-    href: "/admin/technologies",
+    href: "/admin/project_catalyst",
     icon: Cpu,
   },
   {

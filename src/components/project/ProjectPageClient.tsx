@@ -18,11 +18,11 @@ export default function TechnologyPageClient({ isEmbedded = false, searchTerm = 
     isLoading,
     error: technologiesError,
   } = useQuery({
-    queryKey: ['technologies'],
+    queryKey: ['project-public'],
     queryFn: async () => {
-      const response = await fetch('/api/technologies');
+      const response = await fetch('/api/project');
       if (!response.ok) {
-        throw new Error('Failed to fetch technologies');
+        throw new Error('Failed to fetch projects');
       }
       return response.json();
     }

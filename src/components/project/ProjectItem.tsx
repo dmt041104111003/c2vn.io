@@ -1,5 +1,5 @@
 import Skill from "~/components/skill";
-import Project from "~/components/project";
+import Catalyst from "~/components/catalyst";
 import FeatureCards from "./FeatureCards";
 // import { Verify, Onboarding, Decentralized } from "~/components/icons";
 import { Technology } from '~/constants/project';
@@ -34,7 +34,7 @@ export default function TechnologyItem({ technology }: TechnologyItemProps) {
     <div>
       <Skill title={technology.title} skills={[]} />
       <FeatureCards featureCardIds={technology.featureCardIds} />
-      <Project 
+      <Catalyst 
         title={technology.name} 
         description={technology.description} 
         href={technology.href} 

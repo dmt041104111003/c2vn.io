@@ -23,7 +23,7 @@ export default function Navigation({
     console.log("TypeFilter changed to:", typeFilter);
     if (typeFilter === "catalyst") {
       console.log("Fetching funds from API...");
-      fetch('/api/projects')
+      fetch('/api/catalyst')
         .then(res => {
           console.log("Response status:", res.status);
           if (!res.ok) {
@@ -47,8 +47,7 @@ export default function Navigation({
           setCatalystFunds([]);
         });
     } else if (typeFilter === "project") {
-      console.log("Project tab selected - calling technologies API...");
-      fetch('/api/technologies')
+      fetch('/api/project')
         .then(res => {
           console.log("Technologies response status:", res.status);
           if (!res.ok) {
@@ -174,7 +173,7 @@ export default function Navigation({
                 key={key}
                 type="button"
                 role="tab"
-                aria-selected={selectedYear === year ? "true" : "false"}
+                aria-selected={selectedYear === year ? 'true' : 'false'}
                 aria-controls={`content-${year}`}
                 id={`trigger-${year}`}
                 onClick={() => onYearChange(year)}
