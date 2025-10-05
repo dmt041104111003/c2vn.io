@@ -131,44 +131,48 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+            <div key={i} className="h-10 bg-gray-100/70 dark:bg-gray-800/70 rounded-md animate-pulse" />
           ))}
         </div>
       ) : delegators.length === 0 ? (
         <p className="text-sm text-gray-500">No recent delegators found.</p>
       ) : (
-        <ul className="divide-y divide-gray-200 dark:divide-gray-700 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div
+          role="list"
+          className="rounded-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 bg-white/40 dark:bg-gray-900/30 backdrop-blur-sm divide-y divide-gray-200/70 dark:divide-gray-700/60 overflow-hidden"
+        >
           {delegators.map((d: any, idx) => {
             const stake = d.stake_address ?? d.address ?? "";
             const power = (d as any).voting_power ?? (d as any).amount ?? (d as any).live_stake;
-            const detailHref = explorerUrl;
             const active = d.__details?.active;
             const controlled = d.__details?.controlled_amount;
             return (
-              <li key={`${stake}-${idx}`} className="flex items-center justify-between px-3 py-2 bg-white dark:bg-gray-900">
+              <div
+                key={`${stake}-${idx}`}
+                role="listitem"
+                className="group relative flex items-center justify-between py-2 px-3 transition-colors hover:bg-indigo-50/70 dark:hover:bg-indigo-900/40"
+              >
+                <span className="absolute left-0 top-0 h-full w-0.5 bg-indigo-400/80 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-xs text-gray-500 w-6 shrink-0">#{idx + 1}</span>
                   <div className="min-w-0">
                     <div
-                      className="text-sm text-gray-900 dark:text-gray-100 truncate cursor-pointer select-none"
+                      className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate cursor-pointer select-none hover:text-indigo-600 dark:hover:text-indigo-400"
                       title={stake}
                       onClick={() => stake && copyStakeAddress(stake)}
                     >
                       {shorten(stake)}
                     </div>
-                    <div className="text-xs text-gray-500">Power: {formatAda(power)}</div>
-                    {controlled && (
-                      <div className="text-xs text-gray-500">Controlled: {formatAda(controlled)}</div>
-                    )}
-                    {active != null && (
-                      <div className="text-[11px] text-gray-500">Status: {active ? "Active" : "Inactive"}</div>
-                    )}
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+                      <span>Power: {formatAda(power)}</span>
+                      {controlled && <span>Controlled: {formatAda(controlled)}</span>}
+                    </div>
                   </div>
                 </div>
-              </li>
+              </div>
             );
           })}
-        </ul>
+        </div>
       )}
     </div>
   );

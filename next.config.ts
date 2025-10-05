@@ -6,6 +6,47 @@ const withMDX = createMDX();
 
 const config: NextConfig = {
   reactStrictMode: true,
+  experimental: {
+    esmExternals: 'loose',
+  },
+  webpack: (webpackConfig, { isServer }) => {
+    webpackConfig.experiments = {
+      ...(webpackConfig.experiments || {}),
+      asyncWebAssembly: true,
+    };
+    if (!isServer) {
+      webpackConfig.resolve = webpackConfig.resolve || {};
+      webpackConfig.resolve.fallback = {
+        ...(webpackConfig.resolve.fallback || {}),
+        fs: false,
+        path: false,
+        crypto: false,
+        stream: false,
+      };
+    }
+    return webpackConfig;
+  },
+
+  // experimental: {
+  //   esmExternals: 'loose',
+  // },
+  // webpack: (webpackConfig, { isServer }) => {
+  //   webpackConfig.experiments = {
+  //     ...(webpackConfig.experiments || {}),
+  //     asyncWebAssembly: true,
+  //   };
+  //   if (!isServer) {
+  //     webpackConfig.resolve = webpackConfig.resolve || {};
+  //     webpackConfig.resolve.fallback = {
+  //       ...(webpackConfig.resolve.fallback || {}),
+  //       fs: false,
+  //       path: false,
+  //       crypto: false,
+  //       stream: false,
+  //     };
+  //   }
+  //   return webpackConfig;
+  // },
   images: {
     remotePatterns: [
       {

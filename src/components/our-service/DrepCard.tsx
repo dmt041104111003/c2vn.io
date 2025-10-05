@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import CountUp from "react-countup";
 
 export default function DrepCard({
   drepId,
@@ -18,25 +19,73 @@ export default function DrepCard({
   onDelegate: () => void;
 }) {
   const shorten = (id: string) => (id.length <= 20 ? id : `${id.slice(0, 12)}…${id.slice(-8)}`);
+  const statusTone = (s: string) => {
+    const v = s.toLowerCase();
+    if (v.includes("active")) return "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-400/30";
+    if (v.includes("retired") || v.includes("expired")) return "bg-rose-500/15 text-rose-400 ring-1 ring-rose-400/30";
+    return "bg-zinc-500/15 text-zinc-300 ring-1 ring-zinc-300/20";
+  };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-      <h3 className="text-center text-xl font-semibold text-gray-900 dark:text-white mb-6">Our DREP: C2VN</h3>
-      <p className="font-semibold">DRep ID:</p>
-      <p
-        className="text-sm break-all text-gray-700 dark:text-gray-300 cursor-pointer select-none"
-        title={drepId}
-        onClick={() => onCopy(drepId)}
-      >
-        {shorten(drepId)}
-      </p>
-      <p className="mt-3 font-semibold">Status:</p>
-      <p className="text-gray-700 dark:text-gray-300">{loading ? "…" : status}</p>
-      <p className="mt-3 font-semibold">Voting Power:</p>
-      <p className="text-gray-700 dark:text-gray-300">{loading ? "…" : votingPower}</p>
-      <button onClick={onDelegate} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-        Delegate to DRep
-      </button>
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200/60 dark:border-gray-700/60 bg-white/90 dark:bg-gray-800/80 shadow-sm">
+      <div className="absolute inset-0 pointer-events-none [mask-image:radial-gradient(60%_50%_at_50%_0%,black,transparent)]">
+        <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-sky-500/10 blur-2xl" />
+      </div>
+
+      <div className="relative p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">Our DREP: C2VN</h3>
+          <span className={`px-2.5 py-1 text-xs sm:text-[0.8rem] font-medium rounded-full ${statusTone(status)}`}>
+            {loading ? "…" : status}
+          </span>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <div className="text-[13px] uppercase tracking-wide text-gray-500 dark:text-gray-400">DRep ID</div>
+            <button
+              type="button"
+              onClick={() => onCopy(drepId)}
+              title="Copy DRep ID"
+              className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-gray-200 hover:text-indigo-500 dark:hover:text-indigo-400"
+            >
+              <span className="truncate max-w-[260px] sm:max-w-[320px]">{shorten(drepId)}</span>
+            </button>
+          </div>
+
+          <div>
+            <div className="text-[13px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Voting Power</div>
+            <div className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+              {loading ? "…" : (
+                (() => {
+                  // expect format like "1,234,567.890 ₳"
+                  const match = String(votingPower).match(/([\d,]+(?:\.[\d]+)?)\s*₳/);
+                  if (!match) return votingPower;
+                  const num = parseFloat(match[1].replace(/,/g, ""));
+                  if (!Number.isFinite(num)) return votingPower;
+                  const decimals = match[1].includes(".") ? Math.min(3, match[1].split(".")[1].length) : 0;
+                  return (
+                    <>
+                      <CountUp end={num} duration={1.2} separator="," decimals={decimals} />
+                      {" "}₳
+                    </>
+                  );
+                })()
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <button
+            onClick={onDelegate}
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 sm:px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/70"
+          >
+            Delegate to DRep
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
