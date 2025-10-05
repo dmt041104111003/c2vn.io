@@ -41,7 +41,7 @@ export interface ProjectCardProps {
 }
 
 export interface ProjectModalProps {
-  project: Project;
+  project: Project | null;
   isOpen: boolean;
   onClose: () => void;
 } 

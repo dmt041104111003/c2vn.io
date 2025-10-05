@@ -1,154 +1,171 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Metadata } from "next";
-import { ProjectModalProps, Project } from '~/constants/catalyst';
-import { TipTapPreview } from "~/components/ui/tiptap-preview";
-
-export const generateProjectMetadata = (project: Project): Metadata => ({
-  title: `${project.fund || 'Project'}: ${project.title}`,
-  description: project.description,
-  keywords: ["Cardano", "project", "proposal", project.fund || "", project.status.toLowerCase()],
-  openGraph: {
-    title: `${project.fund || 'Project'}: ${project.title}`,
-    description: project.description,
-    type: "article",
-    url: project.href,
-  },
-});
+import { createPortal } from "react-dom";
+import Link from "next/link";
+// import { Project } from "~/constants/catalyst";
+import { ProjectModalProps } from "~/constants/catalyst";
+import CourseModalText from "~/components/home/CourseModalText";
+import CourseModalTitle from "~/components/home/CourseModalTitle";
 
 export default function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300';
-      case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300';
-    }
-  };
-
-  // Update document title when modal opens
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => { 
+    setMounted(true); 
+  }, []);
+  
   useEffect(() => {
     if (isOpen) {
-      const originalTitle = document.title;
-      document.title = `${project.fund || 'Project'}: ${project.title}`;
-      
-      return () => {
-        document.title = originalTitle;
-      };
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-  }, [isOpen, project]);
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{
-            opacity: 0,
-            scaleX: 0,
-            filter: "blur(12px)",
-            transformOrigin: "right",
+              opacity: 0,
+              scaleX: 0,
+              filter: "blur(12px)",
+              transformOrigin: "right",
           }}
           animate={{
-            opacity: 1,
-            scaleX: 1,
-            filter: "blur(0px)",
-            transformOrigin: "right",
+              opacity: 1,
+              scaleX: 1,
+              filter: "blur(0px)",
+              transformOrigin: "right",
           }}
           exit={{
-            opacity: 0,
-            scaleX: 0,
-            filter: "blur(12px)",
-            transformOrigin: "right",
+              opacity: 0,
+              scaleX: 0,
+              filter: "blur(12px)",
+              transformOrigin: "right",
           }}
           transition={{
-            duration: 0.6,
-            ease: [0.25, 1, 0.5, 1],
+              duration: 0.6,
+              ease: [0.25, 1, 0.5, 1],
           }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999999] flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={onClose}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              onClose();
+            }
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
         >
           <motion.div
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative w-full max-w-4xl max-h-[95vh] overflow-y-auto transparent-scrollbar z-[9999999]"
+            className="relative w-full max-w-4xl max-h-[95vh] overflow-y-auto transparent-scrollbar"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-white dark:bg-gray-800 backdrop-blur-xl border border-gray-200 dark:border-gray-600 rounded-[40px] shadow-2xl">
               <div className="p-8">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Project Details
-                  </h2>
-                </div>
-
                 <div className="space-y-6">
+                  <div className="relative h-64 rounded-xl overflow-hidden">
+                    <img
+                      src={'/images/common/loading.png'}
+                      alt={project ? project.title : 'Catalyst'}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  </div>
+                  
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                      {project.fund && `${project.fund}: `}{project.title}
-                    </h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
-                      <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(project.status)}`}>
-                        {project.status.replace('_', ' ')}
-                      </span>
-                      <span>Year: {project.year}</span>
-                      <span>Quarter: {project.quarterly}</span>
-                      {project.fund && <span>Fund: {project.fund}</span>}
+                    {project ? (
+                      <>
+                        <CourseModalTitle title={project.title} maxLength={50} />
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            {project.fund || project.status}
+                          </span>
+                          <span>
+                            Created: {new Date(project.createdAt).toLocaleDateString("en-US", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="animate-pulse">
+                        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <div className="flex items-center gap-2 text-sm">
+                        <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {project ? (
+                          <span className="text-gray-700 dark:text-gray-300">
+                            <strong>Start Date:</strong> {project.quarterly ? `${project.quarterly}/${project.year}` : project.year}
+                          </span>
+                        ) : (
+                          <span className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded inline-block"></span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3" />
+                        </svg>
+                        {project ? (
+                          <span className="text-gray-700 dark:text-gray-300">
+                            <strong>Status:</strong> {project.status.replace('_', ' ')}
+                          </span>
+                        ) : (
+                          <span className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded inline-block"></span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Description</h4>
-                    <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      <TipTapPreview content={project.description} />
-                    </div>
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Project Description</h4>
+                    {project ? (
+                      <CourseModalText text={project.description} maxLength={200} />
+                    ) : (
+                      <div className="space-y-2 animate-pulse">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                      </div>
+                    )}
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-900 dark:text-white">Created:</span>
-                      <span className="ml-2 text-gray-600 dark:text-gray-400">
-                        {new Date(project.createdAt).toLocaleString('en-GB', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-900 dark:text-white">Updated:</span>
-                      <span className="ml-2 text-gray-600 dark:text-gray-400">
-                        {new Date(project.updatedAt).toLocaleString('en-GB', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
-                  </div>
-
-                  {project.href && (
-                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  
+                  <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      onClick={onClose}
+                      className="px-6 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors"
+                    >
+                      Close
+                    </button>
+                    {project && project.href && (
                       <Link
                         href={project.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
                       >
                         View Full Proposal
                       </Link>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -170,7 +187,7 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
               background: 'rgba(180, 83, 107, 0.11)',
               borderRadius: '5px',
               transition: 'background 0.5s',
-              zIndex: 9999999
+              zIndex: 50
             }}
           >
             <span 
@@ -199,33 +216,10 @@ export default function ProjectModal({ project, isOpen, onClose }: ProjectModalP
                 transform: 'translateX(-50%) rotate(-45deg)'
               }}
             ></span>
-            <div 
-              className="close"
-              style={{
-                position: 'absolute',
-                display: 'flex',
-                padding: '0.8rem 1.5rem',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transform: 'translateX(-50%)',
-                top: '-70%',
-                left: '50%',
-                width: '3em',
-                height: '1.7em',
-                fontSize: '12px',
-                backgroundColor: 'rgb(19, 22, 24)',
-                color: 'rgb(187, 229, 236)',
-                border: 'none',
-                borderRadius: '3px',
-                pointerEvents: 'none',
-                opacity: '0'
-              }}
-            >
-              Close
-            </div>
           </motion.button>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
-} 
+}

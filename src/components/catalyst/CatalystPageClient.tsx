@@ -282,7 +282,7 @@ function ProjectPageContent() {
         </div>
       </div>
       
-      {selectedProject && (
+      {isModalOpen && (
         <ProjectModal
           project={selectedProject}
           isOpen={isModalOpen}
