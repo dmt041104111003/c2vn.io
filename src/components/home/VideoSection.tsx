@@ -1,7 +1,7 @@
 "use client";
 
 // import Action from "~/components/action";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import VideoSectionSkeleton from "./VideoSectionSkeleton";
@@ -31,6 +31,8 @@ async function fetchVideos(): Promise<Video[]> {
 export default function VideoSection() {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [showAllVideos, setShowAllVideos] = useState(false);
+  const playerRef = useRef<any>(null);
+  const [ytReady, setYtReady] = useState(false);
 
   const {
     data: videos = [],
@@ -68,7 +70,6 @@ export default function VideoSection() {
 
   const displayedVideos = showAllVideos ? sortedVideos : sortedVideos.slice(0, 2);
 
-  // Use the exact regex logic used in Blog list
   function getYoutubeIdFromUrl(url: string) {
     if (!url) return null;
     const match = url.match(/(?:youtube\.com.*[?&]v=|youtu\.be\/)\s*([A-Za-z0-9_-]{11})/);
@@ -76,12 +77,77 @@ export default function VideoSection() {
   }
 
   function getThumbnail(video: Video) {
-    // Mirror BlogPageClient: prefer deriving from YouTube URL first
     const youtubeId = getYoutubeIdFromUrl(video.videoUrl || "") || (video.videoId && video.videoId.length === 11 ? video.videoId : null);
     if (youtubeId) return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
     if (video.thumbnailUrl && video.thumbnailUrl.trim() !== "") return video.thumbnailUrl.trim();
     return "/images/common/loading.png";
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if ((window as any).YT && (window as any).YT.Player) {
+      setYtReady(true);
+      return;
+    }
+    const existing = document.getElementById('youtube-iframe-api');
+    if (!existing) {
+      const tag = document.createElement('script');
+      tag.id = 'youtube-iframe-api';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.body.appendChild(tag);
+    }
+    (window as any).onYouTubeIframeAPIReady = () => setYtReady(true);
+    const poll = setInterval(() => {
+      if ((window as any).YT && (window as any).YT.Player) {
+        clearInterval(poll);
+        setYtReady(true);
+      }
+    }, 100);
+    return () => clearInterval(poll);
+  }, []);
+
+  useEffect(() => {
+    if (!ytReady || !currentVideo) return;
+    const YT = (window as any).YT;
+    const handleStateChange = (event: any) => {
+      const PlayerState = YT?.PlayerState || {};
+      if (event?.data === PlayerState.ENDED) {
+        const list = Array.isArray(sortedVideos) ? sortedVideos : [];
+        const idx = list.findIndex(v => v.id === currentVideo.id);
+        const next = idx >= 0 && idx + 1 < list.length ? list[idx + 1] : list[0];
+        if (next && next.id !== currentVideo.id) setCurrentVideo(next);
+      }
+    };
+
+    if (playerRef.current) {
+      try {
+        playerRef.current.loadVideoById(currentVideo.videoId);
+        playerRef.current.playVideo?.();
+      } catch {}
+      return;
+    }
+
+    playerRef.current = new YT.Player('video-player', {
+      videoId: currentVideo.videoId,
+      playerVars: {
+        autoplay: 1,
+        rel: 0,
+        controls: 1,
+        modestbranding: 1,
+        playsinline: 1,
+        mute: 1,
+      },
+      events: {
+        onReady: () => {
+          try {
+            playerRef.current?.mute?.();
+            playerRef.current?.playVideo?.();
+          } catch {}
+        },
+        onStateChange: handleStateChange,
+      },
+    });
+  }, [ytReady, currentVideo, sortedVideos]);
 
   if (isLoading) {
     return <VideoSectionSkeleton />;
@@ -106,7 +172,6 @@ export default function VideoSection() {
             </motion.div>
             <NotFoundInline 
               onClearFilters={() => {
-                // Refresh the page or refetch data
                 window.location.reload();
               }}
             />
@@ -136,7 +201,6 @@ export default function VideoSection() {
             </motion.div>
             <NotFoundInline 
               onClearFilters={() => {
-                // Refresh the page or refetch data
                 window.location.reload();
               }}
             />
@@ -182,12 +246,7 @@ export default function VideoSection() {
               className="w-full lg:w-[60%]"
             >
               <div className="relative w-full aspect-video rounded-lg lg:rounded-xl overflow-hidden mb-4 lg:mb-6 shadow-lg lg:shadow-2xl">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${currentVideo.videoId}?autoplay=1&rel=0`}
-                  title={currentVideo.title}
-                  allowFullScreen
-                ></iframe>
+                <div id="video-player" className="w-full h-full"></div>
               </div>
               <h3 className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white mb-1 lg:mb-2 line-clamp-2">{currentVideo.title}</h3>
               <p className="text-sm lg:text-lg text-gray-600 dark:text-gray-400 font-medium">{currentVideo.channelName}</p>

@@ -19,12 +19,21 @@ export function VideoSectionTable({
   const { showSuccess } = useToastContext();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [selectedVideoToDelete, setSelectedVideoToDelete] = React.useState<VideoItem | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false);
+  const [previewSrc, setPreviewSrc] = React.useState<string>("");
+  const [previewTitle, setPreviewTitle] = React.useState<string>("");
 
-  // Use the same simple matcher as Blog page list
   function getYoutubeIdFromUrl(url: string): string | null {
     if (!url) return null;
     const match = url.match(/(?:youtube\.com.*[?&]v=|youtu\.be\/)\s*([A-Za-z0-9_-]{11})/);
     return match ? match[1] : null;
+  }
+
+  function getThumbnailSrc(video: VideoItem): string {
+    const id = getYoutubeIdFromUrl(video.videoUrl) || (video.videoId && video.videoId.length === 11 ? video.videoId : null);
+    if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    if (video.thumbnailUrl && video.thumbnailUrl.trim() !== '') return video.thumbnailUrl.trim();
+    return '/images/common/loading.png';
   }
 
   const handleCopyChannel = async (channelUrl: string) => {
@@ -74,17 +83,18 @@ export function VideoSectionTable({
                 <tr key={video.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <img 
-                      src={(() => {
-                        // Mirror BlogPageClient logic: derive from YouTube first
-                        const id = getYoutubeIdFromUrl(video.videoUrl) || (video.videoId && video.videoId.length === 11 ? video.videoId : null);
-                        if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-                        if (video.thumbnailUrl && video.thumbnailUrl.trim() !== '') return video.thumbnailUrl.trim();
-                        return '/images/common/loading.png';
-                      })()} 
+                      src={getThumbnailSrc(video)} 
                       alt={video.title} 
                       width={80} 
                       height={45} 
-                      className="rounded object-cover" 
+                      className="rounded object-cover cursor-pointer" 
+                      onClick={() => { 
+                        setPreviewSrc(getThumbnailSrc(video)); 
+                        const t = (video.title || '').trim();
+                        const truncated = t.length > 60 ? `${t.slice(0, 60)}...` : t;
+                        setPreviewTitle(truncated);
+                        setIsPreviewOpen(true); 
+                      }}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.src = `/images/common/loading.png`;
@@ -197,6 +207,24 @@ export function VideoSectionTable({
               Delete
             </button>
           </div>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        title={previewTitle || "Image Preview"}
+      >
+        <div className="space-y-4">
+          <img
+            src={previewSrc || '/images/common/loading.png'}
+            alt="Preview"
+            className="w-full h-auto rounded-lg border border-gray-200 dark:border-gray-600"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/images/common/loading.png';
+            }}
+          />
         </div>
       </Modal>
     </div>
