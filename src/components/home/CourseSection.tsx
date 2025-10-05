@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Course } from "~/constants/admin";
 import CourseModal from "./CourseModal";
 import { Pagination } from "~/components/ui/pagination";
+import StarIcon from "../ui/StarIcon";
 
 type TabType = "latest" | "all";
 
@@ -102,7 +103,7 @@ export default function CourseSection() {
         <div className="relative">
           <div className="mb-8">
             <div className="mb-4 flex items-center gap-4">
-              <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-transparent"></div>
+              <StarIcon />
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white lg:text-4xl">C2VN Courses</h2>
             </div>
   

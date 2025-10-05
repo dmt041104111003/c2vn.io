@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import StarIcon from '../ui/StarIcon';
 
 interface ContactFormQuoteBlockProps {
   title?: string;
@@ -34,7 +35,7 @@ export default function ContactFormQuoteBlock({ title, description, hasSelectedC
   return (
     <div className="bg-blue-50/80 dark:bg-gray-800/80 rounded-xl p-8 shadow-lg flex flex-col items-center w-full max-w-2xl mx-auto">
       <div className="mb-4 flex items-center gap-4 w-full">
-        <div className="h-1 w-12 bg-gradient-to-r from-blue-600 dark:from-blue-300 to-transparent flex-shrink-0"></div>
+        <StarIcon />
         <div className="flex-1">
           <h2 className="text-3xl lg:text-4xl font-bold text-blue-800 dark:text-blue-200">
             {truncatedTitle}

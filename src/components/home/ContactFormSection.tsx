@@ -350,7 +350,6 @@ export default function ContactFormSection() {
         }
       }
 
-      // Then send to Google Sheets
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         formDataToSend.append(key, value);
@@ -402,12 +401,6 @@ export default function ContactFormSection() {
     setActiveTab(tab);
   };
 
-  const backgroundStyle = {
-    backgroundImage: selectedCourseImage ? `url(${selectedCourseImage})` : 'linear-gradient(to bottom right, rgb(239 246 255), rgb(224 231 255))',
-    backgroundSize: selectedCourseImage ? 'contain' : 'auto',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat'
-  };
 
   return (
     <section

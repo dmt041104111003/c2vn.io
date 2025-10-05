@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import StarIcon from "~/components/ui/StarIcon";
 
 type TabType = "latest" | "popular";
 
@@ -73,7 +74,7 @@ export default function ProtocolSection() {
         <div className="relative">
           <div className="mb-8">
             <div className="mb-4 flex items-center gap-4">
-              {/* <div className="h-1 w-12 bg-gradient-to-r from-blue-500 to-transparent"></div> */}
+              <StarIcon />
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white lg:text-4xl">Blog</h2>
             </div>
           </div>

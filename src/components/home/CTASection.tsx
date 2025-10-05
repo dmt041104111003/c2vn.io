@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import EventCard from "~/components/home/CTAEventCard";
 import EditModal from "~/components/home/CTAEditModal";
 import { Event } from "~/constants/events";
+import StarIcon from "../ui/StarIcon";
 
 export default function CTASection() {
   const { data: session } = useSession();
@@ -124,7 +125,7 @@ export default function CTASection() {
         <div className="mb-8 lg:mb-16 flex flex-wrap justify-between items-center gap-4">
           <div>
             <div className="mb-4 lg:mb-6 flex items-center gap-2 lg:gap-4">
-              <div className="h-1 w-8 lg:w-12 bg-gradient-to-r from-blue-500 to-transparent" />
+              <StarIcon />
               <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">Events</h2>
             </div>
       
