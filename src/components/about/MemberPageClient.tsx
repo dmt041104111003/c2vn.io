@@ -553,9 +553,58 @@ export default function MemberPageClient() {
     return (
       <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
         <BackgroundMotion />
-        <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
-          <Title title="Founding Team" description="" />
-          <div className="mx-auto pb-20">
+        <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="about-top">
+          <div id="founding-team" className="scroll-mt-28 md:scroll-mt-40">
+            <Title title="Founding Team" description="" />
+          </div>
+          
+          <div id="about-section" className="scroll-mt-28 md:scroll-mt-40 mb-16 text-left">
+            <aside className="mx-auto my-0 flex w-full max-w-[1200px] flex-col gap-2">
+              <div className="flex w-full gap-7 max-sm:flex-col items-start">
+                <div className='relative aspect-video w-[60%] rounded-3xl before:absolute before:left-8 before:top-8 before:h-full before:w-full before:rounded-3xl before:bg-gray-300 dark:before:bg-slate-900 before:shadow-xl before:content-[""] max-sm:w-full flex-shrink-0 self-start animate-pulse'>
+                  <div className="absolute inset-0 z-10 block h-full w-full rounded-xl bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div className="z-10 flex w-[40%] flex-col items-start gap-[15px] max-md:gap-3 max-sm:w-full flex-shrink-0">
+                  <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                  <div className="space-y-2 w-full">
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6 animate-pulse"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-4/5 animate-pulse"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3 animate-pulse"></div>
+                  </div>
+                  <div className="h-12 bg-gray-300 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div className="mx-auto mb-16 scroll-mt-28 md:scroll-mt-40" id="our-cardano-team">
+            <div className="rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 backdrop-blur-sm">
+              <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-1/3 mb-4 animate-pulse"></div>
+              <div className="space-y-3 mb-4">
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6 animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-4/5 animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+              </div>
+              <div className="space-y-3 mb-4">
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6 animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+              </div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-4/5 animate-pulse"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-auto pb-20 scroll-mt-28 md:scroll-mt-40" id="members">
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {[...Array(6)].map((_, index) => (
                 <div key={index} className="animate-pulse">
@@ -566,25 +615,40 @@ export default function MemberPageClient() {
                 </div>
               ))}
             </div>
-            <div className="mt-16">
-              <div className="rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 backdrop-blur-sm">
-                <div className="text-center mb-8">
-                  <h3 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">Contact</h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Have questions about our projects or want to collaborate? We'd love to hear from you.
-                  </p>
-                </div>
-                <div className="w-full max-w-2xl mx-auto">
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="h-12 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
-                      <div className="h-12 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
+          </div>
+        </section>
+
+        <section 
+          id="contact" 
+          className="scroll-mt-28 md:scroll-mt-40 pt-32 pb-12 lg:pt-40 lg:pb-16 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-950"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+              <div className="w-full lg:w-1/2">
+                <Title title="Get in Touch" description="We value your feedback and ideas. Share your thoughts, suggestions, or let us know if you'd like to collaborate with us." />
+              </div>
+              <div className="w-full lg:w-1/2">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="p-6 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-20 mb-1 animate-pulse"></div>
+                        <div className="h-12 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
+                      </div>
+                      <div>
+                        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-24 mb-1 animate-pulse"></div>
+                        <div className="h-12 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
+                      </div>
                     </div>
-                    <div className="h-12 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
-                    <div className="h-32 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
-                    <div className="flex justify-center">
-                      <div className="h-12 w-32 bg-gray-300 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div>
+                      <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-28 mb-1 animate-pulse"></div>
+                      <div className="h-12 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
                     </div>
+                    <div>
+                      <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-16 mb-1 animate-pulse"></div>
+                      <div className="h-24 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
+                    </div>
+                    <div className="h-12 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
                   </div>
                 </div>
               </div>
@@ -755,48 +819,11 @@ export default function MemberPageClient() {
         transition={{ duration: 0.8 }}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            id="join-our-team" 
-            className="text-center mb-8"
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              show: { 
-                opacity: 1, 
-                y: 0,
-                transition: {
-                  duration: 0.6,
-                  delay: 0.2
-                }
-              }
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: false, amount: 0.3 }}
-          >
-            <div className="mb-4 flex items-center justify-center gap-4">
-              <motion.div 
-                initial={{ width: 0 }}
-                whileInView={{ width: "3rem" }}
-                viewport={{ once: false, amount: 0.3 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="h-1 w-12 bg-gradient-to-r from-blue-500 to-transparent"
-              ></motion.div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white lg:text-4xl">Get in Touch</h2>
-              <motion.div 
-                initial={{ width: 0 }}
-                whileInView={{ width: "3rem" }}
-                viewport={{ once: false, amount: 0.3 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="h-1 w-12 bg-gradient-to-r from-transparent to-blue-500"
-              ></motion.div>
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+            <div className="w-full lg:w-1/2">
+              <Title title="Get in Touch" description="We value your feedback and ideas. Share your thoughts, suggestions, or let us know if you'd like to collaborate with us." />
             </div>
-            <p className="max-w-2xl mx-auto text-lg text-gray-700 dark:text-gray-300">
-              We value your feedback and ideas. Share your thoughts, suggestions, or let us know if you'd like to collaborate with us.
-            </p>
-          </motion.div>
-
-          <div className="flex justify-center">
-            <div className="w-full max-w-xl">
+            <div className="w-full lg:w-1/2">
               <AboutContactForm
                 formData={formData}
                 errors={errors}
