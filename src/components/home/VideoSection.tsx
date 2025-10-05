@@ -68,15 +68,18 @@ export default function VideoSection() {
 
   const displayedVideos = showAllVideos ? sortedVideos : sortedVideos.slice(0, 2);
 
+  // Use the exact regex logic used in Blog list
   function getYoutubeIdFromUrl(url: string) {
-    const match = url.match(/(?:youtube\.com.*[?&]v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com.*[?&]v=|youtu\.be\/)\s*([A-Za-z0-9_-]{11})/);
     return match ? match[1] : null;
   }
 
   function getThumbnail(video: Video) {
-    if (video.thumbnailUrl && video.thumbnailUrl !== "") return video.thumbnailUrl;
-    const youtubeId = getYoutubeIdFromUrl(video.videoUrl);
+    // Mirror BlogPageClient: prefer deriving from YouTube URL first
+    const youtubeId = getYoutubeIdFromUrl(video.videoUrl || "") || (video.videoId && video.videoId.length === 11 ? video.videoId : null);
     if (youtubeId) return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+    if (video.thumbnailUrl && video.thumbnailUrl.trim() !== "") return video.thumbnailUrl.trim();
     return "/images/common/loading.png";
   }
 

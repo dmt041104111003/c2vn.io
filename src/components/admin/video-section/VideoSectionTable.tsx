@@ -20,6 +20,13 @@ export function VideoSectionTable({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [selectedVideoToDelete, setSelectedVideoToDelete] = React.useState<VideoItem | null>(null);
 
+  // Use the same simple matcher as Blog page list
+  function getYoutubeIdFromUrl(url: string): string | null {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com.*[?&]v=|youtu\.be\/)\s*([A-Za-z0-9_-]{11})/);
+    return match ? match[1] : null;
+  }
+
   const handleCopyChannel = async (channelUrl: string) => {
     try {
       await navigator.clipboard.writeText(channelUrl);
@@ -67,11 +74,21 @@ export function VideoSectionTable({
                 <tr key={video.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <img 
-                      src={video.thumbnailUrl} 
+                      src={(() => {
+                        // Mirror BlogPageClient logic: derive from YouTube first
+                        const id = getYoutubeIdFromUrl(video.videoUrl) || (video.videoId && video.videoId.length === 11 ? video.videoId : null);
+                        if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+                        if (video.thumbnailUrl && video.thumbnailUrl.trim() !== '') return video.thumbnailUrl.trim();
+                        return '/images/common/loading.png';
+                      })()} 
                       alt={video.title} 
                       width={80} 
                       height={45} 
                       className="rounded object-cover" 
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = `/images/common/loading.png`;
+                      }}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
