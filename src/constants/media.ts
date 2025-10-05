@@ -56,4 +56,6 @@ export interface MediaInputProps {
   multiple?: boolean;
   showVideoLibrary?: boolean;
   showYouTubeInput?: boolean;
+  showImageLibrary?: boolean;
+  showImageInputs?: boolean;
 } 

@@ -42,21 +42,14 @@ export function VideoSectionEditor({
           <label className="block text-sm font-medium mb-2">YouTube Video</label>
           <MediaInput
             showYouTubeInput={true}
-            showVideoLibrary={false}
+            showImageInputs={false}
+            showVideoLibrary={true}
+            showImageLibrary={false}
             onMediaAdd={(media) => {
               if (media?.type === 'youtube' && media.url) {
                 onVideoUrlChange(media.url);
               }
             }}
-          />
-          <input
-            type="text"
-            placeholder="https://www.youtube.com/watch?v=..."
-            value={videoUrl}
-            onChange={(e) => onVideoUrlChange(e.target.value)}
-            className={`w-full mt-2 px-3 py-2 border rounded-md ${
-              isValidUrl === false ? "border-red-500 focus:ring-red-500" : isValidUrl ? "border-green-500 focus:ring-green-500" : ""
-            }`}
           />
           {isValidUrl === false && (
             <p className="text-red-500 text-sm mt-1">Please enter a valid YouTube URL</p>

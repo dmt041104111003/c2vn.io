@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { MediaInputMedia, MediaInputProps } from '~/constants/media';
 
-export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'image', multiple = false, showVideoLibrary = true, showYouTubeInput = false }: MediaInputProps) {
+export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'image', multiple = false, showVideoLibrary = true, showYouTubeInput = false, showImageLibrary = true, showImageInputs = true }: MediaInputProps) {
   const [currentMedia, setCurrentMedia] = useState<MediaInputMedia | null>(null);
-  const [activeImageTab, setActiveImageTab] = useState<'upload' | 'url' | 'library'>('upload');
-  const [activeLibraryTab, setActiveLibraryTab] = useState<'images' | 'videos'>('images');
+  const [activeImageTab, setActiveImageTab] = useState<'upload' | 'url' | 'library'>(showImageInputs ? 'upload' : 'url');
+  const [activeLibraryTab, setActiveLibraryTab] = useState<'images' | 'videos'>(showImageLibrary ? 'images' : 'videos');
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
@@ -143,13 +143,15 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
       {mediaType === 'image' && (
         <>
           <div className="flex gap-2 mb-2">
-            <button
-              type="button"
-              className={`px-3 py-1 rounded-t border-b-2 ${activeImageTab === 'upload' ? 'border-emerald-500 text-emerald-600 bg-white dark:bg-gray-700 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800'}`}
-              onClick={() => setActiveImageTab('upload')}
-            >
-              Upload
-            </button>
+            {showImageInputs && (
+              <button
+                type="button"
+                className={`px-3 py-1 rounded-t border-b-2 ${activeImageTab === 'upload' ? 'border-emerald-500 text-emerald-600 bg-white dark:bg-gray-700 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800'}`}
+                onClick={() => setActiveImageTab('upload')}
+              >
+                Upload
+              </button>
+            )}
             <button
               type="button"
               className={`px-3 py-1 rounded-t border-b-2 ${activeImageTab === 'url' ? 'border-emerald-500 text-emerald-600 bg-white dark:bg-gray-700 dark:text-emerald-400' : 'border-transparent text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800'}`}
@@ -170,7 +172,7 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
               Library
             </button>
           </div>
-          {activeImageTab === 'upload' && (
+          {activeImageTab === 'upload' && showImageInputs && (
             <div className="flex flex-col items-center gap-2">
               <button
                 type="button"
@@ -194,14 +196,16 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
           )}
           {activeImageTab === 'url' && (
             <div className="flex flex-col items-center gap-2 w-full">
-              <input
-                type="url"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="Paste image URL here..."
-                value={imageUrl}
-                onChange={e => setImageUrl(e.target.value)}
-                onBlur={() => handleImageUrl(imageUrl)}
-              />
+              {showImageInputs && (
+                <input
+                  type="url"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Paste image URL here..."
+                  value={imageUrl}
+                  onChange={e => setImageUrl(e.target.value)}
+                  onBlur={() => handleImageUrl(imageUrl)}
+                />
+              )}
               
               {showYouTubeInput && (
                 <div className="w-full">
@@ -252,17 +256,19 @@ export default function MediaInput({ onMediaAdd, onMediaAddMany, mediaType = 'im
             <div className="space-y-4">
               {/* Library sub-tabs */}
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  className={`px-3 py-1 rounded border ${
-                    activeLibraryTab === 'images' 
-                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600' 
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600'
-                  }`}
-                  onClick={() => setActiveLibraryTab('images')}
-                >
-                  Images
-                </button>
+                {showImageLibrary && (
+                  <button
+                    type="button"
+                    className={`px-3 py-1 rounded border ${
+                      activeLibraryTab === 'images' 
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-600' 
+                        : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600'
+                    }`}
+                    onClick={() => setActiveLibraryTab('images')}
+                  >
+                    Images
+                  </button>
+                )}
                 {showVideoLibrary && (
                   <button
                     type="button"
