@@ -5,6 +5,7 @@ import { baseOptions } from "~/app/layout.config";
 import { source } from "~/app/lib/source";
 import { DocsThemeHandler } from "~/components/docs/docs-theme-handler";
 import { DocsRouteHandler } from "~/components/docs/docs-route-handler";
+import BackToTop from "~/components/ui/BackToTop";
 import "fumadocs-ui/css/ocean.css";
 import "fumadocs-ui/css/preset.css";
 
@@ -32,6 +33,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <RootProvider>
           <DocsLayout {...docsOptions}>{children}</DocsLayout>
         </RootProvider>
+        <BackToTop />
       </div>
     </>
   );
