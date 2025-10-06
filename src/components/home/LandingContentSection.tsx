@@ -44,6 +44,19 @@ export default function LandingContentSection({ content }: LandingContentSection
 
   const fontSizes = getFontSizes();
 
+  const scrollToContact = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const el = document.getElementById('contact');
+    if (el) {
+      const headerOffset = 100;
+      const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    } else {
+      // Fallback: navigate to hash on home
+      window.location.assign('/#contact');
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex flex-col justify-center">
       <h1 className={`mb-4 lg:mb-6 font-bold ${fontSizes.title}`}>
@@ -54,7 +67,7 @@ export default function LandingContentSection({ content }: LandingContentSection
         <div className={`mt-2 lg:mt-3 block font-normal text-gray-600 dark:text-gray-300 ${fontSizes.description}`}>
           <TipTapPreview content={content.description} />
         </div>
-        <div className={`mb-2 lg:mb-3 leading-relaxed text-gray-600 dark:text-gray-300 relative mb-4 lg:mb-6 border-l-2 border-gray-300 dark:border-white/20 pl-4 lg:pl-6 font-normal ${fontSizes.mainText}`}>
+        <div className={`leading-relaxed text-gray-600 dark:text-gray-300 relative border-l-2 border-gray-300 dark:border-white/20 pl-4 lg:pl-6 font-normal ${fontSizes.mainText}`}>
           <TipTapPreview content={content.mainText} />
         </div>
         <div className="flex flex-col sm:flex-row gap-4 mt-6 lg:mt-8">
@@ -64,12 +77,13 @@ export default function LandingContentSection({ content }: LandingContentSection
           >
             Our Services
           </Link>
-          <Link
-            href="/project?typeFilter=project"
+          <button
+            onClick={scrollToContact}
             className="inline-flex items-center justify-center whitespace-nowrap rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-white/50 px-6 lg:px-8 py-3 lg:py-4 font-semibold text-gray-900 dark:text-white shadow-lg hover:bg-gray-200 dark:hover:bg-gray-700 text-sm lg:text-base xl:text-lg"
+            aria-label="Register"
           >
-            Our Projects
-          </Link>
+            Register
+          </button>
         </div>
       </h1>
     
