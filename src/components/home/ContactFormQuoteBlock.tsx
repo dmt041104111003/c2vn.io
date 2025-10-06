@@ -51,7 +51,7 @@ export default function ContactFormQuoteBlock({ title, description, hasSelectedC
         </div>
       </div>
       <div className="w-full">
-        <p className="text-lg lg:text-xl leading-relaxed text-blue-700 dark:text-blue-100 text-justify">
+        <p className="text-lg lg:text-xl leading-relaxed text-blue-700 dark:text-blue-100 text-justify max-w-prose mx-auto hyphens-auto">
           {truncatedDescription}
         </p>
         {shouldTruncateDescription && (
