@@ -14,7 +14,7 @@ interface BlogGridProps {
 }
 
 export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
-  const renderPostCard = (post: BlogPost, index: number, isLarge = false) => {
+  const renderPostCard = (post: BlogPost, index: number, isLarge = false, fullWidth = false, isHorizontal = false) => {
     let imageUrl = "/images/common/loading.png";
     if (Array.isArray(post.media) && post.media.length > 0) {
       const youtubeMedia = post.media.find((m: BlogMedia) => m.type === 'YOUTUBE');
@@ -46,10 +46,10 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
         className="relative group"
       >
         <div className={`rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-lg transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-xl overflow-hidden`}>
-          <a href={`/blog/${post.slug || post.id}`} className={isLarge ? "block" : "flex gap-3 p-3"}>
+          <a href={`/blog/${post.slug || post.id}`} className={isLarge ? "block" : isHorizontal ? "flex gap-4 p-4" : "flex gap-3 p-3"}>
             {isLarge ? (
               <>
-                <div className="relative h-48 sm:h-56 lg:h-64 overflow-hidden">
+                <div className={`relative overflow-hidden ${fullWidth ? 'h-64 sm:h-80 lg:h-96' : isLarge ? 'h-64 sm:h-72 lg:h-80' : 'h-32 sm:h-40 lg:h-48'}`}>
                   <img
                     alt={post.title}
                     loading="lazy"
@@ -108,9 +108,9 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
                   </div>
                 </div>
               </>
-            ) : (
+            ) : isHorizontal ? (
               <>
-                <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg">
+                <div className="relative w-24 h-20 flex-shrink-0 overflow-hidden rounded-lg">
                   <img
                     alt={post.title}
                     loading="lazy"
@@ -165,6 +165,63 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
                   </div>
                 </div>
               </>
+            ) : (
+              <>
+                <div className="relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg">
+                  <img
+                    alt={post.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    src={imageUrl}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/images/common/loading.png";
+                    }}
+                  />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  {/* Tags for small cards */}
+                  {Array.isArray(post.tags) && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-1">
+                      {post.tags.slice(0, 2).map((tag: any, tagIndex: number) => {
+                        const tagName = typeof tag === 'string' ? tag : (tag?.name || '');
+                        if (!tagName) return null;
+                        return (
+                          <span 
+                            key={tagIndex}
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                          >
+                            {tagName}
+                          </span>
+                        );
+                      })}
+                      {post.tags.length > 2 && (
+                        <span 
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        >
+                          +{post.tags.length - 2}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  
+                  <h3 className="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2 mb-1">
+                    {post.title}
+                  </h3>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <span className="font-medium">{post.author || "Admin"}</span>
+                    <span className="mx-1">•</span>
+                    <span className="font-mono">
+                      {new Date(post.createdAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </>
             )}
           </a>
         </div>
@@ -191,24 +248,32 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
   };
 
   return (
-    <motion.section className={`grid gap-6 ${posts.length >= 5 ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
-      {posts.length >= 5 ? (
+    <motion.section className={`grid gap-6 ${posts.length >= 6 ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
+      {posts.length >= 6 ? (
         <>
           <div className="lg:col-span-1 space-y-4">
-            {posts.slice(0, 3).map((post, index) => 
-              renderPostCard(post, index, false)
+            {posts.slice(1, 6).map((post, index) => 
+              renderPostCard(post, index + 1, false)
             )}
           </div>
           
-          <div className="lg:col-span-2 space-y-4">
-            {posts[3] && renderPostCard(posts[3], 3, true)}
-            {posts[4] && renderPostCard(posts[4], 4, false)}
+          <div className="lg:col-span-2 flex flex-col space-y-2">
+            {posts[0] && (
+              <div className="flex-1">
+                {renderPostCard(posts[0], 0, true)}
+              </div>
+            )}
+            {posts[5] && (
+              <div className="flex-shrink-0">
+                {renderPostCard(posts[5], 5, false, false, true)}
+              </div>
+            )}
           </div>
         </>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {posts.map((post, index) => 
-            renderPostCard(post, index, true)
+            renderPostCard(post, index, true, true) // true for fullWidth
           )}
         </div>
       )}

@@ -18,7 +18,7 @@ export default function BlogPageClient() {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const pageSize = 6;
   
   useNotifications();
 
@@ -115,7 +115,7 @@ export default function BlogPageClient() {
         ) : (
           <>
             {postsLoading ? (
-              <BlogSkeleton />
+              <BlogSkeleton postCount={pageSize} />
             ) : posts.length === 0 ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
