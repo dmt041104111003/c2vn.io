@@ -84,6 +84,16 @@ export default function VideoSection() {
     return "/images/common/loading.png";
   }
 
+  function formatDateDmy(dateString: string) {
+    try {
+      const d = new Date(dateString);
+      if (isNaN(d.getTime())) return "";
+      return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch {
+      return "";
+    }
+  }
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if ((window as any).YT && (window as any).YT.Player) {
@@ -311,7 +321,7 @@ export default function VideoSection() {
                             </p>
                             <span className="text-xs text-gray-400 dark:text-gray-500">•</span>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {new Date(video.createdAt).toLocaleDateString()}
+                              {formatDateDmy(video.createdAt)}
                             </p>
                           </div>
                         </div>
