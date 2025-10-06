@@ -15,9 +15,7 @@ export default function CourseEditModal({
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [locations, setLocations] = useState<string[]>([]);
-  const [useCustomLocation, setUseCustomLocation] = useState(false);
-  const [customLocation, setCustomLocation] = useState('');
+  
   const [startDate, setStartDate] = useState('');
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
 
@@ -32,33 +30,11 @@ export default function CourseEditModal({
     }
   }, [course]);
 
-  useEffect(() => {
-    const loadLocations = async () => {
-      try {
-        const res = await fetch('/api/admin/courses', { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        const list: any[] = Array.isArray(data?.data) ? data.data : [];
-        const names: string[] = list
-          .map((c: any) => (typeof c?.location === 'string' ? c.location.trim() : ''))
-          .filter((v: string) => v.length > 0);
-        const unique = Array.from(new Set(names)) as string[];
-        unique.sort((a: string, b: string) => a.localeCompare(b));
-        setLocations(unique as string[]);
-      } catch {}
-    };
-    if (isOpen) loadLocations();
-  }, [isOpen]);
+  
 
   const handleSave = () => {
     if (!course || !name.trim()) return;
-    const finalLocation = useCustomLocation
-      ? customLocation.trim()
-      : location.trim();
-    if (useCustomLocation && locations.some(l => l.toLowerCase() === finalLocation.toLowerCase())) {
-      return; 
-    }
-    onSave(course.id, name.trim(), publishStatus, image, description.trim(), finalLocation, startDate);
+    onSave(course.id, name.trim(), publishStatus, image, description.trim(), location.trim(), startDate);
   };
 
   const handleMediaSelect = (media: { id: string; url: string; type: string }) => {
@@ -96,37 +72,13 @@ export default function CourseEditModal({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Location (Optional)
             </label>
-            {!useCustomLocation ? (
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label="Select location"
-              >
-                <option value="">Select a location</option>
-                {locations.map((loc) => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={customLocation}
-                onChange={(e) => setCustomLocation(e.target.value)}
-                placeholder="Enter new location"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            )}
-            <div className="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-              <input
-                id="toggle-custom-location"
-                type="checkbox"
-                checked={useCustomLocation}
-                onChange={(e) => setUseCustomLocation(e.target.checked)}
-                className="rounded"
-              />
-              <label htmlFor="toggle-custom-location">Enter a new location</label>
-            </div>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Enter course location"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

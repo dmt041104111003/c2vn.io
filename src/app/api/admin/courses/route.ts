@@ -30,19 +30,7 @@ export const POST = withAdmin(async (req) => {
     return NextResponse.json(createErrorResponse('Course already exists', 'COURSE_EXISTS'), { status: 409 });
   }
   
-  let finalLocation: string | null = location ? String(location).trim() : null;
-  if (finalLocation) {
-    const existingLocations = await prisma.course.findMany({
-      where: { location: { not: null } },
-      select: { location: true },
-    });
-    const match = existingLocations.find(
-      (c) => c.location && c.location.trim().toLowerCase() === finalLocation!.toLowerCase()
-    );
-    if (match?.location) {
-      finalLocation = match.location.trim();
-    }
-  }
+  const finalLocation: string | null = location ? String(location).trim() : null;
 
   const course = await prisma.course.create({
     data: { 

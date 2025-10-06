@@ -28,25 +28,7 @@ export const PUT = withAdmin(async (req) => {
     return NextResponse.json(createErrorResponse('Course name already exists', 'COURSE_NAME_ALREADY_EXISTS'), { status: 400 });
   }
 
-  let finalLocation: string | null = location ? String(location).trim() : null;
-  if (finalLocation) {
-    const existingLocations = await prisma.course.findMany({
-      where: { location: { not: null } },
-      select: { location: true },
-    });
-    const set = new Set(
-      existingLocations
-        .map((c: { location: string | null }) => (c.location ? c.location.trim() : ''))
-        .filter(Boolean)
-        .map((v: string) => v.toLowerCase())
-    );
-    if (set.has(finalLocation.toLowerCase())) {
-      const match = existingLocations.find(
-        (c) => c.location && c.location.trim().toLowerCase() === finalLocation!.toLowerCase()
-      );
-      finalLocation = match?.location?.trim() || finalLocation;
-    }
-  }
+  const finalLocation: string | null = location ? String(location).trim() : null;
 
   const updatedCourse = await prisma.course.update({
     where: { id },
