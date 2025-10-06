@@ -31,19 +31,20 @@ export default function LightBulbScene() {
   const disposeRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    let MatterLib: any;
-    let engine: any;
-    let ceiling: any;
-    let bulb: any;
-    let cord: any;
-    let mouseConstraint: any;
     let frameRaf = 0;
     let brightness = 1;
-    let lightOn = true;
+    let lightOn = document.documentElement.classList.contains("dark");
     let destroyed = false;
     let cleanupTween: (() => void) | null = null;
 
-    const setup = async () => {
+    let anchorX = 0;
+    const anchorY = 40;
+    let baseLength = 0;
+    let currentLen = 0;
+    let targetLen = 0;
+    let animating = false;
+
+    const setup = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
@@ -52,52 +53,23 @@ export default function LightBulbScene() {
       const resize = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        anchorX = canvas.width - 60; 
+        baseLength = canvas.height / 2 - 62;
+        const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
+        const shortLen = 85;
+        currentLen = Math.min(Math.max(currentLen || shortLen, shortLen), longLen);
+        targetLen = lightOn ? longLen : shortLen;
+        maybeStartLoop();
       };
       resize();
-
-      try {
-        MatterLib = (await import("matter-js")).default ?? (await import("matter-js"));
-      } catch (e) {
-        const drawFallback = () => {
-          ctx.fillStyle = "#000";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.fillStyle = "#e8e8e8";
-          ctx.beginPath();
-          ctx.arc(canvas.width - 60, 140, 20, 0, Math.PI * 2);
-          ctx.fill();
-          frameRaf = requestAnimationFrame(drawFallback);
-        };
-        frameRaf = requestAnimationFrame(drawFallback);
-        disposeRef.current = () => cancelAnimationFrame(frameRaf);
-        return;
-      }
-
-      const { Engine, Bodies, Constraint, World,  Body } = MatterLib;
-      engine = Engine.create();
-      engine.world.gravity.y = 0.8;
-
-      const anchorX = () => (canvas.width - 60);
-      ceiling = Bodies.rectangle(anchorX(), 40, 20, 10, { isStatic: true });
-      bulb = Bodies.circle(anchorX(), canvas.height / 3, 22, {
-        density: 0.006,
-        frictionAir: 0.03,
-        restitution: 0.2,
-      });
-
-      let baseLength = canvas.height / 2 - 62;
-      cord = Constraint.create({ bodyA: ceiling, bodyB: bulb, length: baseLength, stiffness: 0.98, damping: 0.08 });
-      Body.setPosition(bulb, { x: ceiling.position.x, y: ceiling.position.y + baseLength });
-      Body.setInertia(bulb, Infinity);
-
-      World.add(engine.world, [ceiling, bulb, cord]);
-
 
       const drawRealisticLighting = (x: number, y: number) => {
         if (!lightOn) {
           brightness += (0 - brightness) * 0.08;
-          return;
+        } else {
+          brightness += (1 - brightness) * 0.08;
         }
-        brightness += (1 - brightness) * 0.08;
+        if (brightness <= 0.01) return;
         const gradient = ctx.createRadialGradient(x, y, 0, x, y, 560);
         gradient.addColorStop(0, `rgba(255, 240, 200, ${0.5 * brightness})`);
         gradient.addColorStop(0.4, `rgba(255, 220, 170, ${0.2 * brightness})`);
@@ -120,7 +92,7 @@ export default function LightBulbScene() {
         ctx.strokeStyle = "#666";
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.moveTo(ceiling.position.x, ceiling.position.y);
+        ctx.moveTo(anchorX, anchorY);
         ctx.lineTo(x, y - 28);
         ctx.stroke();
 
@@ -189,6 +161,7 @@ export default function LightBulbScene() {
         ctx.ellipse(x - 7, y - 8, 3, 9, -0.2, 0, Math.PI * 2);
         ctx.fill();
 
+        // Subtle outer halo close to bulb
         if (lightOn) {
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
@@ -215,7 +188,6 @@ export default function LightBulbScene() {
           const radius = 36 + t * 80; 
           const line = Math.max(0.5, 2 - t * 1.5);
           const color = `rgba(255, 179, 71, ${alpha})`;
-          const ctx = (canvasRef.current as HTMLCanvasElement).getContext("2d")!;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           ctx.filter = "blur(2px)"; 
@@ -228,81 +200,100 @@ export default function LightBulbScene() {
         }
       };
 
-      const animate = () => {
-        Engine.update(engine);
-        if (Math.abs(bulb.position.x - ceiling.position.x) > 0.1) {
-          Body.setPosition(bulb, { x: ceiling.position.x, y: bulb.position.y });
-        }
-        Body.setVelocity(bulb, { x: 0, y: bulb.velocity.y });
-        const x = ceiling.position.x;
-        const y = bulb.position.y;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const render = () => {
+        if (destroyed) return;
+        const canvas = canvasRef.current!;
+        const ctx2 = ctx; 
+        const x = anchorX;
+        const bob = lightOn ? Math.sin(performance.now() / 450) * 1.2 : 0;
+        const y = anchorY + currentLen + bob;
+        ctx2.clearRect(0, 0, canvas.width, canvas.height);
         drawRealisticLighting(x, y);
         drawBulb(x, y);
         drawRipple(x, y);
-        frameRaf = requestAnimationFrame(animate);
       };
 
-      const onResize = () => {
-        resize();
-        Body.setPosition(ceiling, { x: anchorX(), y: 40 });
-        baseLength = canvas.height / 2 - 62;
-        cord.length = Math.min(cord.length, Math.min(baseLength + 100, (canvas.height * 0.55) | 0));
-        Body.setPosition(bulb, { x: ceiling.position.x, y: bulb.position.y });
-        Body.setVelocity(bulb, { x: 0, y: 0 });
+      const loop = () => {
+        render();
+        if (animating || lightOn) {
+          frameRaf = requestAnimationFrame(loop);
+        } else {
+          frameRaf = 0;
+        }
       };
 
-      window.addEventListener("resize", onResize);
-      frameRaf = requestAnimationFrame(animate);
+      const startLoop = () => {
+        if (!frameRaf) frameRaf = requestAnimationFrame(loop);
+      };
 
+      const maybeStartLoop = () => {
+        if (lightOn || animating) startLoop();
+      };
+
+      const startAnimateTo = (len: number) => {
+        const from = currentLen;
+        const to = len;
+        animating = true;
+        cleanupTween?.();
+        cleanupTween = tween(from, to, 450, v => { currentLen = v; }, () => {
+          animating = false;
+          if (!lightOn) {
+            render();
+          }
+        });
+        startLoop();
+      };
+
+     
+      const longLen0 = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
+      const shortLen0 = 85;
+      currentLen = shortLen0;
+      targetLen = lightOn ? longLen0 : shortLen0;
+      if (lightOn) startAnimateTo(targetLen); else render();
+
+     
       const themeButton = document.querySelector('[data-theme-toggle]') as HTMLElement | null;
       const handleThemeClick = () => {
-        if (!cord) return;
-        const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
-        const shortLen = 85;
         requestAnimationFrame(() => {
-          const isDark = document.documentElement.classList.contains("dark");
-          const target = isDark ? longLen : shortLen;
-          const start = cord.length;
-          cleanupTween?.();
-          cleanupTween = tween(start, target, 450, (v) => (cord.length = v));
+          lightOn = document.documentElement.classList.contains("dark");
+          const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
+          const shortLen = 85;
+          targetLen = lightOn ? longLen : shortLen;
+          startAnimateTo(targetLen);
         });
       };
-
-      const disposeTimers: Array<() => void> = [];
       if (themeButton) themeButton.addEventListener("click", handleThemeClick);
 
       const observer = new MutationObserver(() => {
-        lightOn = document.documentElement.classList.contains("dark");
-        Body.setPosition(bulb, { x: ceiling.position.x, y: bulb.position.y });
-        Body.setVelocity(bulb, { x: 0, y: 0 });
+        const dark = document.documentElement.classList.contains("dark");
+        if (dark === lightOn) return;
+        lightOn = dark;
         const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
         const shortLen = 85;
-        const target = lightOn ? longLen : shortLen;
-        const start = cord.length;
-        cleanupTween?.();
-        cleanupTween = tween(start, target, 450, (v) => (cord.length = v));
+        targetLen = lightOn ? longLen : shortLen;
+        startAnimateTo(targetLen);
       });
       observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-      lightOn = document.documentElement.classList.contains("dark");
 
-      {
+      
+      const onResize = () => {
+        const wasLightOn = lightOn;
+        resize();
+        
         const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
         const shortLen = 85;
-        cord.length = shortLen;
-        Body.setPosition(bulb, { x: ceiling.position.x, y: ceiling.position.y + shortLen });
-        if (lightOn) {
-          cleanupTween?.();
-          cleanupTween = tween(shortLen, longLen, 450, (v) => (cord.length = v));
-        }
-      }
+        targetLen = wasLightOn ? longLen : shortLen;
+        currentLen = Math.min(Math.max(currentLen, shortLen), longLen);
+        maybeStartLoop();
+        render();
+      };
+      window.addEventListener("resize", onResize);
 
       disposeRef.current = () => {
         if (destroyed) return;
         destroyed = true;
-        cancelAnimationFrame(frameRaf);
+        if (frameRaf) cancelAnimationFrame(frameRaf);
         cleanupTween?.();
-        disposeTimers.forEach((fn) => fn());
         window.removeEventListener("resize", onResize);
         if (themeButton) themeButton.removeEventListener("click", handleThemeClick);
         observer.disconnect();
