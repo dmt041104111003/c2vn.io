@@ -22,6 +22,16 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [newLocationName, setNewLocationName] = useState('');
   const [newStartDate, setNewStartDate] = useState('');
+  const formatDateDMY = (val: string) => {
+    if (!val) return '';
+    const d = new Date(val);
+    if (isNaN(d.getTime())) {
+      const [y, m, day] = val.split('-');
+      if (y && m && day) return `${day.padStart(2,'0')}/${m.padStart(2,'0')}/${y}`;
+      return val;
+    }
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  };
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
 
   const createMutation = useMutation({
@@ -182,6 +192,9 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               title="Select start date"
             />
+            {newStartDate && (
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{formatDateDMY(newStartDate)}</p>
+            )}
           </div>
         </div>
         <div>
