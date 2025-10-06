@@ -591,7 +591,7 @@ export function TipTapEditor({ content, onChange, placeholder }: TipTapEditorPro
       }),
       Image.configure({
         HTMLAttributes: {
-          class: 'rounded-lg shadow-md',
+          class: 'max-w-full h-auto rounded-lg shadow-md mx-auto',
         },
       }),
       Table.configure({
@@ -635,6 +635,14 @@ export function TipTapEditor({ content, onChange, placeholder }: TipTapEditorPro
     editorProps: {
       attributes: {
         class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none max-w-none',
+      },
+      transformPastedHTML: (html: string) => {
+        try {
+          const cleaned = html.replace(/-(\d{2,5})x(\d{2,5})(?=\.(?:jpe?g|png|webp|gif)(?:[?#"']|\s|>))/gi, '');
+          return cleaned;
+        } catch {
+          return html;
+        }
       },
     },
     onUpdate: ({ editor }) => {

@@ -295,10 +295,10 @@ export const tiptapStyles = `
     color: #374151 !important;
   }
   
-  /* Editor Images: preserve pasted dimensions (disable Typography's max-width) */
+  /* Images */
   .ProseMirror img {
-    max-width: none !important;
-    image-rendering: auto;
+    max-width: 100%;
+    height: auto;
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
@@ -857,26 +857,12 @@ export const tiptapPreviewStyles = `
     color: #ffffff !important;
   }
   
-  /* Images: show at intrinsic size, no auto-resizing */
+  /* Images */
   .ProseMirror img {
-    width: auto !important;
-    height: auto !important;
-    max-width: none !important;
-    max-height: none !important;
-    image-rendering: auto;
+    max-width: 100%;
+    height: auto;
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  /* Override fixed dimensions coming from attributes or inline styles */
-  .ProseMirror img[width],
-  .ProseMirror img[height],
-  .ProseMirror img[style*="width"],
-  .ProseMirror img[style*="height"] {
-    width: auto !important;
-    height: auto !important;
-    max-width: none !important;
-    max-height: none !important;
   }
   
   /* Links - Responsive */
