@@ -129,15 +129,9 @@ export function handleEmojiConversion(text: string, cursorPosition: number): {
     for (const shortcut of sortedShortcuts) {
       if (textBeforeSpace.endsWith(shortcut)) {
         const beforeShortcut = textBeforeSpace.substring(0, textBeforeSpace.length - shortcut.length);
-        if (beforeShortcut.endsWith(' ')) {
-          convertedText = textBeforeSpace.substring(0, textBeforeSpace.length - shortcut.length - 1) + shortcut + ' ';
-          newCursorPosition = convertedText.length;
-          shouldConvert = false;
-        } else {
-          convertedText = textBeforeSpace.substring(0, textBeforeSpace.length - shortcut.length) + EMOJI_SHORTCUTS[shortcut] + ' ';
-          newCursorPosition = convertedText.length;
-          shouldConvert = true;
-        }
+        convertedText = beforeShortcut + EMOJI_SHORTCUTS[shortcut] + ' ';
+        newCursorPosition = convertedText.length;
+        shouldConvert = true;
         break;
       }
     }
