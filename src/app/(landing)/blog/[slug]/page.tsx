@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   let post: any = null;
   try {
-    const res = await fetch(`/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
+    const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
     if (res.ok) {
       const data = await res.json();
       post = data?.data ?? null;
@@ -29,14 +29,6 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     ? (post.media[0].url.startsWith('http') ? post.media[0].url : `${origin}${post.media[0].url}`)
     : `${origin}/images/common/loading.png`;
 
-  try {
-    const headResp = await fetch(image, { method: 'HEAD', cache: 'no-store' });
-    if (!headResp.ok) {
-      image = `${origin}/images/og-image.png`;
-    }
-  } catch {
-    image = `${origin}/images/og-image.png`;
-  }
 
   return {
     metadataBase: new URL(origin),
