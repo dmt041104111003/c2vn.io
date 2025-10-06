@@ -43,15 +43,33 @@ export default function CourseEditModal({
     if (isOpen) load();
   }, [isOpen]);
   useEffect(() => {
-    if (course) {
-      setName(course.name);
-      setImage(course.image || '');
-      setDescription(course.description || '');
-      setLocation(course.location || '');
-      setStartDate(course.startDate ? new Date(course.startDate).toISOString().slice(0, 16) : '');
-      setPublishStatus(course.publishStatus || 'DRAFT');
-    }
-  }, [course]);
+    const load = async () => {
+      if (!course?.id) return;
+      try {
+        const res = await fetch(`/api/admin/courses/${course.id}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const c = data?.data || course;
+        setName(c.name);
+        setImage(c.image || '');
+        setDescription(c.description || '');
+        setLocation(c.location || '');
+        if (c.startDate) {
+          const d = new Date(c.startDate);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          setStartDate(`${y}-${m}-${day}`);
+        } else {
+          setStartDate('');
+        }
+        setPublishStatus(c.publishStatus || 'DRAFT');
+        if (c.locationRel?.id) setSelectedLocationId(c.locationRel.id);
+        if (c.locationRel?.name) setLocationName(c.locationRel.name);
+      } catch {}
+    };
+    if (isOpen) load();
+  }, [course, isOpen]);
 
   
 

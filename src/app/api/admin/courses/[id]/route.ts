@@ -3,6 +3,25 @@ import { prisma } from '~/lib/prisma';
 import { withAdmin } from '~/lib/api-wrapper';
 import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 
+export const GET = withAdmin(async (req) => {
+  const id = req.nextUrl.pathname.split('/').pop();
+  if (!id) {
+    return NextResponse.json(createErrorResponse('Missing ID', 'MISSING_ID'), { status: 400 });
+  }
+  try {
+    const course = await (prisma as any).course.findUnique({
+      where: { id },
+      include: { locationRel: true },
+    });
+    if (!course) {
+      return NextResponse.json(createErrorResponse('Course not found', 'COURSE_NOT_FOUND'), { status: 404 });
+    }
+    return NextResponse.json(createSuccessResponse(course));
+  } catch (error) {
+    return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
+  }
+});
+
 export const PUT = withAdmin(async (req) => {
   const id = req.nextUrl.pathname.split('/').pop();
   if (!id) {
