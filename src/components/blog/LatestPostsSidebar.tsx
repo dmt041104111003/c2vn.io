@@ -26,7 +26,7 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
   const { data: postsData, isLoading } = useQuery({
     queryKey: ["latest-posts"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/posts?public=1&limit=3&sortBy=createdAt&sortOrder=desc");
+      const res = await fetch("/api/admin/posts?public=1&limit=5&sortBy=createdAt&sortOrder=desc");
       if (!res.ok) throw new Error('Failed to fetch latest posts');
       return res.json();
     },
@@ -41,7 +41,7 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
           <h4 className="text-base font-semibold text-gray-900 dark:text-white">Latest Posts</h4>
         </div>
         <div className="space-y-2">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-12 bg-gray-100/70 dark:bg-gray-800/70 rounded-md animate-pulse" />
           ))}
         </div>

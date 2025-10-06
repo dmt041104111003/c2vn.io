@@ -288,19 +288,19 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
       <BackgroundMotion />
       <Header />
       <div className="pt-20">
-        <div className="mx-auto max-w-4xl px-6 py-8 lg:px-8">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Blog
-          </Link>
-        </div>
         <div className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Main Content */}
             <article className="lg:col-span-3">
+              <div className="mb-8">
+                <Link
+                  href="/blog"
+                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Blog
+                </Link>
+              </div>
           <header className="mb-12">
             <div className="mb-6">
               <time className="text-sm text-gray-600 dark:text-gray-400">
