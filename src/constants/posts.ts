@@ -116,16 +116,16 @@ export interface ReactionCountProps {
 }
 
 export const REACTION_ICONS: Record<string, string> = {
-  LIKE: "👍",
-  like: "👍",
-  HEART: "❤️",
-  heart: "❤️",
-  HAHA: "😂",
-  haha: "😂",
-  WOW: "😮",
-  wow: "😮",
-  SAD: "😢",
-  sad: "😢",
-  ANGRY: "��",
-  angry: "😠"
+  LIKE: "/images/reaction/like.png",
+  like: "/images/reaction/like.png",
+  HEART: "/images/reaction/tym.png",
+  heart: "/images/reaction/tym.png",
+  HAHA: "/images/reaction/haha.png",
+  haha: "/images/reaction/haha.png",
+  WOW: "/images/reaction/wow.png",
+  wow: "/images/reaction/wow.png",
+  SAD: "/images/reaction/sad.png",
+  sad: "/images/reaction/sad.png",
+  ANGRY: "/images/reaction/angry.png",
+  angry: "/images/reaction/angry.png"
 }; 

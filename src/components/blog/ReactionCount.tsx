@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ReactionCountProps, REACTION_ICONS } from '~/constants/posts';
 
 export default function ReactionCount({ reactions }: ReactionCountProps) {
@@ -27,7 +28,13 @@ export default function ReactionCount({ reactions }: ReactionCountProps) {
               className="h-12 w-12 rounded-full bg-transparent border border-gray-700 flex items-center justify-center hover:scale-110 transition-transform"
               style={{ zIndex: topTypes.length - index }}
             >
-              <span className="text-lg">{REACTION_ICONS[type]}</span>
+              <Image
+                src={REACTION_ICONS[type]}
+                alt={type}
+                width={24}
+                height={24}
+                className="w-6 h-6"
+              />
             </div>
           ))}
         </div>

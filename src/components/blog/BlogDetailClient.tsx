@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, MessageCircle, Share2, ThumbsUp } from "lucide-react";
 import Header from "~/components/header";
 import ShareModal from "~/components/blog/ShareModal";
@@ -460,12 +461,12 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
                     >
                     <div className="flex items-center gap-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200/50 dark:border-gray-600/50 rounded-full px-6 py-4 shadow-2xl">
                       {[
-                        { emoji: "👍", label: "Like", color: "bg-blue-500", type: "LIKE" },
-                        { emoji: "❤️", label: "Love", color: "bg-red-500", type: "HEART" },
-                        { emoji: "😂", label: "Haha", color: "bg-yellow-500", type: "HAHA" },
-                        { emoji: "😮", label: "Wow", color: "bg-yellow-500", type: "WOW" },
-                        { emoji: "😢", label: "Sad", color: "bg-yellow-500", type: "SAD" },
-                        { emoji: "😠", label: "Angry", color: "bg-red-500", type: "ANGRY" },
+                        { image: "/images/reaction/like.png", label: "Like", color: "bg-blue-500", type: "LIKE" },
+                        { image: "/images/reaction/tym.png", label: "Love", color: "bg-red-500", type: "HEART" },
+                        { image: "/images/reaction/haha.png", label: "Haha", color: "bg-yellow-500", type: "HAHA" },
+                        { image: "/images/reaction/wow.png", label: "Wow", color: "bg-yellow-500", type: "WOW" },
+                        { image: "/images/reaction/sad.png", label: "Sad", color: "bg-yellow-500", type: "SAD" },
+                        { image: "/images/reaction/angry.png", label: "Angry", color: "bg-red-500", type: "ANGRY" },
                       ].map((reaction, index) => (
                         <motion.button
                           key={index}
@@ -485,9 +486,15 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
                           className={`w-14 h-14 rounded-full bg-transparent hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center text-gray-900 dark:text-gray-100 text-3xl group relative overflow-hidden ${currentUserReaction === reaction.type ? 'ring-4 ring-blue-400 scale-110' : 'hover:scale-125'} ${isReacting ? 'opacity-50 cursor-not-allowed' : ''}`}
                           aria-label={reaction.label}
                         >
-                          <span className="group-hover:scale-110 transition-transform duration-200">
-                            {reaction.emoji}
-                          </span>
+                          <div className="group-hover:scale-110 transition-transform duration-200">
+                            <Image
+                              src={reaction.image}
+                              alt={reaction.label}
+                              width={32}
+                              height={32}
+                              className="w-8 h-8"
+                            />
+                          </div>
                           <div className="absolute inset-0 bg-gray-100/5 dark:bg-gray-700/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full"></div>
                         </motion.button>
                       ))}
