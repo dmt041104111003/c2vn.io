@@ -247,36 +247,85 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
     );
   };
 
+  const getGridLayout = () => {
+    if (posts.length >= 5) {
+      return {
+        className: 'lg:grid-cols-3',
+        content: (
+          <>
+            <div className="lg:col-span-1 space-y-4">
+              {posts.slice(1, 6).map((post, index) => 
+                renderPostCard(post, index + 1, false)
+              )}
+            </div>
+            
+            <div className="lg:col-span-2 flex flex-col space-y-2">
+              {posts[0] && (
+                <div className="flex-1">
+                  {renderPostCard(posts[0], 0, true)}
+                </div>
+              )}
+              {posts[5] && (
+                <div className="flex-shrink-0">
+                  {renderPostCard(posts[5], 5, false, false, true)}
+                </div>
+              )}
+            </div>
+          </>
+        )
+      };
+    } else if (posts.length === 4) {
+      return {
+        className: 'lg:grid-cols-2',
+        content: (
+          <>
+            {posts.map((post, index) => 
+              renderPostCard(post, index, true, true) 
+            )}
+          </>
+        )
+      };
+    } else if (posts.length === 3) {
+      return {
+        className: 'lg:grid-cols-2',
+        content: (
+          <>
+            {posts.map((post, index) => 
+              renderPostCard(post, index, true, true) 
+            )}
+          </>
+        )
+      };
+    } else if (posts.length === 2) {
+      return {
+        className: 'lg:grid-cols-2',
+        content: (
+          <>
+            {posts.map((post, index) => 
+              renderPostCard(post, index, true, true) 
+            )}
+          </>
+        )
+      };
+    } else {
+      return {
+        className: 'lg:grid-cols-1',
+        content: (
+          <div className="space-y-6">
+            {posts.map((post, index) => 
+              renderPostCard(post, index, true, true) 
+            )}
+          </div>
+        )
+      };
+    }
+  };
+
+  const layout = getGridLayout();
+
   return (
-    <motion.section className={`grid gap-6 ${posts.length >= 6 ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
-      {posts.length >= 6 ? (
-        <>
-          <div className="lg:col-span-1 space-y-4">
-            {posts.slice(1, 6).map((post, index) => 
-              renderPostCard(post, index + 1, false)
-            )}
-          </div>
-          
-          <div className="lg:col-span-2 flex flex-col space-y-2">
-            {posts[0] && (
-              <div className="flex-1">
-                {renderPostCard(posts[0], 0, true)}
-              </div>
-            )}
-            {posts[5] && (
-              <div className="flex-shrink-0">
-                {renderPostCard(posts[5], 5, false, false, true)}
-              </div>
-            )}
-          </div>
-        </>
-      ) : (
-        <div className="space-y-6">
-          {posts.map((post, index) => 
-            renderPostCard(post, index, true, true) // true for fullWidth
-          )}
-        </div>
-      )}
+    <motion.section className={`grid gap-6 ${layout.className}`}>
+      {layout.content}
     </motion.section>
   );
 }
