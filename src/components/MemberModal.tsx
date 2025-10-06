@@ -1,10 +1,72 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 // import { StaticImageData } from "next/image";
 import { SimpleRichPreview } from "~/components/ui/simple-rich-editor";
-import { MemberModalProps } from '~/constants/members';
+import { MemberModalProps, MemberType } from '~/constants/members';
 
-export default function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
-  if (!member) return null;
+interface EnhancedMemberModalProps extends MemberModalProps {
+  members?: MemberType[];
+  initialIndex?: number;
+}
+
+export default function MemberModal({ member, members = [], initialIndex = 0, isOpen, onClose }: EnhancedMemberModalProps) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  
+  // Filter members that have valid data
+  const validMembers = members.filter(m => m && m.id);
+  const hasMultipleMembers = validMembers.length > 1;
+  
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentIndex(initialIndex);
+    }
+  }, [isOpen, initialIndex]);
+
+  const goToPrevious = useCallback(() => {
+    if (validMembers.length === 0) return;
+    setCurrentIndex((prev) => 
+      prev === 0 ? validMembers.length - 1 : prev - 1
+    );
+  }, [validMembers.length]);
+
+  const goToNext = useCallback(() => {
+    if (validMembers.length === 0) return;
+    setCurrentIndex((prev) => 
+      prev === validMembers.length - 1 ? 0 : prev + 1
+    );
+  }, [validMembers.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen || !hasMultipleMembers) return;
+      
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          goToPrevious();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          goToNext();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onClose();
+          break;
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [isOpen, hasMultipleMembers, goToPrevious, goToNext, onClose]);
+
+  // Use current member from slide or fallback to single member prop
+  const currentMember = hasMultipleMembers ? validMembers[currentIndex] : member;
+
+  if (!currentMember) return null;
 
   return (
     <AnimatePresence>
@@ -46,14 +108,18 @@ export default function MemberModal({ member, isOpen, onClose }: MemberModalProp
             <div className="bg-white dark:bg-gray-800 backdrop-blur-xl border border-gray-200 dark:border-gray-600 rounded-[40px] overflow-hidden shadow-2xl">
               <div className="flex h-96">
                 <div className="w-2/5 relative overflow-hidden">
-                  <motion.img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                    initial={{ scale: 1.1 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                  />
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={currentMember.id}
+                      src={currentMember.image}
+                      alt={currentMember.name}
+                      className="w-full h-full object-cover"
+                      initial={{ scale: 1.1, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.9, opacity: 0 }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                    />
+                  </AnimatePresence>
   
                   <div className="absolute top-4 left-4">
                     <div className="w-8 h-0.5 bg-gray-400/60 dark:bg-white/60 rounded-full"></div>
@@ -61,86 +127,109 @@ export default function MemberModal({ member, isOpen, onClose }: MemberModalProp
                   <div className="absolute bottom-4 left-4">
                     <div className="text-gray-200/90 dark:text-white/90 text-xs font-medium">Cardano2VN</div>
                   </div>
+
+                  {/* Navigation Arrows */}
+                  {hasMultipleMembers && (
+                    <>
+                      <button
+                        onClick={goToPrevious}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                        title="Previous member"
+                        aria-label="Previous member"
+                      >
+                        <ChevronLeft size={24} />
+                      </button>
+                      <button
+                        onClick={goToNext}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                        title="Next member"
+                        aria-label="Next member"
+                      >
+                        <ChevronRight size={24} />
+                      </button>
+                    </>
+                  )}
                 </div>
                 <div className="w-3/5 flex flex-col overflow-hidden">
                   <div className="p-8 overflow-y-auto flex-1 transparent-scrollbar">
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                      className="space-y-6"
-                    >
-                      <div>
-                        <motion.h2
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3, duration: 0.4 }}
-                          className="text-3xl font-bold text-gray-900 dark:text-white mb-3"
-                        >
-                          {member.name}
-                        </motion.h2>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4, duration: 0.4 }}
-                          className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
-                        >
-                          {member.role}
-                        </motion.div>
-                      </div>
+                    <AnimatePresence mode="wait">
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5, duration: 0.4 }}
-                        className="text-gray-600 dark:text-gray-300 leading-relaxed text-base"
+                        key={currentMember.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-6"
                       >
-                        <SimpleRichPreview content={member.description} />
-                      </motion.div>
-                      {member.skills && member.skills.length > 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.6, duration: 0.4 }}
-                          className="space-y-3"
-                        >
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Skills</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {member.skills.map((skill: string, index: number) => (
-                              <motion.span
-                                key={skill}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.7 + index * 0.1, duration: 0.3 }}
-                                className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
-                              >
-                                {skill}
-                              </motion.span>
-                            ))}
+                        <div>
+                          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                            {currentMember.name}
+                          </h2>
+                          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">
+                            {currentMember.role}
                           </div>
-                        </motion.div>
-                      )}
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8, duration: 0.4 }}
-                        className="space-y-2"
-                      >
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Contact</h3>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                            <div className="w-1.5 h-1.5 bg-gray-400/60 dark:bg-white/60 rounded-full"></div>
-                            <span>{member.email || "cardano2vn@gmail.com"}</span>
+                        </div>
+                        <div className="text-gray-600 dark:text-gray-300 leading-relaxed text-base">
+                          <SimpleRichPreview content={currentMember.description} />
+                        </div>
+                        {currentMember.skills && currentMember.skills.length > 0 && (
+                          <div className="space-y-3">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Skills</h3>
+                            <div className="flex flex-wrap gap-2">
+                              {currentMember.skills.map((skill: string, index: number) => (
+                                <span
+                                  key={skill}
+                                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-xs text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                            <div className="w-1.5 h-1.5 bg-gray-400/60 dark:bg-white/60 rounded-full"></div>
-                            <span>LinkedIn</span>
+                        )}
+                        <div className="space-y-2">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Contact</h3>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                              <div className="w-1.5 h-1.5 bg-gray-400/60 dark:bg-white/60 rounded-full"></div>
+                              <span>{currentMember.email || "cardano2vn@gmail.com"}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                              <div className="w-1.5 h-1.5 bg-gray-400/60 dark:bg-white/60 rounded-full"></div>
+                              <span>LinkedIn</span>
+                            </div>
                           </div>
                         </div>
                       </motion.div>
-                    </motion.div>
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
+
+              {/* Thumbnail Navigation */}
+              {hasMultipleMembers && (
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="flex gap-2 overflow-x-auto pb-1">
+                    {validMembers.map((member, index) => (
+                      <button
+                        key={member.id}
+                        onClick={() => setCurrentIndex(index)}
+                        className={`flex-shrink-0 w-12 h-12 rounded-md overflow-hidden border-2 transition-colors ${
+                          index === currentIndex
+                            ? "border-blue-500"
+                            : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
+                        }`}
+                      >
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
           
@@ -149,66 +238,65 @@ export default function MemberModal({ member, isOpen, onClose }: MemberModalProp
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 0.3 }}
             onClick={onClose}
-            className="absolute button"
+            className="absolute top-4 right-4 z-10 button"
+            title="Close modal"
+            aria-label="Close modal"
             style={{
-              position: 'absolute',
-              top: '8px',
-              right: '8px',
-              width: '4em',
-              height: '4em',
-              border: 'none',
-              background: 'rgba(180, 83, 107, 0.11)',
-              borderRadius: '5px',
-              transition: 'background 0.5s',
-              zIndex: 50
+              width: "4em",
+              height: "4em",
+              border: "none",
+              background: "rgba(180, 83, 107, 0.11)",
+              borderRadius: "5px",
+              transition: "background 0.5s",
+              zIndex: 50,
             }}
           >
-            <span 
+            <span
               className="X"
               style={{
                 content: "",
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                width: '2em',
-                height: '1.5px',
-                backgroundColor: 'rgb(255, 255, 255)',
-                transform: 'translateX(-50%) rotate(45deg)'
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "2em",
+                height: "1.5px",
+                backgroundColor: "rgb(255, 255, 255)",
+                transform: "translateX(-50%) rotate(45deg)",
               }}
             ></span>
-            <span 
+            <span
               className="Y"
               style={{
                 content: "",
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                width: '2em',
-                height: '1.5px',
-                backgroundColor: '#fff',
-                transform: 'translateX(-50%) rotate(-45deg)'
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "2em",
+                height: "1.5px",
+                backgroundColor: "#fff",
+                transform: "translateX(-50%) rotate(-45deg)",
               }}
             ></span>
-            <div 
+            <div
               className="close"
               style={{
-                position: 'absolute',
-                display: 'flex',
-                padding: '0.8rem 1.5rem',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transform: 'translateX(-50%)',
-                top: '-70%',
-                left: '50%',
-                width: '3em',
-                height: '1.7em',
-                fontSize: '12px',
-                backgroundColor: 'rgb(19, 22, 24)',
-                color: 'rgb(187, 229, 236)',
-                border: 'none',
-                borderRadius: '3px',
-                pointerEvents: 'none',
-                opacity: '0'
+                position: "absolute",
+                display: "flex",
+                padding: "0.8rem 1.5rem",
+                alignItems: "center",
+                justifyContent: "center",
+                transform: "translateX(-50%)",
+                top: "-70%",
+                left: "50%",
+                width: "3em",
+                height: "1.7em",
+                fontSize: "12px",
+                backgroundColor: "rgb(19, 22, 24)",
+                color: "rgb(187, 229, 236)",
+                border: "none",
+                borderRadius: "3px",
+                pointerEvents: "none",
+                opacity: "0",
               }}
             >
               Close

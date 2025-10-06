@@ -348,6 +348,12 @@ export default function MemberPageClient() {
     setSelectedMember(null);
   };
 
+  // Find the index of the selected member in the filtered members list
+  const getSelectedMemberIndex = () => {
+    if (!selectedMember) return 0;
+    return filteredMembers.findIndex((m: MemberType) => m && m.id === selectedMember.id);
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const ids = ['founding-team', 'about-section', 'our-cardano-team', 'members', 'contact'];
@@ -837,7 +843,15 @@ export default function MemberPageClient() {
       </motion.section>
 
       {/* Modal */}
-      {selectedMember && <MemberModal member={selectedMember} isOpen={isModalOpen} onClose={handleCloseModal} />}
+      {selectedMember && (
+        <MemberModal 
+          member={selectedMember} 
+          members={filteredMembers}
+          initialIndex={getSelectedMemberIndex()}
+          isOpen={isModalOpen} 
+          onClose={handleCloseModal} 
+        />
+      )}
     </main>
   );
 }
