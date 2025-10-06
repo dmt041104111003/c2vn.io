@@ -18,7 +18,7 @@ export default function BlogPageClient() {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
+  const pageSize = 7;
   
   useNotifications();
 

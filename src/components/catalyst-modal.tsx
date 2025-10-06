@@ -7,7 +7,6 @@ import Link from "next/link";
 // import { Project } from "~/constants/catalyst";
 import { ProjectModalProps } from "~/constants/catalyst";
 import CourseModalText from "~/components/home/CourseModalText";
-import CourseModalTitle from "~/components/home/CourseModalTitle";
 
 export default function ProjectModal({ project, isOpen, onClose }: ProjectModalProps) {
   const [mounted, setMounted] = useState(false);

@@ -248,7 +248,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
   };
 
   const getGridLayout = () => {
-    if (posts.length >= 5) {
+    if (posts.length >= 7) {
       return {
         className: 'lg:grid-cols-3',
         content: (
@@ -265,9 +265,9 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
                   {renderPostCard(posts[0], 0, true)}
                 </div>
               )}
-              {posts[5] && (
+              {posts[6] && (
                 <div className="flex-shrink-0">
-                  {renderPostCard(posts[5], 5, false, false, true)}
+                  {renderPostCard(posts[6], 6, false, false, true)}
                 </div>
               )}
             </div>

@@ -6,9 +6,9 @@ interface BlogSkeletonProps {
   postCount?: number;
 }
 
-export default function BlogSkeleton({ postCount = 6 }: BlogSkeletonProps) {
+export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
   const getSkeletonLayout = () => {
-    if (postCount >= 5) {
+    if (postCount >= 7) {
       return {
         className: 'lg:grid-cols-3',
         content: (
