@@ -257,87 +257,103 @@ export default function CourseSection() {
             <div className="space-y-4">
               {isLoading ? (
                 [...Array(6)].map((_, idx) => (
-                  <div key={idx} className="animate-pulse">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="h-16 w-16 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
-                          <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
-                        </div>
-                        <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.3 }}
+                    transition={{ duration: 0.6, delay: idx * 0.1 }}
+                    className="animate-pulse"
+                  >
+                    <div className="flex gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
+                      <div className="w-24 h-16 bg-gray-300 dark:bg-gray-700 rounded-lg flex-shrink-0"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                        <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))
-                             ) : paginatedCourses.length === 0 ? (
-                 <div className="text-center py-12">
-                   <div className="text-gray-500 dark:text-gray-400">
-                     <svg className="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                     </svg>
-                                           <p className="text-lg font-medium">No courses available</p>
-                      <p className="text-sm">Please check back later for new courses</p>
-                   </div>
-                 </div>
-               ) : (
-                 <>
-                   {paginatedCourses.map((course: Course) => (
-                                     <div
-                     key={course.id}
-                     className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-                     onClick={() => handleCourseClick(course)}
-                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="flex-shrink-0">
-                        <img
-                          src={course.image || "/images/common/loading.png"}
-                          alt={course.name}
-                          className="h-16 w-16 rounded-lg object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "/images/common/loading.png";
-                          }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                          {course.title || course.name}
-                        </h3>
-                        <div className="flex items-center mt-2 space-x-4 text-xs text-gray-500 dark:text-gray-400">
-                                                     <span>
-                             Created: {new Date(course.createdAt).toLocaleDateString("en-US", {
-                               day: "2-digit",
-                               month: "2-digit",
-                               year: "numeric"
-                             })}
-                           </span>
-                           <span>•</span>
+              ) : paginatedCourses.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-500 dark:text-gray-400">
+                    <svg className="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="text-lg font-medium">No courses available</p>
+                    <p className="text-sm">Please check back later for new courses</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {paginatedCourses.map((course: Course, idx: number) => (
+                    <motion.div
+                      key={course.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        duration: 0.6, 
+                        delay: idx * 0.1,
+                        ease: "easeOut"
+                      }}
+                      viewport={{ once: false, amount: 0.3 }}
+                      whileHover={{ 
+                        x: 4,
+                        transition: { duration: 0.2 }
+                      }}
+                      className="group"
+                    >
+                      <div 
+                        className="flex gap-4 p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
+                        onClick={() => handleCourseClick(course)}
+                      >
+                        <div className="relative w-24 h-16 flex-shrink-0 rounded-lg overflow-hidden">
+                          <img
+                            src={course.image || "/images/common/loading.png"}
+                            alt={course.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = "/images/common/loading.png";
+                            }}
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            {course.title || course.name}
+                          </h3>
+
+                          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                            <span>
+                              {new Date(course.createdAt).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric"
+                              })}
+                            </span>
+                            <span>•</span>
+                            <span className="text-blue-600 dark:text-blue-400 font-medium">View Course</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex-shrink-0">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                          {course.name}
-                        </span>
-                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {totalPages > 1 && (
+                    <div className="mt-8">
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        totalItems={allCourses.length}
+                        itemsPerPage={ITEMS_PER_PAGE}
+                        onPageChange={handlePageChange}
+                      />
                     </div>
-                  </div>
-                ))}
-                
-                {totalPages > 1 && (
-                  <div className="mt-8">
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      totalItems={allCourses.length}
-                      itemsPerPage={ITEMS_PER_PAGE}
-                      onPageChange={handlePageChange}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+                  )}
+                </>
+              )}
+            </div>
         )}
         </div>
       </section>
