@@ -10,6 +10,7 @@ import CommentSection from "~/components/blog/CommentSection";
 import ReactionCount from "~/components/blog/ReactionCount";
 import BlogDetailSkeleton from "~/components/blog/BlogDetailSkeleton";
 import RelatedPostsSlider from "~/components/blog/RelatedPostsSlider";
+import LatestPostsSidebar from "~/components/blog/LatestPostsSidebar";
 import { useSession } from "next-auth/react";
 import { useToastContext } from '~/components/toast-provider';
 import { TipTapPreview } from '~/components/ui/tiptap-preview';
@@ -296,7 +297,10 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
             Back to Blog
           </Link>
         </div>
-        <article className="mx-auto max-w-4xl px-6 pb-20 lg:px-8">
+        <div className="mx-auto max-w-7xl px-6 pb-20 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Main Content */}
+            <article className="lg:col-span-3">
           <header className="mb-12">
             <div className="mb-6">
               <time className="text-sm text-gray-600 dark:text-gray-400">
@@ -510,9 +514,9 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
             </div>
           </div>
 
-          <RelatedPostsSlider posts={relatedPosts} />
+              <RelatedPostsSlider posts={relatedPosts} />
 
-          <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
+              <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <div className="text-sm text-gray-600 dark:text-gray-400">
                 Published on {new Date(post.createdAt).toLocaleString("en-GB", {
@@ -531,7 +535,16 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
               </Link>
             </div>
           </footer>
-        </article>
+            </article>
+
+            {/* Sidebar */}
+            <aside className="lg:col-span-1">
+              <div className="sticky top-24">
+                <LatestPostsSidebar currentPostSlug={slug} />
+              </div>
+            </aside>
+          </div>
+        </div>
       </div>
       <ShareModal
         isOpen={showShareModal}
