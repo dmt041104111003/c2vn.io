@@ -13,13 +13,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 7000);
   try {
-    let res = await fetch(`/api/public/posts/${params.slug}`, {
+    let res = await fetch(`${origin}/api/public/posts/${params.slug}`, {
       cache: 'no-store',
       next: { revalidate: 0 },
       signal: controller.signal,
     });
     if (!res.ok) {
-      res = await fetch(`/api/admin/posts/${params.slug}?public=1`, {
+      res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, {
         cache: 'no-store',
         next: { revalidate: 0 },
         signal: controller.signal,
@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       post = data?.data ?? null;
     }
   } catch (err) {
+    console.error('Error fetching post for metadata:', err);
   } finally {
     clearTimeout(timeoutId);
   }
