@@ -16,10 +16,11 @@ export const PUT = withAdmin(async (req) => {
     return NextResponse.json(createErrorResponse('Name is required', 'MISSING_NAME'), { status: 400 });
   }
 
+  const normalizedName = String(name).trim();
   const existingCourse = await prisma.course.findFirst({
     where: {
-      name,
-      id: { not: id }
+      id: { not: id },
+      name: { equals: normalizedName, mode: 'insensitive' } as any,
     }
   });
 
@@ -27,13 +28,33 @@ export const PUT = withAdmin(async (req) => {
     return NextResponse.json(createErrorResponse('Course name already exists', 'COURSE_NAME_ALREADY_EXISTS'), { status: 400 });
   }
 
+  let finalLocation: string | null = location ? String(location).trim() : null;
+  if (finalLocation) {
+    const existingLocations = await prisma.course.findMany({
+      where: { location: { not: null } },
+      select: { location: true },
+    });
+    const set = new Set(
+      existingLocations
+        .map((c: { location: string | null }) => (c.location ? c.location.trim() : ''))
+        .filter(Boolean)
+        .map((v: string) => v.toLowerCase())
+    );
+    if (set.has(finalLocation.toLowerCase())) {
+      const match = existingLocations.find(
+        (c) => c.location && c.location.trim().toLowerCase() === finalLocation!.toLowerCase()
+      );
+      finalLocation = match?.location?.trim() || finalLocation;
+    }
+  }
+
   const updatedCourse = await prisma.course.update({
     where: { id },
     data: {
-      name,
+      name: normalizedName,
       image: image || null,
       description: description || null,
-      location: location || null,
+      location: finalLocation || null,
       startDate: startDate ? new Date(startDate) : null,
       publishStatus
     }

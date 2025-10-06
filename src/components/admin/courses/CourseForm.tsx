@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToastContext } from '~/components/toast-provider';
 import MediaInput from '~/components/ui/media-input';
@@ -19,8 +19,28 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const [newImage, setNewImage] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [newLocation, setNewLocation] = useState('');
+  const [locations, setLocations] = useState<string[]>([]);
+  const [useCustomLocation, setUseCustomLocation] = useState(false);
+  const [customLocation, setCustomLocation] = useState('');
   const [newStartDate, setNewStartDate] = useState('');
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
+  useEffect(() => {
+    const loadLocations = async () => {
+      try {
+        const res = await fetch('/api/admin/courses', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const list: any[] = Array.isArray(data?.data) ? data.data : [];
+        const names: string[] = list
+          .map((c: any) => (typeof c?.location === 'string' ? c.location.trim() : ''))
+          .filter((v: string) => v.length > 0);
+        const unique = Array.from(new Set(names)) as string[];
+        unique.sort((a: string, b: string) => a.localeCompare(b));
+        setLocations(unique as string[]);
+      } catch {}
+    };
+    loadLocations();
+  }, []);
 
   const createMutation = useMutation({
     mutationFn: async ({ name, image, description, location, startDate, publishStatus }: { name: string; image?: string; description?: string; location?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
@@ -75,11 +95,16 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       return;
     }
     
+    const finalLocation = useCustomLocation ? customLocation.trim() : newLocation.trim();
+    if (useCustomLocation && locations.some(l => l.toLowerCase() === finalLocation.toLowerCase())) {
+      showError('Location already exists. Please select it from the dropdown.');
+      return;
+    }
     createMutation.mutate({ 
       name: newName.trim(), 
       image: newImage, 
       description: newDescription.trim(), 
-      location: newLocation.trim() || undefined,
+      location: finalLocation || undefined,
       startDate: newStartDate || undefined,
       publishStatus: publishStatus 
     });
@@ -123,13 +148,37 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Location (Optional)
             </label>
-            <input
-              type="text"
-              value={newLocation}
-              onChange={(e) => setNewLocation(e.target.value)}
-              placeholder="Enter course location"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            {!useCustomLocation ? (
+              <select
+                value={newLocation}
+                onChange={(e) => setNewLocation(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Select location"
+              >
+                <option value="">Select a location</option>
+                {locations.map((loc) => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={customLocation}
+                onChange={(e) => setCustomLocation(e.target.value)}
+                placeholder="Enter new location"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            )}
+            <div className="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+              <input
+                id="toggle-custom-location-create"
+                type="checkbox"
+                checked={useCustomLocation}
+                onChange={(e) => setUseCustomLocation(e.target.checked)}
+                className="rounded"
+              />
+              <label htmlFor="toggle-custom-location-create">Enter a new location</label>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

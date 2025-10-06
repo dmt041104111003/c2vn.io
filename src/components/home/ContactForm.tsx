@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ContactFormData, FormErrors, ContactFormProps } from '~/constants/contact';
 import { Captcha } from '~/components/ui/captcha';
@@ -20,7 +20,6 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
           throw new Error('Failed to fetch courses');
         }
         const data = await response.json();
-        console.log('ContactForm courses fetched:', data?.data);
         return data?.data || [];
       } catch (error) {
         return []; 
@@ -30,7 +29,31 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
     gcTime: 10 * 60 * 1000, 
     refetchOnWindowFocus: false,
   });
-
+  const uniqueLocations: string[] = useMemo(() => {
+    const list: any[] = Array.isArray(courses) ? (courses as any[]) : [];
+    const names = list
+      .map((c: any) => (typeof c?.location === 'string' ? c.location : ''))
+      .filter((v: string) => v.length > 0);
+    const canonicalize = (s: string) =>
+      s
+        .normalize('NFKC')
+        .replace(/\u00A0/g, ' ') 
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+    const map = new Map<string, string>();
+    for (const raw of names) {
+      const display = raw
+        .normalize('NFKC')
+        .replace(/\u00A0/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!display) continue;
+      const key = canonicalize(display);
+      if (!map.has(key)) map.set(key, display);
+    }
+    return Array.from(map.values());
+  }, [courses]);
 
   return (
          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden max-w-2xl mx-auto">
@@ -126,9 +149,9 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
             >
               <option value="">Select Course Location</option>
-              {courses?.filter((course: any) => course.location && course.location.trim()).map((course: any) => (
-                <option key={course.id} value={course.location}>
-                  {course.location}
+              {uniqueLocations.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc}
                 </option>
               ))}
             </select>

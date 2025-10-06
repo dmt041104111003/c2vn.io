@@ -21,17 +21,35 @@ export const POST = withAdmin(async (req) => {
     return NextResponse.json(createErrorResponse('Missing course name', 'MISSING_NAME'), { status: 400 });
   }
   
-  const exist = await prisma.course.findFirst({ where: { name } });
+  const normalizedName = String(name).trim();
+  if (!normalizedName) {
+    return NextResponse.json(createErrorResponse('Missing course name', 'MISSING_NAME'), { status: 400 });
+  }
+  const exist = await prisma.course.findFirst({ where: { name: { equals: normalizedName, mode: 'insensitive' } } as any });
   if (exist) {
     return NextResponse.json(createErrorResponse('Course already exists', 'COURSE_EXISTS'), { status: 409 });
   }
   
+  let finalLocation: string | null = location ? String(location).trim() : null;
+  if (finalLocation) {
+    const existingLocations = await prisma.course.findMany({
+      where: { location: { not: null } },
+      select: { location: true },
+    });
+    const match = existingLocations.find(
+      (c) => c.location && c.location.trim().toLowerCase() === finalLocation!.toLowerCase()
+    );
+    if (match?.location) {
+      finalLocation = match.location.trim();
+    }
+  }
+
   const course = await prisma.course.create({
     data: { 
-      name, 
+      name: normalizedName, 
       image: image || null, 
       description: description || null, 
-      location: location || null,
+      location: finalLocation || null,
       startDate: startDate ? new Date(startDate) : null,
       publishStatus 
     }
