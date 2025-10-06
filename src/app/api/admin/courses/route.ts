@@ -5,8 +5,9 @@ import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 
 export const GET = withAdmin(async () => {
   try {
-    const courses = await prisma.course.findMany({
+    const courses = await (prisma as any).course.findMany({
       orderBy: { createdAt: 'desc' },
+      include: { locationRel: true },
     });
     return NextResponse.json(createSuccessResponse(courses));
   } catch (error) {
@@ -15,7 +16,7 @@ export const GET = withAdmin(async () => {
 });
 
 export const POST = withAdmin(async (req) => {
-  const { name, image, description, location, startDate, publishStatus } = await req.json();
+  const { name, image, description, location, locationId, locationName, startDate, publishStatus } = await req.json();
   
   if (!name) {
     return NextResponse.json(createErrorResponse('Missing course name', 'MISSING_NAME'), { status: 400 });
@@ -30,17 +31,29 @@ export const POST = withAdmin(async (req) => {
     return NextResponse.json(createErrorResponse('Course already exists', 'COURSE_EXISTS'), { status: 409 });
   }
   
-  const finalLocation: string | null = location ? String(location).trim() : null;
+  let finalLocation: string | null = location ? String(location).trim() : null;
+  let finalLocationId: string | null = locationId ? String(locationId) : null;
+  const desiredLocationName: string | null = locationName ? String(locationName).trim() : finalLocation;
+  if (!finalLocationId && desiredLocationName) {
+    const existing = await (prisma as any).location.findFirst({ where: { name: { equals: desiredLocationName, mode: 'insensitive' } } });
+    if (existing) {
+      finalLocationId = existing.id;
+    } else {
+      const created = await (prisma as any).location.create({ data: { name: desiredLocationName } });
+      finalLocationId = created.id;
+    }
+  }
 
-  const course = await prisma.course.create({
-    data: { 
+  const course = await (prisma as any).course.create({
+    data: ({ 
       name: normalizedName, 
       image: image || null, 
       description: description || null, 
       location: finalLocation || null,
+      locationId: finalLocationId,
       startDate: startDate ? new Date(startDate) : null,
       publishStatus 
-    }
+    } as any)
   });
   
   return NextResponse.json(createSuccessResponse(course));

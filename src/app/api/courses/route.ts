@@ -4,12 +4,13 @@ import { createSuccessResponse, createErrorResponse } from "~/lib/api-response";
 
 export async function GET() {
   try {
-    const courses = await prisma.course.findMany({
+    const courses = await (prisma as any).course.findMany({
       where: { 
         isActive: true,
         publishStatus: 'PUBLISHED'
       },
       orderBy: { createdAt: 'desc' },
+      include: { locationRel: true },
     });
     return NextResponse.json(createSuccessResponse(courses));
   } catch (error) {

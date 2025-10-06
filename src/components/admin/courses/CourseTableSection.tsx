@@ -23,11 +23,11 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, name, image, description, location, startDate, publishStatus }: { id: string; name: string; image?: string; description?: string; location?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
+    mutationFn: async ({ id, name, image, description, location, locationId, locationName, startDate, publishStatus }: { id: string; name: string; image?: string; description?: string; location?: string; locationId?: string; locationName?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
       const response = await fetch(`/api/admin/courses/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, image, description, location, startDate, publishStatus })
+        body: JSON.stringify({ name, image, description, location, locationId, locationName, startDate, publishStatus })
       });
       if (!response.ok) {
         const error = await response.json();
@@ -37,6 +37,7 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-locations'] });
       queryClient.invalidateQueries({ queryKey: ['contact-form-courses'] });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       queryClient.invalidateQueries({ predicate: (query) => 

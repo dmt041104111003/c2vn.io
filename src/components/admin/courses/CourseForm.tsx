@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToastContext } from '~/components/toast-provider';
 import MediaInput from '~/components/ui/media-input';
@@ -18,7 +18,9 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const [newName, setNewName] = useState('');
   const [newImage, setNewImage] = useState('');
   const [newDescription, setNewDescription] = useState('');
-  const [newLocation, setNewLocation] = useState('');
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [selectedLocationId, setSelectedLocationId] = useState('');
+  const [newLocationName, setNewLocationName] = useState('');
   const [newStartDate, setNewStartDate] = useState('');
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
 
@@ -48,7 +50,8 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       setNewName('');
       setNewImage('');
       setNewDescription('');
-      setNewLocation('');
+      setSelectedLocationId('');
+      setNewLocationName('');
       setNewStartDate('');
       setPublishStatus('DRAFT');
       showSuccess('Course created successfully');
@@ -75,15 +78,36 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       return;
     }
     
+    const isOther = selectedLocationId === '__OTHER__';
+    if (isOther) {
+      const exists = locations.some(l => l.name.trim().toLowerCase() === newLocationName.trim().toLowerCase());
+      if (exists) {
+        showError('Location name already exists. Please select it from the dropdown.');
+        return;
+      }
+    }
+
     createMutation.mutate({ 
       name: newName.trim(), 
       image: newImage, 
       description: newDescription.trim(), 
-      location: newLocation.trim() || undefined,
+      ...(selectedLocationId && selectedLocationId !== '__OTHER__' ? { locationId: selectedLocationId } : {} as any),
+      ...(isOther && newLocationName.trim() ? { locationName: newLocationName.trim() } : {} as any),
       startDate: newStartDate || undefined,
       publishStatus: publishStatus 
     });
   };
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/admin/locations');
+        if (!res.ok) return;
+        const data = await res.json();
+        setLocations(Array.isArray(data?.data) ? data.data : []);
+      } catch {}
+    };
+    load();
+  }, []);
 
   const handleMediaSelect = (media: { id: string; url: string; type: string }) => {
     setNewImage(media.url);
@@ -123,13 +147,29 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Location (Optional)
             </label>
-            <input
-              type="text"
-              value={newLocation}
-              onChange={(e) => setNewLocation(e.target.value)}
-              placeholder="Enter course location"
+            <select
+              value={selectedLocationId}
+              onChange={(e) => setSelectedLocationId(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+              aria-label="Select existing location"
+            >
+              <option value="">Select existing location</option>
+              {locations.map((l) => (
+                <option key={l.id} value={l.id}>{l.name}</option>
+              ))}
+              <option value="__OTHER__">Others...</option>
+            </select>
+            {selectedLocationId === '__OTHER__' && (
+              <div className="mt-2">
+                <input
+                  type="text"
+                  value={newLocationName}
+                  onChange={(e) => setNewLocationName(e.target.value)}
+                  placeholder="Enter new Location name (unique)"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

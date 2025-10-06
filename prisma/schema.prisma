@@ -287,7 +287,8 @@ model Course {
   name        String   @unique
   image       String?
   description String?
-  location    String?
+  locationId  String?
+  locationRel Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   startDate   DateTime?
   publishStatus  ProjectPublishStatus @default(DRAFT)
   isActive    Boolean  @default(true)
@@ -297,6 +298,16 @@ model Course {
   @@index([isActive])
   @@index([createdAt])
   @@index([publishStatus])
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  courses   Course[]
+
+  @@index([name])
 }
 
 model LandingContent {

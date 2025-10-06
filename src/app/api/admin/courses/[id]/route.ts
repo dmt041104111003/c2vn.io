@@ -10,7 +10,7 @@ export const PUT = withAdmin(async (req) => {
   }
 
   const body = await req.json();
-  const { name, image, description, location, startDate, publishStatus } = body;
+  const { name, image, description, location, locationId, locationName, startDate, publishStatus } = body;
 
   if (!name) {
     return NextResponse.json(createErrorResponse('Name is required', 'MISSING_NAME'), { status: 400 });
@@ -28,15 +28,27 @@ export const PUT = withAdmin(async (req) => {
     return NextResponse.json(createErrorResponse('Course name already exists', 'COURSE_NAME_ALREADY_EXISTS'), { status: 400 });
   }
 
-  const finalLocation: string | null = location ? String(location).trim() : null;
+  let finalLocation: string | null = location ? String(location).trim() : null;
+  let finalLocationId: string | null = locationId ? String(locationId) : null;
+  const desiredLocationName: string | null = locationName ? String(locationName).trim() : finalLocation;
+  if (!finalLocationId && desiredLocationName) {
+    const existing = await (prisma as any).location.findFirst({ where: { name: { equals: desiredLocationName, mode: 'insensitive' } } });
+    if (existing) {
+      finalLocationId = existing.id;
+    } else {
+      const created = await (prisma as any).location.create({ data: { name: desiredLocationName } });
+      finalLocationId = created.id;
+    }
+  }
 
-  const updatedCourse = await prisma.course.update({
+  const updatedCourse = await (prisma as any).course.update({
     where: { id },
     data: {
       name: normalizedName,
       image: image || null,
       description: description || null,
       location: finalLocation || null,
+      locationId: finalLocationId,
       startDate: startDate ? new Date(startDate) : null,
       publishStatus
     }

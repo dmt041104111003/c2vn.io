@@ -15,10 +15,23 @@ export default function CourseEditModal({
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [locationName, setLocationName] = useState('');
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [selectedLocationId, setSelectedLocationId] = useState('');
   
   const [startDate, setStartDate] = useState('');
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
-
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/admin/locations');
+        if (!res.ok) return;
+        const data = await res.json();
+        setLocations(Array.isArray(data?.data) ? data.data : []);
+      } catch {}
+    };
+    if (isOpen) load();
+  }, [isOpen]);
   useEffect(() => {
     if (course) {
       setName(course.name);
@@ -34,6 +47,11 @@ export default function CourseEditModal({
 
   const handleSave = () => {
     if (!course || !name.trim()) return;
+    const isOther = selectedLocationId === '__OTHER__';
+    if (isOther) {
+      const exists = locations.some(l => l.name.trim().toLowerCase() === locationName.trim().toLowerCase());
+      if (exists) return;
+    }
     onSave(course.id, name.trim(), publishStatus, image, description.trim(), location.trim(), startDate);
   };
 
@@ -72,13 +90,29 @@ export default function CourseEditModal({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Location (Optional)
             </label>
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Enter course location"
+            <select
+              value={selectedLocationId}
+              onChange={(e) => setSelectedLocationId(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+              aria-label="Select existing location"
+            >
+              <option value="">Select existing location</option>
+              {locations.map((l) => (
+                <option key={l.id} value={l.id}>{l.name}</option>
+              ))}
+              <option value="__OTHER__">Others...</option>
+            </select>
+            {selectedLocationId === '__OTHER__' && (
+              <div className="mt-2">
+                <input
+                  type="text"
+                  value={locationName}
+                  onChange={(e) => setLocationName(e.target.value)}
+                  placeholder="Enter new Location name (unique)"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

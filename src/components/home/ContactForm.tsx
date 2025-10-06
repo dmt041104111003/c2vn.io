@@ -149,11 +149,17 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
             >
               <option value="">Select Course Location</option>
-              {uniqueLocations.map((loc) => (
-                <option key={loc} value={loc}>
-                  {loc}
-                </option>
-              ))}
+              {Array.isArray(courses) && (courses as any[])
+                .map((c: any) => c.locationRel?.name)
+                .filter((v: any) => typeof v === 'string' && v.trim().length > 0)
+                .reduce((acc: string[], curr: string) => {
+                  const key = curr.trim().toLowerCase();
+                  if (!acc.some(a => a.toLowerCase() === key)) acc.push(curr.trim());
+                  return acc;
+                }, [])
+                .map((loc: string) => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
             </select>
           </div>
           
@@ -183,10 +189,10 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
                 if (onCourseChange) onCourseChange(e.target.value);
                 
                 const selectedCourse = courses?.find((course: any) => course.name === e.target.value);
-                if (selectedCourse?.location) {
+                if (selectedCourse?.locationRel?.name) {
                   const locationSelect = document.querySelector('select[name="event-location"]') as HTMLSelectElement;
                   if (locationSelect) {
-                    locationSelect.value = selectedCourse.location;
+                    locationSelect.value = selectedCourse.locationRel.name;
                     locationSelect.dispatchEvent(new Event('change', { bubbles: true }));
                   }
                 }
