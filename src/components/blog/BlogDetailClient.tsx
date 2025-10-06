@@ -11,6 +11,7 @@ import ReactionCount from "~/components/blog/ReactionCount";
 import BlogDetailSkeleton from "~/components/blog/BlogDetailSkeleton";
 import RelatedPostsSlider from "~/components/blog/RelatedPostsSlider";
 import LatestPostsSidebar from "~/components/blog/LatestPostsSidebar";
+import ServiceAdCard from "~/components/blog/ServiceAdCard";
 import { useSession } from "next-auth/react";
 import { useToastContext } from '~/components/toast-provider';
 import { TipTapPreview } from '~/components/ui/tiptap-preview';
@@ -539,8 +540,13 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
 
             {/* Sidebar */}
             <aside className="lg:col-span-1">
-              <div className="sticky top-24">
+              <div className="sticky top-24 space-y-6">
                 <LatestPostsSidebar currentPostSlug={slug} />
+                <ServiceAdCard 
+                  onDelegateService={() => {
+                    window.location.href = '/our-service';
+                  }}
+                />
               </div>
             </aside>
           </div>
