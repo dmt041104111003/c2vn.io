@@ -34,7 +34,7 @@ export default function LoginHeader() {
             alt="GitHub"
             width={16}
             height={16}
-            className="w-4 h-4 md:w-6 md:h-6"
+            className="w-4 h-4 md:w-6 md:h-6 rounded-full"
             loading="lazy"
           />
         </div>

@@ -78,6 +78,8 @@ export default function FloatingNotification({ children }: FloatingNotificationP
     setShowModal(false);
   };
 
+  const fmt = (d: Date) => d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+
   const getTooltipText = () => {
     if (!welcomeData?.data) {
       return "No event available";
@@ -92,9 +94,9 @@ export default function FloatingNotification({ children }: FloatingNotificationP
       
       if (startDate && endDate) {
         if (now >= startDate && now <= endDate) {
-          return `Event active until ${endDate.toLocaleDateString()}`;
+          return `Event active until ${fmt(endDate)}`;
         } else if (now < startDate) {
-          return `Event starts ${startDate.toLocaleDateString()}`;
+          return `Event starts ${fmt(startDate)}`;
         } else {
           return "Event has ended";
         }
@@ -102,11 +104,11 @@ export default function FloatingNotification({ children }: FloatingNotificationP
         if (now >= startDate) {
           return "Event is active (no end date)";
         } else {
-          return `Event starts ${startDate.toLocaleDateString()}`;
+          return `Event starts ${fmt(startDate)}`;
         }
       } else if (!startDate && endDate) {
         if (now <= endDate) {
-          return `Event active until ${endDate.toLocaleDateString()}`;
+          return `Event active until ${fmt(endDate)}`;
         } else {
           return "Event has ended";
         }
