@@ -473,7 +473,7 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ delay: index * 0.05, duration: 0.2 }}
-                          whileHover={{ scale: isReacting ? 1 : 1.2 }}
+                          whileHover={{ scale: isReacting ? 1 : 1.4 }}
                           whileTap={{ scale: isReacting ? 1 : 0.9 }}
                           onClick={async (e) => {
                             e.stopPropagation();
@@ -483,7 +483,7 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
                             }
                           }}
                           disabled={isReacting}
-                          className={`w-14 h-14 rounded-full bg-transparent hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center text-gray-900 dark:text-gray-100 text-3xl group relative overflow-hidden ${currentUserReaction === reaction.type ? 'ring-4 ring-blue-400 scale-110' : 'hover:scale-125'} ${isReacting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`w-14 h-14 rounded-full bg-transparent hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-all duration-200 flex items-center justify-center text-gray-900 dark:text-gray-100 text-3xl group relative overflow-hidden ${currentUserReaction === reaction.type ? 'ring-4 ring-blue-400 scale-110' : 'hover:scale-150'} ${isReacting ? 'opacity-50 cursor-not-allowed' : ''}`}
                           aria-label={reaction.label}
                         >
                           <div className="group-hover:scale-110 transition-transform duration-200">
