@@ -6,12 +6,12 @@ export const revalidate = 0;
 export const runtime = 'nodejs';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://website-sigma-ebon-96.vercel.app';
   const origin = envSiteUrl.replace(/\/$/, '');
 
   let post: any = null;
   try {
-    const res = await fetch(`/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 }, signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(2500) : undefined });
+    const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 }, signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(2500) : undefined });
     if (res.ok) {
       const data = await res.json();
       post = data?.data ?? null;
