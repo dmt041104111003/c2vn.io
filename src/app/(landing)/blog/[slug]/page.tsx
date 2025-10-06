@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { prisma } from '~/lib/prisma';
 import BlogDetailClient from '~/components/blog/BlogDetailClient';
 
 export const dynamic = 'force-dynamic';
@@ -11,28 +12,40 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const origin = envSiteUrl.replace(/\/$/, '');
 
   let post: any = null;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 7000);
   try {
-    let res = await fetch(`${origin}/api/public/posts/${params.slug}`, {
-      cache: 'no-store',
-      next: { revalidate: 0 },
-      signal: controller.signal,
+    const dbPost = await prisma.post.findUnique({
+      where: { slug: params.slug },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        status: true,
+        media: { select: { url: true, type: true, id: true } },
+        tags: { select: { tag: { select: { id: true, name: true } } } },
+        author: { select: { name: true } },
+      },
     });
-    if (!res.ok) {
-      res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, {
-        cache: 'no-store',
-        next: { revalidate: 0 },
-        signal: controller.signal,
-      });
-    }
-    if (res.ok) {
-      const data = await res.json();
-      post = data?.data ?? null;
+    if (dbPost && dbPost.status === 'PUBLISHED') {
+      const excerpt = dbPost.content
+        ? dbPost.content.replace(/<[^>]*>/g, '').substring(0, 150).trim() + (dbPost.content.length > 150 ? '...' : '')
+        : '';
+      post = {
+        id: dbPost.id,
+        title: dbPost.title,
+        slug: dbPost.slug,
+        excerpt,
+        createdAt: dbPost.createdAt,
+        updatedAt: dbPost.updatedAt,
+        media: Array.isArray(dbPost.media) ? dbPost.media : [],
+        tags: dbPost.tags?.map((t: any) => t.tag) || [],
+        author: dbPost.author?.name || 'Admin',
+        content: dbPost.content,
+      };
     }
   } catch (err) {
-  } finally {
-    clearTimeout(timeoutId);
   }
 
   const fallbackTitle = decodeURIComponent(params.slug)
