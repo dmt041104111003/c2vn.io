@@ -54,9 +54,47 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     .join(' ');
   const fallbackDescription = `${fallbackTitle} Cardano2vn.`;
 
-  const image = post?.media?.[0]?.url
-    ? (post.media[0].url.startsWith('http') ? post.media[0].url : `${origin}${post.media[0].url}`)
-    : `${origin}/images/og-image.png`;
+  const getYoutubeIdFromUrl = (url: string): string => {
+    const patterns = [
+      /(?:v=|vi=)([A-Za-z0-9_-]{11})/,
+      /(?:youtu\.be\/)([A-Za-z0-9_-]{11})/,
+      /(?:youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/,
+    ];
+    for (const re of patterns) {
+      const m = url.match(re);
+      if (m && m[1]) return m[1];
+    }
+    return '';
+  };
+
+  const pickImageUrl = (): string => {
+    const mediaList: any[] = Array.isArray(post?.media) ? post!.media : [];
+    const candidate = mediaList.find((m) => {
+      const url: string = m?.url || '';
+      const type: string = (m?.type || '').toString().toUpperCase();
+      const isYouTube = type === 'YOUTUBE' || /youtube|youtu\.be/.test(url);
+      const looksLikeImage = /(\.png|\.jpe?g|\.webp|\.gif)(\?|$)/i.test(url);
+      return !isYouTube && (looksLikeImage || type === 'IMAGE');
+    });
+    if (candidate?.url) {
+      return candidate.url.startsWith('http') ? candidate.url : `${origin}${candidate.url}`;
+    }
+    const yt = mediaList.find((m) => {
+      const url: string = m?.url || '';
+      const type: string = (m?.type || '').toString().toUpperCase();
+      return type === 'YOUTUBE' || /youtube|youtu\.be/.test(url);
+    });
+    if (yt) {
+      const url: string = yt.url || '';
+      const id = (yt.id && String(yt.id).length === 11) ? yt.id : getYoutubeIdFromUrl(url);
+      if (id) return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    }
+    if (post?.media?.[0]?.url) {
+      return post.media[0].url.startsWith('http') ? post.media[0].url : `${origin}${post.media[0].url}`;
+    }
+    return `${origin}/images/og-image.png`;
+  };
+  const image = pickImageUrl();
 
   const title = post?.title || fallbackTitle || 'Blog Detail | Cardano2vn';
   const description = post?.excerpt || post?.content?.slice(0, 150) || fallbackDescription;
@@ -74,6 +112,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       description,
       images: [
         { url: image, width: 1200, height: 630, alt: title },
+        { url: `${origin}/images/og-image.png`, width: 1200, height: 630, alt: `${title} (fallback)` },
       ],
       url: `${origin}/blog/${params.slug}`,
       type: 'article',
