@@ -6,7 +6,8 @@ export const revalidate = 0;
 export const runtime = 'nodejs';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://c2vn-io.vercel.app';
+  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL 
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
   const origin = envSiteUrl.replace(/\/$/, '');
 
   let post: any = null;
@@ -30,7 +31,6 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       post = data?.data ?? null;
     }
   } catch (err) {
-    console.error('Error fetching post for metadata:', err);
   } finally {
     clearTimeout(timeoutId);
   }
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     .split('-')
     .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w))
     .join(' ');
-  const fallbackDescription = `Xem chi tiết bài viết ${fallbackTitle} trên Cardano2vn.`;
+  const fallbackDescription = `${fallbackTitle} Cardano2vn.`;
 
   const image = post?.media?.[0]?.url
     ? (post.media[0].url.startsWith('http') ? post.media[0].url : `${origin}${post.media[0].url}`)
