@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 export default function BackToBottom() {
@@ -106,33 +107,40 @@ export default function BackToBottom() {
   };
 
   return (
-    <div
-      onClick={scrollToNextSection}
-      className={`fixed bottom-8 left-6 z-50 cursor-pointer transition-all duration-500 group ${
-        visible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-6 pointer-events-none"
-      }`}
-    >
-      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-        <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-nowrap relative">
-          {getTooltipText()}
-          <div className="absolute right-full top-1/2 -translate-y-1/2 border-r-4 border-r-gray-900 dark:border-r-gray-100 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
-        </div>
-      </div>
-      
-      <svg
-        viewBox="0 0 100 100"
-        className="w-16 h-16 text-gray-900 dark:text-gray-100 transition-transform duration-300 hover:translate-y-1"
-      >
-        <polygon
-          points="50,85 25,60 35,60 35,15 65,15 65,60 75,60"
-          className="fill-gray-900 dark:fill-gray-100"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          onClick={scrollToNextSection}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 24 }}
+          transition={{ duration: 0.25 }}
+          className="fixed bottom-8 left-6 z-50 cursor-pointer group"
+        >
+          <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+            <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-nowrap relative">
+              {getTooltipText()}
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-r-4 border-r-gray-900 dark:border-r-gray-100 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+            </div>
+          </div>
+
+          <motion.svg
+            viewBox="0 0 100 100"
+            className="w-16 h-16 text-gray-900 dark:text-gray-100"
+            whileHover={{ y: 4, scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <polygon
+              points="50,85 25,60 35,60 35,15 65,15 65,60 75,60"
+              className="fill-gray-900 dark:fill-gray-100"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          </motion.svg>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
