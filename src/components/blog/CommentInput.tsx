@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 
-import { EMOJIS } from "../../constants/emoji";
 import { CommentInputProps } from '~/constants/comment';
 import MentionAutocomplete from '~/components/ui/mention-autocomplete';
 import { 
@@ -13,6 +12,7 @@ import {
   calculateMentionPosition,
   formatMentionsForStorage
 } from '~/lib/mention-utils';
+import { convertTextToEmoji, EMOJI_CATEGORIES, handleEmojiConversion, convertTextToEmojiOnSubmit } from '~/lib/emoji-converter';
 
 export default function CommentInput({ onSubmit, user }: CommentInputProps) {
   const [commentText, setCommentText] = useState("");
@@ -22,6 +22,7 @@ export default function CommentInput({ onSubmit, user }: CommentInputProps) {
   const [mentionPosition, setMentionPosition] = useState({ x: 0, y: 0 });
   const [cursorPosition, setCursorPosition] = useState(0);
   const [mentionsInInput, setMentionsInInput] = useState<Array<{ id: string; name: string; displayName: string }>>([]);
+  const [activeEmojiCategory, setActiveEmojiCategory] = useState<string>('Faces');
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +52,8 @@ export default function CommentInput({ onSubmit, user }: CommentInputProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (commentText.trim()) {
-      const storageText = formatMentionsForStorage(commentText, mentionsInInput);
+      const convertedText = convertTextToEmojiOnSubmit(commentText);
+      const storageText = formatMentionsForStorage(convertedText, mentionsInInput);
       onSubmit(storageText, user);
       setCommentText("");
       setMentionsInInput([]);
@@ -63,27 +65,36 @@ export default function CommentInput({ onSubmit, user }: CommentInputProps) {
     const value = e.target.value;
     const cursorPos = e.target.selectionStart || 0;
     
-    setCommentText(value);
-    setCursorPosition(cursorPos);
+    const { convertedText, newCursorPosition, shouldConvert } = handleEmojiConversion(value, cursorPos);
     
-
-    if (hasMentionTrigger(value, cursorPos)) {
+    if (shouldConvert) {
+      setCommentText(convertedText);
+      setCursorPosition(newCursorPosition);
       
-      const query = extractMentionQuery(value, cursorPos);
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+      }, 0);
+    } else {
+      setCommentText(value);
+      setCursorPosition(cursorPos);
+    }
+    
+    if (hasMentionTrigger(convertedText, newCursorPosition)) {
+      const query = extractMentionQuery(convertedText, newCursorPosition);
       
       if (query !== null) {
         setMentionQuery(query);
         
         if (inputRef.current) {
-          const position = calculateMentionPosition(inputRef.current, cursorPos, value);
-          
+          const position = calculateMentionPosition(inputRef.current, newCursorPosition, convertedText);
           setMentionPosition(position);
         }
         
         setShowMentionDropdown(true);
       }
     } else {
-      
       setShowMentionDropdown(false);
     }
   };
@@ -185,28 +196,57 @@ export default function CommentInput({ onSubmit, user }: CommentInputProps) {
                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                    </svg>
                  </button>
-            
-                 {showEmojiPicker && (
-                   <div
-                     ref={emojiPickerRef}
-                     className="absolute z-50 right-10 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 shadow-lg"
-                   >
-                     <div className="grid grid-cols-8 gap-1">
-                       {EMOJIS.map((emoji, index) => (
-                         <button
-                           key={index}
-                           onClick={() => handleEmojiClick(emoji)}
-                           className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-lg"
-                           title={emoji}
-                         >
-                           {emoji}
-                         </button>
-                       ))}
-                     </div>
-                   </div>
-                 )}
                </div>
+               
+               {commentText && convertTextToEmoji(commentText) !== commentText && (
+                 <div className="mt-2 p-2 bg-gray-100 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Preview:</div>
+                   <div className="text-sm text-gray-700 dark:text-gray-300">
+                     {convertTextToEmoji(commentText)}
+                   </div>
+                 </div>
+               )}
              </form>
+            
+             {showEmojiPicker && (
+               <div
+                 ref={emojiPickerRef}
+                 className="absolute z-50 right-10 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg w-80"
+               >
+                 {/* Category Tabs */}
+                 <div className="flex border-b border-gray-200 dark:border-gray-700">
+                   {Object.keys(EMOJI_CATEGORIES).map((category) => (
+                     <button
+                       key={category}
+                       onClick={() => setActiveEmojiCategory(category)}
+                       className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                         activeEmojiCategory === category
+                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-b-2 border-blue-500'
+                           : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                       }`}
+                     >
+                       {category}
+                     </button>
+                   ))}
+                 </div>
+                 
+                 {/* Emoji Grid */}
+                 <div className="p-3 max-h-60 overflow-y-auto scrollbar-hide">
+                   <div className="grid grid-cols-8 gap-1">
+                     {Object.entries(EMOJI_CATEGORIES[activeEmojiCategory as keyof typeof EMOJI_CATEGORIES]).map(([shortcut, emoji], index) => (
+                       <button
+                         key={index}
+                         onClick={() => handleEmojiClick(emoji)}
+                         className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-lg"
+                         title={`${emoji} (${shortcut})`}
+                       >
+                         {emoji}
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+               </div>
+             )}
              
              <MentionAutocomplete
                isVisible={showMentionDropdown}
