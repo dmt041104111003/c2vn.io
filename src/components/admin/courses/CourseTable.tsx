@@ -112,36 +112,33 @@ export function CourseTable({
       >
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
-              <Trash2 className="w-5 h-5 text-red-600" />
+            <div className="flex items-center justify-center w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full">
+              <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Delete Course</h3>
-              <p className="text-sm text-gray-600">Are you sure you want to delete this course?</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete Course</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Are you sure you want to delete this course?</p>
             </div>
           </div>
-          
           {selectedCourseToDelete && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm text-gray-500">Course to delete:</p>
-              <p className="font-medium text-gray-900">{selectedCourseToDelete.name}</p>
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Course to delete:</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{selectedCourseToDelete.name}</p>
             </div>
           )}
-          
-          <p className="text-sm text-red-600 font-medium">
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium">
             This action cannot be undone.
           </p>
-          
           <div className="flex items-center justify-end gap-3 pt-4">
             <button
               onClick={() => setIsDeleteModalOpen(false)}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+              className="px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmDelete}
-              className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 rounded-lg font-medium transition-colors flex items-center gap-2"
             >
               <Trash2 className="w-4 h-4" />
               Delete
