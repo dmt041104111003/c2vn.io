@@ -10,27 +10,29 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const origin = envSiteUrl.replace(/\/$/, '');
 
   let post: any = null;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 7000);
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7000);
-    let res = await fetch(`${origin}/api/public/posts/${params.slug}`, {
+    let res = await fetch(`/api/public/posts/${params.slug}`, {
       cache: 'no-store',
       next: { revalidate: 0 },
       signal: controller.signal,
     });
     if (!res.ok) {
-      res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, {
+      res = await fetch(`/api/admin/posts/${params.slug}?public=1`, {
         cache: 'no-store',
         next: { revalidate: 0 },
         signal: controller.signal,
       });
     }
-    clearTimeout(timeoutId);
     if (res.ok) {
       const data = await res.json();
       post = data?.data ?? null;
     }
-  } catch {}
+  } catch (err) {
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   const fallbackTitle = decodeURIComponent(params.slug)
     .split('-')
