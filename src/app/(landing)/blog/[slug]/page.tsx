@@ -3,23 +3,39 @@ import { headers } from 'next/headers';
 import BlogDetailClient from '~/components/blog/BlogDetailClient';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const hdrs = await headers();
   const forwardedHost = hdrs.get('x-forwarded-host') || hdrs.get('host');
   const forwardedProto = hdrs.get('x-forwarded-proto') || 'https';
   const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  const envHost = envSiteUrl ? envSiteUrl.replace(/^https?:\/\//, '') : undefined;
-  const host = forwardedHost || envHost || 'localhost:3000';
-  const origin = `${forwardedProto}://${host}`;
+  const origin = envSiteUrl && /^https?:\/\//.test(envSiteUrl)
+    ? envSiteUrl.replace(/\/$/, '')
+    : `${forwardedProto}://${(forwardedHost || 'localhost:3000')}`;
 
-  const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store' });
-  const data = await res.json();
-  const post = data.data;
+  let post: any = null;
+  try {
+    const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
+    if (res.ok) {
+      const data = await res.json();
+      post = data?.data ?? null;
+    }
+  } catch {
+  }
 
-  const image = post?.media?.[0]?.url
+  let image = post?.media?.[0]?.url
     ? (post.media[0].url.startsWith('http') ? post.media[0].url : `${origin}${post.media[0].url}`)
     : `${origin}/images/common/loading.png`;
+
+  try {
+    const headResp = await fetch(image, { method: 'HEAD', cache: 'no-store' });
+    if (!headResp.ok) {
+      image = `${origin}/images/og-image.png`;
+    }
+  } catch {
+    image = `${origin}/images/og-image.png`;
+  }
 
   return {
     metadataBase: new URL(origin),
