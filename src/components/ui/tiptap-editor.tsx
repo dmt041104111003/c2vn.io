@@ -591,7 +591,7 @@ export function TipTapEditor({ content, onChange, placeholder }: TipTapEditorPro
       }),
       Image.configure({
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg shadow-md mx-auto',
+          class: 'rounded-lg shadow-md',
         },
       }),
       Table.configure({

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, MessageCircle, Share2, ThumbsUp } from "lucide-react";
+import { REACTION_ICONS } from "~/constants/posts";
 import Header from "~/components/header";
 import ShareModal from "~/components/blog/ShareModal";
 import CommentSection from "~/components/blog/CommentSection";
@@ -443,8 +444,12 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
                   disabled={isReacting}
                   className={`flex items-center justify-center gap-2 py-3 text-gray-600 dark:text-gray-400 transition-colors w-full ${currentUserReaction ? 'text-blue-600 dark:text-blue-400' : 'hover:text-blue-600 dark:hover:text-blue-400'} ${isReacting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <span className={`flex items-center justify-center text-2xl ${currentUserReaction ? 'scale-110' : 'hover:scale-110'}`} style={{ minWidth: 28, minHeight: 28 }}>
-                    {currentUserReaction ? REACTION_EMOJIS[currentUserReaction] || '👍' : <ThumbsUp className="h-5 w-5" />}
+                  <span className={`flex items-center justify-center ${currentUserReaction ? 'scale-110' : 'hover:scale-110'}`} style={{ minWidth: 28, minHeight: 28 }}>
+                    {currentUserReaction ? (
+                      <Image src={REACTION_ICONS[currentUserReaction]} alt={currentUserReaction} width={24} height={24} className="w-6 h-6" />
+                    ) : (
+                      <ThumbsUp className="h-5 w-5" />
+                    )}
                   </span>
                   <span className={`font-medium ml-1 ${currentUserReaction ? 'text-blue-600 dark:text-blue-400' : ''}`} style={{ lineHeight: '28px', fontSize: '18px' }}>
                     {currentUserReaction ? currentUserReaction.charAt(0) + currentUserReaction.slice(1).toLowerCase() : 'Like'}
