@@ -675,7 +675,12 @@ export default function Header() {
             className="flex items-center"
           >
             <Link href={routers.home} className="flex items-center gap-3">
-              <Logo compact className="h-10 w-auto" />
+              <div className="hidden sm:block">
+                <Logo layout="inline" size="md" />
+              </div>
+              <div className="sm:hidden">
+                <Logo compact className="h-10 w-auto" />
+              </div>
             </Link>
           </motion.section>
 

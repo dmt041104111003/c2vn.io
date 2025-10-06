@@ -1,4 +1,4 @@
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 // import { images } from "~/public/images";
 import { ThemeToggle } from "./ui/theme-toggle";
@@ -96,8 +96,8 @@ export default function Footer() {
           </div>
           <div className="mt-16 border-t border-white/10 pt-8">
             <div className="flex flex-col items-center justify-between md:flex-row">
-              <div className="mb-4 flex items-center gap-4 md:mb-0">
-                <Logo compact className="h-8 w-auto opacity-80" />
+              <div className="mb-4 flex items-center gap-3 md:mb-0">
+                <Logo layout="inline" size="sm" />
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <ThemeToggle />
