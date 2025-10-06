@@ -198,11 +198,17 @@ export default function CourseModal({ course, courses = [], initialIndex = 0, is
                             {currentCourse.name}
                           </span>
                           <span>
-                            Created: {new Date(currentCourse.createdAt).toLocaleDateString("en-US", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric"
-                            })}
+                            {(() => {
+                              const created = new Date(currentCourse.createdAt as unknown as string);
+                              const createdText = isNaN(created.getTime())
+                                ? "-"
+                                : created.toLocaleDateString("vi-VN", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  });
+                              return <>Created: {createdText}</>;
+                            })()}
                           </span>
                         </div>
                         
