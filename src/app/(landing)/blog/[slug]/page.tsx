@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   let post: any = null;
   try {
-    const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 }, signal: (AbortSignal as any).timeout ? (AbortSignal as any).timeout(2500) : undefined });
+    const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
     if (res.ok) {
       const data = await res.json();
       post = data?.data ?? null;
