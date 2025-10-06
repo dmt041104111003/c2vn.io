@@ -21,7 +21,13 @@ export const DELETE = withAdmin(async (req) => {
 export const PATCH = withAdmin(async (req) => {
   const id = req.nextUrl.pathname.split("/").pop();
   const body = await req.json();
-  const { isFeatured } = body;
+  const { isFeatured, videoUrl, title, channelName, thumbnailUrl } = body as {
+    isFeatured?: boolean;
+    videoUrl?: string;
+    title?: string;
+    channelName?: string;
+    thumbnailUrl?: string;
+  };
 
   if (!id) {
     return NextResponse.json(createErrorResponse('Missing video ID', 'MISSING_VIDEO_ID'), { status: 400 });
@@ -43,12 +49,67 @@ export const PATCH = withAdmin(async (req) => {
     }
   }
 
+  const data: Record<string, any> = {};
+  if (typeof isFeatured === "boolean") {
+    data.isFeatured = isFeatured;
+  }
+  if (typeof title === "string") {
+    data.title = title;
+  }
+  if (typeof channelName === "string") {
+    data.channelName = channelName;
+  }
+
+  if (typeof videoUrl === "string") {
+    const trimmedUrl = videoUrl.trim();
+    if (!trimmedUrl) {
+      return NextResponse.json(
+        createErrorResponse("Missing videoUrl", "MISSING_VIDEO_URL"),
+        { status: 400 }
+      );
+    }
+
+    const videoId = extractYouTubeVideoId(trimmedUrl);
+    if (!videoId) {
+      return NextResponse.json(
+        createErrorResponse("Invalid YouTube URL", "INVALID_YOUTUBE_URL"),
+        { status: 400 }
+      );
+    }
+
+    const existing = await prisma.videoSection.findFirst({
+      where: {
+        videoUrl: trimmedUrl,
+        NOT: { id },
+      },
+    });
+    if (existing) {
+      return NextResponse.json(
+        createErrorResponse("Video already exists", "VIDEO_ALREADY_EXISTS"),
+        { status: 409 }
+      );
+    }
+
+    data.videoUrl = trimmedUrl;
+    data.videoId = videoId;
+    data.thumbnailUrl =
+      typeof thumbnailUrl === "string" && thumbnailUrl.trim()
+        ? thumbnailUrl.trim()
+        : `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+  }
+
+  data.updatedAt = new Date();
+
   const updated = await prisma.videoSection.update({
     where: { id },
-    data: {
-      ...(isFeatured !== undefined && { isFeatured }),
-    },
+    data,
   });
 
   return NextResponse.json(createSuccessResponse(updated));
 });
+
+function extractYouTubeVideoId(url: string): string | null {
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+}
