@@ -9,6 +9,7 @@ import ShareModal from "~/components/blog/ShareModal";
 import CommentSection from "~/components/blog/CommentSection";
 import ReactionCount from "~/components/blog/ReactionCount";
 import BlogDetailSkeleton from "~/components/blog/BlogDetailSkeleton";
+import RelatedPostsSlider from "~/components/blog/RelatedPostsSlider";
 import { useSession } from "next-auth/react";
 import { useToastContext } from '~/components/toast-provider';
 import { TipTapPreview } from '~/components/ui/tiptap-preview';
@@ -88,6 +89,25 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
     enabled: !!slug && isLoggedIn
   });
   const currentUserReaction: string | null = currentUserReactionData?.data?.currentUserReaction || null;
+
+  const {
+    data: relatedPostsData,
+    isLoading: loadingRelatedPosts,
+  } = useQuery({
+    queryKey: ['related-posts', slug, post?.tags],
+    queryFn: async () => {
+      if (!post?.tags || post.tags.length === 0) return { data: [] };
+      
+      const tagNames = post.tags.map(tag => typeof tag === 'string' ? tag : tag.name);
+      const tagParams = tagNames.map(tag => `tags=${encodeURIComponent(tag)}`).join('&');
+      
+      const res = await fetch(`/api/admin/posts?public=1&${tagParams}&exclude=${slug}&limit=4`);
+      if (!res.ok) throw new Error('Failed to fetch related posts');
+      return res.json();
+    },
+    enabled: !!post?.tags && post.tags.length > 0
+  });
+  const relatedPosts = relatedPostsData?.data || [];
 
   useEffect(() => {
     if (!proseRef.current) return;
@@ -489,6 +509,8 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
               />
             </div>
           </div>
+
+          <RelatedPostsSlider posts={relatedPosts} />
 
           <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">

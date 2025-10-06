@@ -21,6 +21,8 @@ export async function GET(request: NextRequest) {
   const sortOrder = searchParams.get('sortOrder') || 'desc';
   const status = searchParams.get('status');
   const authorId = searchParams.get('authorId');
+  const tags = searchParams.getAll('tags');
+  const exclude = searchParams.get('exclude');
 
   try {
     let where: any = {};
@@ -42,6 +44,27 @@ export async function GET(request: NextRequest) {
     if (authorId) {
       where.authorId = authorId;
     }
+
+    if (tags.length > 0) {
+      where.tags = {
+        some: {
+          tag: {
+            name: {
+              in: tags
+            }
+          }
+        }
+      };
+    }
+
+    if (exclude) {
+      where.NOT = {
+        OR: [
+          { id: exclude },
+          { slug: exclude }
+        ]
+      };
+    }
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
         where,
@@ -52,6 +75,7 @@ export async function GET(request: NextRequest) {
           id: true,
           title: true,
           slug: true,
+          content: true,
           status: true,
           shares: true,
           createdAt: true,
@@ -71,10 +95,15 @@ export async function GET(request: NextRequest) {
       for (const r of post.reactions) {
         reactionCount[r.type] = (reactionCount[r.type] || 0) + 1;
       }
+      const excerpt = post.content 
+        ? post.content.replace(/<[^>]*>/g, '').substring(0, 150).trim() + (post.content.length > 150 ? '...' : '')
+        : '';
+
       return {
         id: post.id,
         title: post.title,
         slug: post.slug || post.id,
+        excerpt,
         status: post.status,
         shares: post.shares,
         createdAt: post.createdAt,
@@ -90,7 +119,7 @@ export async function GET(request: NextRequest) {
             )
           : [],
         author: post.author?.name || 'Admin',
-        tags: post.tags?.map(t => t.tag) || [],
+        tags: post.tags?.map((t: any) => t.tag) || [],
         ...reactionCount,
       };
     });
