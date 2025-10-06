@@ -68,12 +68,12 @@ export default function LightBulbScene() {
       ctx.clearRect(0, 0, c.width, c.height);
       drawRealisticLighting(x, y);
       drawBulb(x, y);
-      if (now < activeUntil && lightOn) drawRipple(x, y);
+      if (lightOn) drawRipple(x, y);
     }
 
     function loop() {
       render();
-      if (animating || (lightOn && performance.now() < activeUntil)) {
+      if (animating || lightOn) {
         frameRaf = requestAnimationFrame(loop);
       } else {
         frameRaf = 0;
@@ -108,17 +108,25 @@ export default function LightBulbScene() {
     };
 
     const drawRealisticLighting = (x: number, y: number) => {
-      brightness += (lightOn ? 1 : 0 - brightness) * 0.08;
+      if (!lightOn) return;
+      brightness += (1 - brightness) * 0.08;
       if (brightness <= 0.01) return;
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, 520);
-      gradient.addColorStop(0, `rgba(255, 240, 200, ${0.45 * brightness})`);
-      gradient.addColorStop(0.4, `rgba(255, 220, 170, ${0.18 * brightness})`);
-      gradient.addColorStop(1, "rgba(150, 120, 100, 0)");
+      const g1 = ctx.createRadialGradient(x, y, 0, x, y, 600);
+      g1.addColorStop(0, `rgba(200, 220, 255, ${0.18 * brightness})`);
+      g1.addColorStop(0.5, `rgba(170, 200, 255, ${0.05 * brightness})`);
+      g1.addColorStop(1, "rgba(120, 150, 220, 0)");
+      const g2 = ctx.createRadialGradient(x, y, 0, x, y, 760);
+      g2.addColorStop(0, `rgba(200, 220, 255, ${0.04 * brightness})`);
+      g2.addColorStop(1, "rgba(120, 150, 220, 0)");
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
-      ctx.fillStyle = gradient;
+      ctx.fillStyle = g1;
       ctx.beginPath();
-      ctx.arc(x, y, 520, 0, Math.PI * 2);
+      ctx.arc(x, y, 600, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.arc(x, y, 760, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalCompositeOperation = "source-over";
       ctx.restore();
@@ -173,14 +181,14 @@ export default function LightBulbScene() {
 
       const r = 20;
       const grd = ctx.createRadialGradient(x - 6, y - 8, 2, x, y, r);
-      grd.addColorStop(0, lightOn ? "rgba(255,255,255,0.95)" : "rgba(235,235,235,0.9)");
-      grd.addColorStop(0.55, lightOn ? "rgba(255,250,230,0.7)" : "rgba(230,230,230,0.6)");
-      grd.addColorStop(1, "rgba(200,200,200,0.25)");
+      grd.addColorStop(0, lightOn ? "rgba(220,230,255,0.85)" : "rgba(235,235,235,0.88)");
+      grd.addColorStop(0.55, lightOn ? "rgba(200,220,255,0.50)" : "rgba(230,230,230,0.55)");
+      grd.addColorStop(1, "rgba(200,200,200,0.20)");
       ctx.fillStyle = grd;
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = "rgba(180,180,180,0.6)";
+      ctx.strokeStyle = "rgba(180,180,180,0.5)";
       ctx.lineWidth = 1;
       ctx.stroke();
 
@@ -195,10 +203,10 @@ export default function LightBulbScene() {
 
       ctx.save();
       if (lightOn) {
-        ctx.shadowColor = "#ffb347";
-        ctx.shadowBlur = 6;
-        ctx.strokeStyle = "#ffb347";
-        ctx.lineWidth = 1.3;
+        ctx.shadowColor = "#7bb8ff";
+        ctx.shadowBlur = 3;
+        ctx.strokeStyle = "#7bb8ff";
+        ctx.lineWidth = 1.1;
       } else {
         ctx.shadowBlur = 0;
         ctx.strokeStyle = "#888";
@@ -212,7 +220,7 @@ export default function LightBulbScene() {
       ctx.stroke();
       ctx.restore();
 
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.fillStyle = "rgba(255,255,255,0.35)";
       ctx.beginPath();
       ctx.ellipse(x - 7, y - 8, 3, 9, -0.2, 0, Math.PI * 2);
       ctx.fill();
@@ -220,12 +228,12 @@ export default function LightBulbScene() {
       if (lightOn) {
         ctx.save();
         ctx.globalCompositeOperation = "lighter";
-        const halo = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 1.5);
-        halo.addColorStop(0, "rgba(255, 210, 150, 0.22)");
-        halo.addColorStop(1, "rgba(255, 210, 150, 0)");
+        const halo = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 1.7);
+        halo.addColorStop(0, "rgba(140, 190, 255, 0.10)");
+        halo.addColorStop(1, "rgba(140, 190, 255, 0)");
         ctx.fillStyle = halo;
         ctx.beginPath();
-        ctx.arc(x, y, r * 1.5, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 1.7, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
       }
@@ -235,13 +243,13 @@ export default function LightBulbScene() {
 
     const drawRipple = (x: number, y: number) => {
       const now = performance.now();
-      const period = 1000;
+      const period = 1100;
       const waves = 1;
       for (let k = 0; k < waves; k++) {
         const t = ((now + k * (period / 2)) % period) / period;
-        const alpha = (1 - t) * 0.14;
-        const radius = 32 + t * 70;
-        const line = Math.max(0.5, 1.6 - t * 1.2);
+        const alpha = (1 - t) * 0.09;
+        const radius = 34 + t * 76;
+        const line = Math.max(0.4, 1.4 - t * 1.1);
         const color = `rgba(255, 179, 71, ${alpha})`;
         ctx.save();
         ctx.globalCompositeOperation = "lighter";
