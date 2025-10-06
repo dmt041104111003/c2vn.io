@@ -126,21 +126,24 @@ export default function ProtocolSection() {
             </nav>
           </div>
 
-          <div className="grid max-w-none gap-16 lg:grid-cols-3">
+          <div className="space-y-4">
             {isLoading ? (
               [...Array(3)].map((_, idx) => (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 40 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 0.6, delay: idx * 0.2 }}
+                  transition={{ duration: 0.6, delay: idx * 0.1 }}
                   className="animate-pulse"
                 >
-                  <div className="bg-gray-300 dark:bg-gray-700 rounded-lg h-48 mb-4"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-                  <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+                  <div className="flex gap-4 p-4 border-b border-gray-200 dark:border-gray-700">
+                    <div className="w-24 h-16 bg-gray-300 dark:bg-gray-700 rounded-lg flex-shrink-0"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
+                    </div>
+                  </div>
                 </motion.div>
               ))
             ) : (
@@ -148,94 +151,89 @@ export default function ProtocolSection() {
                 post ? (
                   <motion.div
                     key={post.id}
-                    initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ 
                       duration: 0.6, 
-                      delay: idx * 0.2,
+                      delay: idx * 0.1,
                       ease: "easeOut"
                     }}
                     viewport={{ once: false, amount: 0.3 }}
                     whileHover={{ 
-                      y: -8,
-                      transition: { duration: 0.3 }
+                      x: 4,
+                      transition: { duration: 0.2 }
                     }}
-                    className="flex flex-col"
+                    className="group"
                   >
-                    <div className="rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl h-full flex flex-col overflow-hidden">
-                      <Link className="flex-1 flex flex-col" href={`/blog/${post.slug || post.id}`}>
-                        {/* Image Section - Fixed height */}
-                        <div className="relative h-48 overflow-hidden">
-                          <img
-                            alt={post.title}
-                            loading="lazy"
-                            className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                            src={(() => {
-                              const media = post.media?.[0];
-                              if (media && typeof media.url === 'string' && media.url) {
-                                const youtubeId = getYoutubeIdFromUrl(media.url);
-                                if (youtubeId) {
-                                  return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
-                                }
-                                return media.url;
+                    <Link 
+                      href={`/blog/${post.slug || post.id}`}
+                      className="flex gap-4 p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                    >
+                      {/* Thumbnail */}
+                      <div className="relative w-24 h-16 flex-shrink-0 rounded-lg overflow-hidden">
+                        <img
+                          alt={post.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          src={(() => {
+                            const media = post.media?.[0];
+                            if (media && typeof media.url === 'string' && media.url) {
+                              const youtubeId = getYoutubeIdFromUrl(media.url);
+                              if (youtubeId) {
+                                return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
                               }
-                              return "/images/common/loading.png";
-                            })()}
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = "/images/common/loading.png";
-                            }}
-                          />
-                        </div>
+                              return media.url;
+                            }
+                            return "/images/common/loading.png";
+                          })()}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/images/common/loading.png";
+                          }}
+                        />
+                      </div>
 
-                        {/* Content Section - Compact */}
-                        <div className="p-4 flex flex-col">
-                          {/* Tags */}
-                          {Array.isArray(post.tags) && post.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-2">
-                              {post.tags.slice(0, 2).map((tag: any) => (
-                                <span
-                                  key={tag.id}
-                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300"
-                                >
-                                  {tag.name}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        {/* Title */}
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {post.title}
+                        </h3>
 
-                          {/* Title - Compact */}
-                          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                            {post.title}
-                          </h3>
-
-                          {/* Footer - Compact */}
-                          <div className="text-xs text-gray-600 dark:text-gray-400">
-                            <div className="flex items-center justify-between">
-                              <span className="font-mono">
-                                {new Date(post.createdAt).toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric"
-                                })}
+                        {/* Meta */}
+                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                          <span>
+                            {new Date(post.createdAt).toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric"
+                            })}
+                          </span>
+                          {post.totalComments > 0 && (
+                            <>
+                              <span>•</span>
+                              <span className="flex items-center gap-1">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                {post.totalComments}
                               </span>
-                              <span className="text-blue-600 dark:text-blue-400 font-medium">Read More</span>
-                            </div>
-                          </div>
+                            </>
+                          )}
                         </div>
-                      </Link>
-                    </div>
+                      </div>
+                    </Link>
                   </motion.div>
                 ) : (
                   <motion.div
                     key={idx}
-                    initial={{ opacity: 0, y: 40 }}
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: idx * 0.2 }}
+                    transition={{ duration: 0.6, delay: idx * 0.1 }}
                     viewport={{ once: false, amount: 0.3 }}
-                    className="rounded-xl shadow-lg bg-white dark:bg-gray-800 p-6 flex items-center justify-center"
+                    className="flex gap-4 p-4 border-b border-gray-200 dark:border-gray-700 items-center justify-center"
                   >
-                    <img src="/images/common/loading.png" alt="Loading" width={120} height={120} />
+                    <img src="/images/common/loading.png" alt="Loading" width={60} height={40} />
                   </motion.div>
                 )
               )
