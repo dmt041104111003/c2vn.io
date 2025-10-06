@@ -30,22 +30,28 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     : `${origin}/images/common/loading.png`;
 
 
+  const fallbackTitle = decodeURIComponent(params.slug)
+    .split('-')
+    .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+    .join(' ');
+  const fallbackDescription = 'Read this article on Cardano2vn.';
+
   return {
     metadataBase: new URL(origin),
-    title: post?.title || 'Blog Detail | Cardano2vn',
-    description: post?.excerpt || post?.content?.slice(0, 150) || '',
+    title: post?.title || fallbackTitle || 'Blog Detail | Cardano2vn',
+    description: post?.excerpt || post?.content?.slice(0, 150) || fallbackDescription,
     alternates: {
       canonical: `${origin}/blog/${params.slug}`,
     },
     openGraph: {
-      title: post?.title || 'Blog Detail | Cardano2vn',
-      description: post?.excerpt || post?.content?.slice(0, 150) || '',
+      title: post?.title || fallbackTitle || 'Blog Detail | Cardano2vn',
+      description: post?.excerpt || post?.content?.slice(0, 150) || fallbackDescription,
       images: [
         {
           url: image,
           width: 1200,
           height: 630,
-          alt: post?.title || 'Blog Detail | Cardano2vn',
+          alt: post?.title || fallbackTitle || 'Blog Detail | Cardano2vn',
         },
       ],
       url: `${origin}/blog/${params.slug}`,
@@ -53,8 +59,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     },
     twitter: {
       card: 'summary_large_image',
-      title: post?.title || 'Blog Detail | Cardano2vn',
-      description: post?.excerpt || post?.content?.slice(0, 150) || '',
+      title: post?.title || fallbackTitle || 'Blog Detail | Cardano2vn',
+      description: post?.excerpt || post?.content?.slice(0, 150) || fallbackDescription,
       images: [image],
     }
   };
