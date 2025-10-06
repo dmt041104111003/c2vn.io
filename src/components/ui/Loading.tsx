@@ -20,11 +20,11 @@ export default function Loading() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-white transition-opacity">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-white dark:bg-gray-900 transition-opacity">
       <div className="pointer-events-none select-none fixed right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-0 opacity-20">
-        <div className="relative w-[900px] h-[900px] sm:w-[1500px] sm:h-[1500px] md:w-[2400px] md:h-[2400px] rounded-full bg-gradient-to-br from-[#00A3FF]/10 to-[#003C8C]/10">
-          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-[#00A3FF]/20 to-[#003C8C]/20">
-            <div className="absolute inset-4 rounded-full bg-gradient-to-br from-[#00A3FF]/30 to-[#003C8C]/30">
+        <div className="relative w-[900px] h-[900px] sm:w-[1500px] sm:h-[1500px] md:w-[2400px] md:h-[2400px] rounded-full bg-gradient-to-br from-[#00A3FF]/10 to-[#003C8C]/10 dark:from-[#00A3FF]/20 dark:to-[#003C8C]/20">
+          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-[#00A3FF]/20 to-[#003C8C]/20 dark:from-[#00A3FF]/30 dark:to-[#003C8C]/30">
+            <div className="absolute inset-4 rounded-full bg-gradient-to-br from-[#00A3FF]/30 to-[#003C8C]/30 dark:from-[#00A3FF]/40 dark:to-[#003C8C]/40">
               <div className="absolute inset-4 rounded-full overflow-hidden flex items-center justify-center">
                 <img
                   src="/images/common/loading.png"
@@ -46,16 +46,16 @@ export default function Loading() {
             draggable={false}
           />
         </div>
-        <div className="text-[32px] font-bold text-[#003C8C] mb-2">CARDANO2VN.IO</div>
-        <div className="text-xl text-[#666666] tracking-[0.2em] uppercase">BREAK THE BLOCKS</div>
+        <div className="text-[32px] font-bold text-[#003C8C] dark:text-[#00A3FF] mb-2">CARDANO2VN.IO</div>
+        <div className="text-xl text-[#666666] dark:text-gray-400 tracking-[0.2em] uppercase">BREAK THE BLOCKS</div>
         <div className="mt-6 flex flex-col items-center space-y-2">
-          <div className="w-48 h-1 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-48 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#00A3FF] rounded-full transition-all duration-100"
+              className="h-full bg-[#00A3FF] dark:bg-[#00A3FF] rounded-full transition-all duration-100"
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <div className="text-sm text-[#666666]">{progress}%</div>
+          <div className="text-sm text-[#666666] dark:text-gray-400">{progress}%</div>
         </div>
       </div>
     </div>
