@@ -299,8 +299,23 @@ export const tiptapStyles = `
   .ProseMirror img {
     max-width: 100%;
     height: auto;
+    width: auto;
+    object-fit: contain;
+    image-rendering: auto;
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Override fixed dimensions coming from attributes or inline styles */
+  .ProseMirror img[width],
+  .ProseMirror img[height],
+  .ProseMirror img[style*="width"],
+  .ProseMirror img[style*="height"] {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    object-fit: contain !important;
   }
   
   /* Links - Responsive */
@@ -861,8 +876,23 @@ export const tiptapPreviewStyles = `
   .ProseMirror img {
     max-width: 100%;
     height: auto;
+    width: auto;
+    object-fit: contain;
+    image-rendering: auto;
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Override fixed dimensions coming from attributes or inline styles */
+  .ProseMirror img[width],
+  .ProseMirror img[height],
+  .ProseMirror img[style*="width"],
+  .ProseMirror img[style*="height"] {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    object-fit: contain !important;
   }
   
   /* Links - Responsive */
