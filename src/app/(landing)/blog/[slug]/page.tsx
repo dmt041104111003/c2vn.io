@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import BlogDetailClient from '~/components/blog/BlogDetailClient';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const hdrs = await headers();
   const forwardedHost = hdrs.get('x-forwarded-host') || hdrs.get('host');
@@ -11,7 +13,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const host = forwardedHost || envHost || 'localhost:3000';
   const origin = `${forwardedProto}://${host}`;
 
-  const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`);
+  const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store' });
   const data = await res.json();
   const post = data.data;
 
