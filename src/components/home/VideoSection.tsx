@@ -261,7 +261,7 @@ export default function VideoSection() {
                 duration: 0.6,
                 ease: "easeOut"
               }}
-              className={`w-full lg:w-[40%] ${showAllVideos ? "max-h-[60vh] lg:max-h-[94vh]" : "max-h-fit"} custom-scrollbar p-4 lg:p-6 border border-gray-200 dark:border-gray-600 rounded-lg lg:rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg lg:shadow-xl`}
+              className="w-full lg:w-[40%]"
             >
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -274,58 +274,71 @@ export default function VideoSection() {
                 <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">Select a video to watch</p>
               </motion.div>
 
-              <div
-                className={`space-y-3 lg:space-y-4 ${showAllVideos ? "max-h-[45vh] lg:max-h-[70vh] overflow-y-auto" : ""} scrollbar-thick scrollbar-thumb-red-500 dark:scrollbar-thumb-red-400 scrollbar-track-gray-300 dark:scrollbar-track-gray-600 hover:scrollbar-thumb-red-600 dark:hover:scrollbar-thumb-red-300 pr-2 lg:pr-3`}
-              >
-                {displayedVideos.map((video, idx) => (
-                  <motion.div
-                    key={video.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: false, amount: 0.3 }}
-                    transition={{ 
-                      duration: 0.5, 
-                      delay: idx * 0.1,
-                      ease: "easeOut"
-                    }}
-                    whileHover={{ 
-                      y: -4,
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
-                    className={`flex gap-3 lg:gap-4 p-3 lg:p-4 rounded-lg lg:rounded-xl cursor-pointer transition-all duration-200 ${
-                      currentVideo.id === video.id
-                        ? "bg-blue-50 dark:bg-blue-900/50 border-2 border-blue-200 dark:border-blue-700 shadow-lg"
-                        : "bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600/50 hover:shadow-md"
-                    }`}
-                    onClick={() => handleVideoSelect(video)}
-                  >
-                    <div className="relative w-24 h-16 lg:w-32 lg:h-20 shrink-0 rounded-lg overflow-hidden shadow-md">
-                      <img src={getThumbnail(video)} alt={video.title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex flex-col justify-between overflow-hidden flex-1">
-                      <p className="text-xs lg:text-sm font-semibold line-clamp-2 text-gray-900 dark:text-white leading-tight">{video.title}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">{video.channelName}</p>
-                    </div>
-                  </motion.div>
-                ))}
+              <div className="rounded-md ring-1 ring-gray-200 dark:ring-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {displayedVideos.map((video, idx) => (
+                    <motion.div
+                      key={video.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: false, amount: 0.3 }}
+                      transition={{ 
+                        duration: 0.5, 
+                        delay: idx * 0.1,
+                        ease: "easeOut"
+                      }}
+                      className={`group relative flex items-center py-3 px-3 cursor-pointer transition-all duration-200 ${
+                        currentVideo.id === video.id
+                          ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-500"
+                          : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      }`}
+                      onClick={() => handleVideoSelect(video)}
+                    >
+                      <div className="w-0.5 bg-indigo-400/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute left-0 top-0 bottom-0"></div>
+                      
+                      <div className="relative w-10 h-10 shrink-0 rounded-lg overflow-hidden mr-3">
+                        <img src={getThumbnail(video)} alt={video.title} className="w-full h-full object-cover" />
+                      </div>
+                      
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1 leading-tight">
+                            {video.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {video.channelName}
+                            </p>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">•</span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {new Date(video.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                {sortedVideos.length > 2 && (
+                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                    <motion.button
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: false, amount: 0.3 }}
+                      transition={{ duration: 0.5, delay: 0.4 }}
+                      whileHover={{ 
+                        scale: 1.05,
+                        transition: { duration: 0.2 }
+                      }}
+                      onClick={() => setShowAllVideos(!showAllVideos)}
+                      className="w-full text-center text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {showAllVideos ? "Show Less" : "Show More"}
+                    </motion.button>
+                  </div>
+                )}
               </div>
-              {sortedVideos.length > 2 && (
-                <motion.button
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                  whileHover={{ 
-                    scale: 1.05,
-                    transition: { duration: 0.2 }
-                  }}
-                  onClick={() => setShowAllVideos(!showAllVideos)}
-                  className="w-full text-center text-xs lg:text-sm text-blue-600 dark:text-blue-400 hover:underline mt-3 lg:mt-4"
-                >
-                  {showAllVideos ? "Show Less" : "Show More"}
-                </motion.button>
-              )}
             </motion.div>
           </div>
         </div>
