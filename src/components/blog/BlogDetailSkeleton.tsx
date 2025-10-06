@@ -30,6 +30,9 @@ export default function BlogDetailSkeleton() {
                   <div className="h-6 w-20 bg-blue-200/20 dark:bg-blue-800/20 rounded-full animate-pulse" />
                   <div className="h-6 w-16 bg-blue-200/20 dark:bg-blue-800/20 rounded-full animate-pulse" />
                   <div className="h-6 w-24 bg-blue-200/20 dark:bg-blue-800/20 rounded-full animate-pulse" />
+                  <div className="h-6 w-18 bg-blue-200/20 dark:bg-blue-800/20 rounded-full animate-pulse" />
+                  <div className="h-6 w-22 bg-blue-200/20 dark:bg-blue-800/20 rounded-full animate-pulse" />
+                  <div className="h-6 w-14 bg-blue-200/20 dark:bg-blue-800/20 rounded-full animate-pulse" />
             </div>
           </header>
               

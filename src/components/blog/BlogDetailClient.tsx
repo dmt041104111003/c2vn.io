@@ -335,14 +335,21 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
             </h1>
             {Array.isArray(post.tags) && post.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-4">
-                {post.tags.map((tag: BlogTag | string, index: number) => (
-                  <span 
-                    key={typeof tag === 'string' ? tag : tag.id}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                  >
-                    {typeof tag === 'string' ? tag : tag.name}
-                  </span>
-                ))}
+                {post.tags.map((tag: BlogTag | string, index: number) => {
+                  const tagName = typeof tag === 'string' ? tag : (tag?.name || '');
+                  const tagId = typeof tag === 'string' ? tag : (tag?.id || index.toString());
+                  
+                  if (!tagName) return null;
+                  
+                  return (
+                    <span 
+                      key={tagId}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                    >
+                      {tagName}
+                    </span>
+                  );
+                })}
               </div>
             )}
           </header>
