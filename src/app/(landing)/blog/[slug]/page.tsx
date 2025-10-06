@@ -4,6 +4,7 @@ import BlogDetailClient from '~/components/blog/BlogDetailClient';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const runtime = 'nodejs';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const hdrs = await headers();
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   let post: any = null;
   try {
-    const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
+    const res = await fetch(`/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
     if (res.ok) {
       const data = await res.json();
       post = data?.data ?? null;
