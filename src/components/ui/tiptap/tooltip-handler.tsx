@@ -1,86 +1,67 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { TruncatedText } from './truncated-text';
-import { TooltipData } from '~/constants/tooltip';
-import Modal from '~/components/admin/common/Modal';
+import { useEffect } from 'react';
 
 export function TooltipHandler() {
-  const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
-
   useEffect(() => {
-    const handleTooltipClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const tooltipElement = target.closest('[data-tooltip]');
-      
-      if (tooltipElement) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        const isDoubleClick = event.detail === 2;
-        
-        if (isDoubleClick) {
-          return;
-        }
-        
-        const tooltipText = tooltipElement.getAttribute('data-tooltip');
-        if (tooltipText) {
-          const clickedText = (event.target as HTMLElement).textContent || '';
-          
-          const tooltipButtons = document.querySelectorAll('[data-tooltip-button]');
-          tooltipButtons.forEach(button => {
-            const badges = button.querySelectorAll('[data-tooltip-badge]');
-            badges.forEach(badge => {
-              (badge as HTMLElement).style.filter = 'blur(1px)';
-              (badge as HTMLElement).style.opacity = '0.3';
-            });
-          });
-          
-          setTooltipData({
-            text: tooltipText,
-            clickedText,
-            x: event.clientX,
-            y: event.clientY
-          });
-        }
+    const style = document.createElement('style');
+    style.textContent = `
+      [data-tooltip] {
+        position: relative;
+        cursor: pointer;
       }
-    };
-
-    document.addEventListener('click', handleTooltipClick);
+      
+      [data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+        margin-left: 8px;
+        padding: 8px 12px;
+        background-color: rgb(17 24 39);
+        color: white;
+        font-size: 14px;
+        border-radius: 8px;
+        white-space: nowrap;
+        max-width: calc(100vw - 20px);
+        white-space: normal;
+        word-wrap: break-word;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.2s;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+      
+      [data-tooltip]:hover::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+        margin-left: 2px;
+        border: 4px solid transparent;
+        border-right-color: rgb(17 24 39);
+        z-index: 1000;
+        pointer-events: none;
+      }
+      
+      .dark [data-tooltip]:hover::after {
+        background-color: rgb(243 244 246);
+        color: rgb(17 24 39);
+      }
+      
+      .dark [data-tooltip]:hover::before {
+        border-right-color: rgb(243 244 246);
+      }
+    `;
+    document.head.appendChild(style);
 
     return () => {
-      document.removeEventListener('click', handleTooltipClick);
+      document.head.removeChild(style);
     };
   }, []);
 
-  const handleClose = () => {
-    setTooltipData(null);
-    
-    const tooltipButtons = document.querySelectorAll('[data-tooltip-button]');
-    tooltipButtons.forEach(button => {
-      const badges = button.querySelectorAll('[data-tooltip-badge]');
-      badges.forEach(badge => {
-        (badge as HTMLElement).style.filter = 'none';
-        (badge as HTMLElement).style.opacity = '1';
-      });
-    });
-  };
-
-  if (!tooltipData) return null;
-
-  return (
-    <Modal
-      isOpen={!!tooltipData}
-      onClose={handleClose}
-      title={tooltipData.clickedText}
-    >
-      <div className="p-4">
-        <TruncatedText 
-          text={tooltipData.text}
-          maxLength={200}
-          className="text-base font-medium text-gray-800 dark:text-gray-200 leading-relaxed"
-        />
-      </div>
-    </Modal>
-  );
+  return null;
 } 

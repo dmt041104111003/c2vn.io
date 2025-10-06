@@ -1,65 +1,67 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { TruncatedText } from './truncated-text';
-import { TooltipData } from '~/constants/tooltip';
-import Modal from '~/components/admin/common/Modal';
+import { useEffect } from 'react';
 
 export function TooltipPreviewHandler() {
-  const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
-
   useEffect(() => {
-    const handleTooltipClick = (event: Event) => {
-      const target = event.target as HTMLElement;
-      const tooltipElement = target.closest('[data-tooltip]');
-      
-      if (tooltipElement) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        const tooltipText = tooltipElement.getAttribute('data-tooltip');
-        if (tooltipText) {
-          const clickedText = (event.target as HTMLElement).textContent || '';
-          
-          setTooltipData({
-            text: tooltipText,
-            clickedText,
-            x: (event as MouseEvent).clientX,
-            y: (event as MouseEvent).clientY
-          });
-        }
+    const style = document.createElement('style');
+    style.textContent = `
+      .prose [data-tooltip] {
+        position: relative;
+        cursor: pointer;
       }
-    };
-
-    const previewContainer = document.querySelector('.prose');
-    if (previewContainer) {
-      previewContainer.addEventListener('click', handleTooltipClick);
       
-      return () => {
-        previewContainer.removeEventListener('click', handleTooltipClick);
-      };
-    }
+      .prose [data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+        margin-left: 8px;
+        padding: 8px 12px;
+        background-color: rgb(17 24 39);
+        color: white;
+        font-size: 14px;
+        border-radius: 8px;
+        white-space: nowrap;
+        max-width: calc(100vw - 20px);
+        white-space: normal;
+        word-wrap: break-word;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.2s;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+      
+      .prose [data-tooltip]:hover::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translateY(-50%);
+        margin-left: 2px;
+        border: 4px solid transparent;
+        border-right-color: rgb(17 24 39);
+        z-index: 1000;
+        pointer-events: none;
+      }
+      
+      .dark .prose [data-tooltip]:hover::after {
+        background-color: rgb(243 244 246);
+        color: rgb(17 24 39);
+      }
+      
+      .dark .prose [data-tooltip]:hover::before {
+        border-right-color: rgb(243 244 246);
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
-  const handleClose = () => {
-    setTooltipData(null);
-  };
-
-  if (!tooltipData) return null;
-
-  return (
-    <Modal
-      isOpen={!!tooltipData}
-      onClose={handleClose}
-      title={tooltipData.clickedText}
-    >
-      <div className="p-4">
-        <TruncatedText 
-          text={tooltipData.text}
-          maxLength={200}
-          className="text-base font-medium text-gray-800 dark:text-gray-200 leading-relaxed"
-        />
-      </div>
-    </Modal>
-  );
+  return null;
 } 
