@@ -52,7 +52,17 @@ export default function CourseEditModal({
       const exists = locations.some(l => l.name.trim().toLowerCase() === locationName.trim().toLowerCase());
       if (exists) return;
     }
-    onSave(course.id, name.trim(), publishStatus, image, description.trim(), location.trim(), startDate);
+    onSave(
+      course.id,
+      name.trim(),
+      publishStatus,
+      image,
+      description.trim(),
+      location.trim(),
+      startDate,
+      selectedLocationId && selectedLocationId !== '__OTHER__' ? selectedLocationId : undefined,
+      isOther && locationName.trim() ? locationName.trim() : undefined,
+    );
   };
 
   const handleMediaSelect = (media: { id: string; url: string; type: string }) => {

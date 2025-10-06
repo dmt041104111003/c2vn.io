@@ -68,7 +68,17 @@ export interface CourseEditModalProps {
   course: Course | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED', image?: string, description?: string, location?: string, startDate?: string) => void;
+  onSave: (
+    id: string,
+    name: string,
+    publishStatus: 'DRAFT' | 'PUBLISHED',
+    image?: string,
+    description?: string,
+    location?: string,
+    startDate?: string,
+    locationId?: string,
+    locationName?: string,
+  ) => void;
   isSaving: boolean;
 }
 

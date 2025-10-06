@@ -84,7 +84,7 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
     }
   });
 
-  const handleUpdate = (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED', image?: string, description?: string, location?: string, startDate?: string) => {
+  const handleUpdate = (id: string, name: string, publishStatus: 'DRAFT' | 'PUBLISHED', image?: string, description?: string, location?: string, startDate?: string, locationId?: string, locationName?: string) => {
     if (!name.trim()) {
       showError('Name is required');
       return;
@@ -101,7 +101,7 @@ export default function CourseTableSection({ courses = [], onSuccess }: CourseTa
       return;
     }
     
-    updateMutation.mutate({ id, name: name.trim(), image, description, location, startDate, publishStatus });
+    updateMutation.mutate({ id, name: name.trim(), image, description, location, startDate, publishStatus, locationId, locationName });
   };
 
   const handleDelete = (id: string) => {
