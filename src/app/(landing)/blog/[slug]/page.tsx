@@ -25,10 +25,20 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     metadataBase: new URL(origin),
     title: post?.title || 'Blog Detail | Cardano2vn',
     description: post?.excerpt || post?.content?.slice(0, 150) || '',
+    alternates: {
+      canonical: `${origin}/blog/${params.slug}`,
+    },
     openGraph: {
       title: post?.title || 'Blog Detail | Cardano2vn',
       description: post?.excerpt || post?.content?.slice(0, 150) || '',
-      images: [image],
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: post?.title || 'Blog Detail | Cardano2vn',
+        },
+      ],
       url: `${origin}/blog/${params.slug}`,
       type: 'article',
     },
