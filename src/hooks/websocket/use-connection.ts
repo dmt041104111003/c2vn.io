@@ -27,7 +27,7 @@ export function useConnection({ postId, userId, onError, onMessage }: UseConnect
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('WebSocket connected to:', wsUrl);
+        if (process.env.NODE_ENV !== 'production') console.log('WebSocket connected to:', wsUrl);
         reconnectAttempts.current = 0;
         
         const pingInterval = setInterval(() => {
@@ -41,9 +41,9 @@ export function useConnection({ postId, userId, onError, onMessage }: UseConnect
 
       ws.onmessage = (event) => {
         try {
-          console.log('WebSocket message received:', event.data);
+          if (process.env.NODE_ENV !== 'production') console.log('WebSocket message received:', event.data);
           const message = JSON.parse(event.data);
-          console.log('Parsed message:', message);
+          if (process.env.NODE_ENV !== 'production') console.log('Parsed message:', message);
           onMessage(message);
         } catch (error) {
           console.error('Error parsing WebSocket message:', error);
@@ -51,26 +51,24 @@ export function useConnection({ postId, userId, onError, onMessage }: UseConnect
       };
 
       ws.onclose = (event) => {
-        console.log('WebSocket disconnected:', event.code, event.reason);
+        if (process.env.NODE_ENV !== 'production') console.log('WebSocket disconnected:', event.code, event.reason);
         
         if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
           reconnectAttempts.current++;
           const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 10000);
           
           reconnectTimeoutRef.current = setTimeout(() => {
-            console.log(`Attempting to reconnect (${reconnectAttempts.current}/${maxReconnectAttempts})`);
+            if (process.env.NODE_ENV !== 'production') console.log(`Attempting to reconnect (${reconnectAttempts.current}/${maxReconnectAttempts})`);
             connect();
           }, delay);
         }
       };
 
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
         onError?.('WebSocket connection error');
       };
 
     } catch (error) {
-      console.error('Error creating WebSocket connection:', error);
       onError?.('Failed to create WebSocket connection');
     }
   }, [postId, userId, onError, onMessage]);

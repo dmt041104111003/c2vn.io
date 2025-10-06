@@ -26,18 +26,14 @@ export function useMessageHandler({
   onError,
 }: UseMessageHandlerProps) {
   const handleMessage = useCallback((message: WebSocketMessage) => {
-    console.log('Handling message type:', message.type);
     
     switch (message.type) {
       case 'connected':
-        console.log('Connected to WebSocket server:', message.message);
         break;
       case 'pong':
-        console.log('Received pong from server');
         break;
         
       case 'new_comment':
-        console.log('Received new_comment message:', message.comment);
         if (onNewComment && message.comment) {
           const comment: Comment = {
             id: message.comment.id,
@@ -52,15 +48,12 @@ export function useMessageHandler({
             replies: [],
             isTemp: message.comment.isTemp || false,
           };
-          console.log('Calling onNewComment with:', comment);
           onNewComment(comment);
         } else {
-          console.log('onNewComment not provided or message.comment missing');
         }
         break;
         
       case 'new_reply':
-        console.log('Received new_reply message:', message.reply);
         if (onNewReply && message.reply) {
           const reply: Comment = {
             id: message.reply.id,
@@ -77,13 +70,11 @@ export function useMessageHandler({
             parentUserId: message.reply.parentComment?.userId,
             parentAuthor: message.reply.parentComment?.user?.displayName || message.reply.parentComment?.user?.name || message.reply.parentComment?.user?.wallet || 'Unknown',
           };
-          console.log('Calling onNewReply with:', reply);
           onNewReply(reply);
         }
         break;
         
       case 'reply_updated':
-        console.log('Received reply_updated message:', message.reply);
         if (onCommentUpdated && message.reply) {
           const reply: Comment = {
             id: message.reply.id,
@@ -98,7 +89,6 @@ export function useMessageHandler({
             replies: [],
             isTemp: message.reply.isTemp || false,
           };
-          console.log('Calling onCommentUpdated for reply with:', reply);
           onCommentUpdated(reply);
         }
         break;
@@ -130,13 +120,11 @@ export function useMessageHandler({
             replies: [],
             isTemp: message.comment.isTemp || false,
           };
-          console.log('Calling onCommentUpdated with:', comment);
           onCommentUpdated(comment);
         }
         break;
         
       case 'comment_updated_sent':
-        console.log('Received comment_updated_sent message:', message.comment);
         if (onCommentUpdated && message.comment) {
           const comment: Comment = {
             id: message.comment.id,
@@ -151,7 +139,6 @@ export function useMessageHandler({
             replies: [],
             isTemp: message.comment.isTemp || false,
           };
-          console.log('Calling onCommentUpdated with:', comment);
           onCommentUpdated(comment);
         }
         break;
@@ -162,7 +149,6 @@ export function useMessageHandler({
         break;
         
       default:
-        console.log('Unknown WebSocket message type:', message.type);
     }
   }, [onNewComment, onNewReply, onCommentDeleted, onCommentUpdated, onError]);
 
