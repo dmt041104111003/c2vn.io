@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { headers } from 'next/headers';
 import BlogDetailClient from '~/components/blog/BlogDetailClient';
 
 export const dynamic = 'force-dynamic';
@@ -7,17 +6,12 @@ export const revalidate = 0;
 export const runtime = 'nodejs';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const hdrs = await headers();
-  const forwardedHost = hdrs.get('x-forwarded-host') || hdrs.get('host');
-  const forwardedProto = hdrs.get('x-forwarded-proto') || 'https';
-  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  const origin = envSiteUrl && /^https?:\/\//.test(envSiteUrl)
-    ? envSiteUrl.replace(/\/$/, '')
-    : `${forwardedProto}://${(forwardedHost || 'localhost:3000')}`;
+  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://website-sigma-ebon-96.vercel.app';
+  const origin = envSiteUrl.replace(/\/$/, '');
 
   let post: any = null;
   try {
-    const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
+    const res = await fetch(`/api/admin/posts/${params.slug}?public=1`, { cache: 'no-store', next: { revalidate: 0 } });
     if (res.ok) {
       const data = await res.json();
       post = data?.data ?? null;
