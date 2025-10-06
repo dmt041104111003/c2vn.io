@@ -444,7 +444,7 @@ export default function CommentItem({ comment, onSubmitReply, onDeleteComment, o
                           className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-colors p-1"
                           aria-label="Send reply"
                         >
-                          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="h-4 w-4 rotate-90" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                           </svg>
                         </button>
