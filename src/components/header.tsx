@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Edit, User, LogOut, Copy, Check, Gift, Users, ExternalLink } from "lucide-react";
 import { navbars } from "~/constants/navbars";
 import { images } from "~/public/images";
+import Logo from "~/components/ui/logo";
 import { routers, NavbarType } from "~/constants/routers";
 import { useUser } from "~/hooks/useUser";
 import { WalletAvatar } from "~/components/WalletAvatar";
@@ -674,7 +675,7 @@ export default function Header() {
             className="flex items-center"
           >
             <Link href={routers.home} className="flex items-center gap-3">
-              <img className="text-xl h-10 w-auto font-bold text-gray-900 dark:text-white" loading="lazy" src={images.logo.src} alt="Cardano2vn" />
+              <Logo compact className="h-10 w-auto" />
             </Link>
           </motion.section>
 
