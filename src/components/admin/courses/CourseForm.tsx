@@ -25,11 +25,11 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
 
   const createMutation = useMutation({
-    mutationFn: async ({ name, image, description, location, startDate, publishStatus }: { name: string; image?: string; description?: string; location?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
+    mutationFn: async ({ name, image, description, locationId, locationName, startDate, publishStatus }: { name: string; image?: string; description?: string; locationId?: string; locationName?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
       const response = await fetch('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, image, description, location, startDate, publishStatus })
+        body: JSON.stringify({ name, image, description, locationId, locationName, startDate, publishStatus })
       });
       if (!response.ok) {
         const error = await response.json();
