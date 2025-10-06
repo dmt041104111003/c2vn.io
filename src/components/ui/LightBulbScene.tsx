@@ -1,0 +1,260 @@
+"use client";
+
+import React, { useEffect, useRef } from "react";
+
+function tween(
+  from: number,
+  to: number,
+  durationMs: number,
+  onUpdate: (v: number) => void,
+  onDone?: () => void
+) {
+  const start = performance.now();
+  let raf = 0;
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - start) / durationMs);
+    const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    const v = from + (to - from) * eased;
+    onUpdate(v);
+    if (t < 1) {
+      raf = requestAnimationFrame(tick);
+    } else if (onDone) {
+      onDone();
+    }
+  };
+  raf = requestAnimationFrame(tick);
+  return () => cancelAnimationFrame(raf);
+}
+
+export default function LightBulbScene() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const disposeRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    let MatterLib: any;
+    let engine: any;
+    let ceiling: any;
+    let bulb: any;
+    let cord: any;
+    let mouseConstraint: any;
+    let frameRaf = 0;
+    let brightness = 1;
+    let lightOn = true;
+    let destroyed = false;
+    let cleanupTween: (() => void) | null = null;
+
+    const setup = async () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const resize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+      resize();
+
+      try {
+        MatterLib = (await import("matter-js")).default ?? (await import("matter-js"));
+      } catch (e) {
+        const drawFallback = () => {
+          ctx.fillStyle = "#000";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#e8e8e8";
+          ctx.beginPath();
+          ctx.arc(canvas.width - 60, 140, 20, 0, Math.PI * 2);
+          ctx.fill();
+          frameRaf = requestAnimationFrame(drawFallback);
+        };
+        frameRaf = requestAnimationFrame(drawFallback);
+        disposeRef.current = () => cancelAnimationFrame(frameRaf);
+        return;
+      }
+
+      const { Engine, Bodies, Constraint, World,  Body } = MatterLib;
+      engine = Engine.create();
+      engine.world.gravity.y = 0.8;
+
+      const anchorX = () => (canvas.width - 60);
+      ceiling = Bodies.rectangle(anchorX(), 40, 20, 10, { isStatic: true });
+      bulb = Bodies.circle(anchorX(), canvas.height / 3, 22, {
+        density: 0.006,
+        frictionAir: 0.03,
+        restitution: 0.2,
+      });
+
+      let baseLength = canvas.height / 2 - 62;
+      cord = Constraint.create({ bodyA: ceiling, bodyB: bulb, length: baseLength, stiffness: 0.98, damping: 0.08 });
+      Body.setPosition(bulb, { x: ceiling.position.x, y: ceiling.position.y + baseLength });
+      Body.setInertia(bulb, Infinity);
+
+      World.add(engine.world, [ceiling, bulb, cord]);
+
+
+      const drawRealisticLighting = (x: number, y: number) => {
+        if (!lightOn) {
+          brightness += (0 - brightness) * 0.08;
+          return;
+        }
+        brightness += (1 - brightness) * 0.08;
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, 560);
+        gradient.addColorStop(0, `rgba(255, 240, 200, ${0.5 * brightness})`);
+        gradient.addColorStop(0.4, `rgba(255, 220, 170, ${0.2 * brightness})`);
+        gradient.addColorStop(1, "rgba(150, 120, 100, 0)");
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, 560, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = "source-over";
+        ctx.restore();
+      };
+
+      const drawBulb = (x: number, y: number) => {
+        ctx.save();
+        ctx.filter = "blur(1px)";
+        ctx.globalAlpha = 0.9;
+        ctx.strokeStyle = "#444";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ceiling.position.x, ceiling.position.y);
+        ctx.lineTo(x, y - 25);
+        ctx.stroke();
+        ctx.fillStyle = "#888";
+        ctx.fillRect(x - 12, y - 25, 24, 12);
+        ctx.strokeStyle = "#555";
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.moveTo(x - 12, y - 22 + i * 2);
+          ctx.lineTo(x + 12, y - 22 + i * 2);
+          ctx.stroke();
+        }
+        ctx.fillStyle = lightOn ? "#ffffff" : "#e8e8e8";
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(200, 200, 200, 0.5)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.beginPath();
+        ctx.ellipse(x - 8, y - 6, 3, 10, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = lightOn ? "#ff9900" : "#666";
+        ctx.shadowColor = lightOn ? "#ff9900" : "transparent";
+        ctx.shadowBlur = lightOn ? 6 : 0;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x, y - 12);
+        ctx.lineTo(x, y + 12);
+        ctx.stroke();
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x - 8, y - 6);
+        ctx.quadraticCurveTo(x, y, x + 8, y - 6);
+        ctx.moveTo(x - 8, y + 6);
+        ctx.quadraticCurveTo(x, y, x + 8, y + 6);
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      const animate = () => {
+        Engine.update(engine);
+        if (Math.abs(bulb.position.x - ceiling.position.x) > 0.1) {
+          Body.setPosition(bulb, { x: ceiling.position.x, y: bulb.position.y });
+        }
+        Body.setVelocity(bulb, { x: 0, y: bulb.velocity.y });
+        const x = ceiling.position.x;
+        const y = bulb.position.y;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawRealisticLighting(x, y);
+        drawBulb(x, y);
+        frameRaf = requestAnimationFrame(animate);
+      };
+
+      const onResize = () => {
+        resize();
+        Body.setPosition(ceiling, { x: anchorX(), y: 40 });
+        baseLength = canvas.height / 2 - 62;
+        cord.length = Math.min(cord.length, Math.min(baseLength + 100, (canvas.height * 0.55) | 0));
+        Body.setPosition(bulb, { x: ceiling.position.x, y: bulb.position.y });
+        Body.setVelocity(bulb, { x: 0, y: 0 });
+      };
+
+      window.addEventListener("resize", onResize);
+      frameRaf = requestAnimationFrame(animate);
+
+      const themeButton = document.querySelector('[data-theme-toggle]') as HTMLElement | null;
+      const handleThemeClick = () => {
+        if (!cord) return;
+        const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
+        const shortLen = 85;
+        requestAnimationFrame(() => {
+          const isDark = document.documentElement.classList.contains("dark");
+          const target = isDark ? longLen : shortLen;
+          const start = cord.length;
+          cleanupTween?.();
+          cleanupTween = tween(start, target, 450, (v) => (cord.length = v));
+        });
+      };
+
+      const disposeTimers: Array<() => void> = [];
+      if (themeButton) themeButton.addEventListener("click", handleThemeClick);
+
+      const observer = new MutationObserver(() => {
+        lightOn = document.documentElement.classList.contains("dark");
+        Body.setPosition(bulb, { x: ceiling.position.x, y: bulb.position.y });
+        Body.setVelocity(bulb, { x: 0, y: 0 });
+        const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
+        const shortLen = 85;
+        const target = lightOn ? longLen : shortLen;
+        const start = cord.length;
+        cleanupTween?.();
+        cleanupTween = tween(start, target, 450, (v) => (cord.length = v));
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+      lightOn = document.documentElement.classList.contains("dark");
+
+      {
+        const longLen = Math.min(baseLength + 50, (canvas.height * 0.42) | 0);
+        const shortLen = 85;
+        cord.length = shortLen;
+        Body.setPosition(bulb, { x: ceiling.position.x, y: ceiling.position.y + shortLen });
+        if (lightOn) {
+          cleanupTween?.();
+          cleanupTween = tween(shortLen, longLen, 450, (v) => (cord.length = v));
+        }
+      }
+
+      disposeRef.current = () => {
+        if (destroyed) return;
+        destroyed = true;
+        cancelAnimationFrame(frameRaf);
+        cleanupTween?.();
+        disposeTimers.forEach((fn) => fn());
+        window.removeEventListener("resize", onResize);
+        if (themeButton) themeButton.removeEventListener("click", handleThemeClick);
+        observer.disconnect();
+      };
+    };
+
+    setup();
+
+    return () => {
+      disposeRef.current?.();
+    };
+  }, []);
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0">
+      <canvas ref={canvasRef} className="block w-full h-full" />
+    </div>
+  );
+}
+
+

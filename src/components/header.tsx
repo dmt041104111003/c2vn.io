@@ -7,7 +7,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Edit, User, LogOut, Copy, Check, Gift, Users, ExternalLink } from "lucide-react";
 import { navbars } from "~/constants/navbars";
-import { images } from "~/public/images";
 import Logo from "~/components/ui/logo";
 import { routers, NavbarType } from "~/constants/routers";
 import { useUser } from "~/hooks/useUser";
