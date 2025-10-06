@@ -52,13 +52,11 @@ export function PostStats({ posts, year: yearProp }: PostStatsProps) {
       ANGRY += p.ANGRY || 0;
       WOW += p.WOW || 0;
       Comments += p.comments || 0;
-      // Đếm user từ comments_rel
       if (Array.isArray(p.comments_rel)) {
         p.comments_rel.forEach((c) => {
           if (c && c.userId) userSet.add(c.userId);
         });
       }
-      // Đếm user từ reactions
       if (Array.isArray(p.reactions)) {
         p.reactions.forEach((r) => {
           if (r && r.userId) userSet.add(r.userId);
