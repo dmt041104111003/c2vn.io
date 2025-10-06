@@ -1,25 +1,40 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import BlogDetailClient from '~/components/blog/BlogDetailClient';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://cardano2-vn.vercel.app'}/api/admin/posts/${params.slug}?public=1`);
+  const hdrs = await headers();
+  const forwardedHost = hdrs.get('x-forwarded-host') || hdrs.get('host');
+  const forwardedProto = hdrs.get('x-forwarded-proto') || 'https';
+  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const envHost = envSiteUrl ? envSiteUrl.replace(/^https?:\/\//, '') : undefined;
+  const host = forwardedHost || envHost || 'localhost:3000';
+  const origin = `${forwardedProto}://${host}`;
+
+  const res = await fetch(`${origin}/api/admin/posts/${params.slug}?public=1`);
   const data = await res.json();
   const post = data.data;
+
+  const image = post?.media?.[0]?.url
+    ? (post.media[0].url.startsWith('http') ? post.media[0].url : `${origin}${post.media[0].url}`)
+    : `${origin}/images/common/loading.png`;
+
   return {
+    metadataBase: new URL(origin),
     title: post?.title || 'Blog Detail | Cardano2vn',
     description: post?.excerpt || post?.content?.slice(0, 150) || '',
     openGraph: {
       title: post?.title || 'Blog Detail | Cardano2vn',
       description: post?.excerpt || post?.content?.slice(0, 150) || '',
-      images: post?.media?.[0]?.url ? [post.media[0].url] : ['/images/common/loading.png'],
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://cardano2-vn.vercel.app'}/blog/${params.slug}`,
+      images: [image],
+      url: `${origin}/blog/${params.slug}`,
       type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
       title: post?.title || 'Blog Detail | Cardano2vn',
       description: post?.excerpt || post?.content?.slice(0, 150) || '',
-      images: post?.media?.[0]?.url ? [post.media[0].url] : ['/images/common/loading.png'],
+      images: [image],
     }
   };
 }
