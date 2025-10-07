@@ -116,12 +116,12 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
                 </div>
                 
                 <div className="min-w-0 flex-1">
-                  <div className={`relative text-sm font-medium truncate ${
+                  <div className={`relative text-sm font-medium ${
                     isCurrentPost 
                       ? "text-blue-700 dark:text-blue-300" 
                       : "text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
                   }`}>
-                    {post.title}
+                    <span className="block truncate">{post.title}</span>
                   <div className="absolute left-0 top-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[2147483647]">
                       <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[70vw] relative">
                         {post.title}

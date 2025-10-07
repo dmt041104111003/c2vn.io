@@ -99,7 +99,7 @@ export default function RelatedPostsSlider({ posts }: RelatedPostsSliderProps) {
                 }}
                 className="flex flex-col"
               >
-                <div className="w-full rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl h-full flex flex-col overflow-hidden">
+                <div className="w-full rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl h-full flex flex-col overflow-visible group">
                   <Link className="flex-1 flex flex-col" href={`/blog/${post.slug || post.id}`} onClick={() => {
                     const pid = post.slug || post.id;
                     try {
@@ -149,7 +149,7 @@ export default function RelatedPostsSlider({ posts }: RelatedPostsSliderProps) {
                         </div>
                       )}
 
-                      <div className="relative group">
+                      <div className="relative">
                         <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                           {post.title}
                         </h3>
