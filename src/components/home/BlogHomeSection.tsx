@@ -211,25 +211,28 @@ export default function ProtocolSection() {
                         </div>
 
                         {/* Meta */}
-                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                          <span>
-                            {new Date(post.createdAt).toLocaleDateString("en-GB", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric"
-                            })}
-                          </span>
-                          {post.totalComments > 0 && (
-                            <>
-                              <span>•</span>
-                              <span className="flex items-center gap-1">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                                {post.totalComments}
-                              </span>
-                            </>
-                          )}
+                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                          <div className="flex items-center gap-2">
+                            <span>
+                              {new Date(post.createdAt).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric"
+                              })}
+                            </span>
+                            {post.totalComments > 0 && (
+                              <>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03 8 9 8s9 3.582 9 8z" />
+                                  </svg>
+                                  {post.totalComments}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <span className="ml-4 truncate max-w-[40%] text-right">{post.author || "Admin"}</span>
                         </div>
                       </div>
                     </Link>
