@@ -64,7 +64,7 @@ export default function BlogDetailSkeleton() {
                     <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
                   </div>
                 </div>
-                <div className="grid max-w-none gap-16 lg:grid-cols-3">
+                <div className="grid max-w-none gap-8 md:gap-10 lg:gap-8 lg:grid-cols-3">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="flex flex-col">
                       <div className="rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl h-full flex flex-col overflow-hidden">
