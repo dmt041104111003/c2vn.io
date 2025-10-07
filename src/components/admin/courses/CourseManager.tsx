@@ -29,16 +29,16 @@ export default function CourseManager() {
       <div className="space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
           <div className="space-y-4">
-            <div className="flex gap-4">
-              <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              <div className="h-10 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
             </div>
-            <div className="flex gap-4">
-              <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-            </div>
-            <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-            <div className="space-y-2">
-              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
               <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
             </div>
           </div>

@@ -117,6 +117,7 @@ export default function CourseEditModal({
       isOpen={isOpen}
       onClose={handleClose}
       title="Edit Course"
+      maxWidth="max-w-4xl"
     >
       <div className="space-y-6">
         <div>
