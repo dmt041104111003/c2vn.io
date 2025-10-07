@@ -13,6 +13,7 @@ export function VideoSectionEditor({
   videoTitle,
   channelName,
   order,
+  isFeatured = false,
   isValidUrl,
   isAdding,
   onVideoUrlChange,
@@ -91,10 +92,10 @@ export function VideoSectionEditor({
             onChange={(e) => onOrderChange(parseInt(e.target.value) || 0)}
             className="w-full px-3 py-2 border rounded-md"
             min="1"
-            disabled={order === 0}
+            disabled={isFeatured}
           />
           <p className="text-xs text-gray-500 mt-1">
-            {order === 0 
+            {isFeatured 
               ? "Featured videos automatically have order 0 (highest priority)"
               : "Enter order number (1, 2, 3...). Lower numbers appear first."
             }

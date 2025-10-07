@@ -303,6 +303,7 @@ export function VideoSectionPageClient() {
         onOrderChange={handleOrderChange}
         onAddVideo={handleAddVideo}
         thumbnailUrl={newThumbnailUrl}
+        isFeatured={editingVideo?.isFeatured || false}
         submitLabel={editingVideo ? "Save Changes" : "Add Video"}
         title={editingVideo ? "Edit Video" : "Add New Video"}
       />

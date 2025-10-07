@@ -20,6 +20,7 @@ export interface VideoSectionEditorProps {
   videoTitle: string;
   channelName: string;
   order: number;
+  isFeatured?: boolean;
   isValidUrl: boolean | null;
   isAdding: boolean;
   onVideoUrlChange: (url: string) => void;
