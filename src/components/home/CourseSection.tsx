@@ -163,7 +163,7 @@ export default function CourseSection() {
           </div>
 
           {activeTab === "latest" ? (
-            <div className="grid max-w-none gap-16 lg:grid-cols-3">
+            <div className="grid max-w-none gap-8 md:gap-10 lg:gap-8 lg:grid-cols-3">
               {isLoading ? (
                 [...Array(3)].map((_, idx) => (
                   <motion.div
