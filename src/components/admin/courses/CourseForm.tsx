@@ -103,7 +103,12 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       }
     }
 
-    const finalPrice = selectedPriceType === 'free' ? 'free' : customPrice;
+    if (selectedPriceType === 'custom' && (!customPrice || customPrice.trim() === '')) {
+      showError('Please enter a custom price');
+      return;
+    }
+    
+    const finalPrice = selectedPriceType === 'free' ? 'free' : (customPrice || 'free');
     
     createMutation.mutate({ 
       name: newName.trim(), 

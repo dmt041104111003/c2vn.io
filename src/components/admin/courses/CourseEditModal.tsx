@@ -86,19 +86,24 @@ export default function CourseEditModal({
       const exists = locations.some(l => l.name.trim().toLowerCase() === locationName.trim().toLowerCase());
       if (exists) return;
     }
-    const finalPrice = selectedPriceType === 'free' ? 'free' : customPrice;
+    
+    if (selectedPriceType === 'custom' && (!customPrice || customPrice.trim() === '')) {
+      return;
+    }
+    
+    const finalPrice = selectedPriceType === 'free' ? 'free' : (customPrice || 'free');
     
     onSave(
       course.id,
       name.trim(),
       publishStatus,
       image,
-      description.trim(),
+      description?.trim() || '',
       finalPrice,
-      location.trim(),
+      location?.trim() || '',
       startDate,
       selectedLocationId && selectedLocationId !== '__OTHER__' ? selectedLocationId : undefined,
-      isOther && locationName.trim() ? locationName.trim() : undefined,
+      isOther && locationName?.trim() ? locationName.trim() : undefined,
     );
   };
 
