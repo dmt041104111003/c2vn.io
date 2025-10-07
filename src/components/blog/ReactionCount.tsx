@@ -25,8 +25,7 @@ export default function ReactionCount({ reactions }: ReactionCountProps) {
           {topTypes.map(([type], index) => (
             <div
               key={type}
-              className="h-12 w-12 rounded-full bg-transparent border border-gray-700 flex items-center justify-center hover:scale-110 transition-transform"
-              style={{ zIndex: topTypes.length - index }}
+              className={`h-12 w-12 rounded-full bg-transparent flex items-center justify-center hover:scale-110 transition-transform ${index === 0 ? 'z-30' : index === 1 ? 'z-20' : 'z-10'}`}
             >
               <Image
                 src={REACTION_ICONS[type]}
