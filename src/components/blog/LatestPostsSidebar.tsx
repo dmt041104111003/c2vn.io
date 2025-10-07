@@ -57,7 +57,7 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
         <h4 className="text-base font-semibold text-gray-900 dark:text-white">Latest Posts</h4>
       </div>
       
-      <div className="rounded-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 bg-white/40 dark:bg-gray-900/30 backdrop-blur-sm divide-y divide-gray-200/70 dark:divide-gray-700/60 overflow-hidden">
+      <div className="rounded-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 bg-white/40 dark:bg-gray-900/30 backdrop-blur-sm divide-y divide-gray-200/70 dark:divide-gray-700/60 overflow-visible">
         {latestPosts.map((post, idx) => {
           const isCurrentPost = currentPostSlug && (post.slug === currentPostSlug || post.id === currentPostSlug);
           
@@ -122,7 +122,7 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
                       : "text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
                   }`}>
                     {post.title}
-                    <div className="absolute left-0 top-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                  <div className="absolute left-0 top-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[2147483647]">
                       <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[70vw] relative">
                         {post.title}
                         <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
