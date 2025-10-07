@@ -356,7 +356,7 @@ export default function MemberPageClient() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const ids = ['founding-team', 'about-section', 'our-cardano-team', 'members', 'contact'];
+    const ids = ['executive-team', 'about-section', 'our-cardano-team', 'members', 'contact'];
     const elements = ids.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
     if (elements.length === 0) return;
 
@@ -387,7 +387,7 @@ export default function MemberPageClient() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const ids = ['founding-team', 'about-section', 'our-cardano-team', 'members', 'contact'];
+    const ids = ['executive-team', 'about-section', 'our-cardano-team', 'members', 'contact'];
     const getActive = () => {
       const headerOffset = 120; 
       const scrollPos = window.scrollY + headerOffset;
@@ -560,8 +560,8 @@ export default function MemberPageClient() {
       <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
         <BackgroundMotion />
         <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="about-top">
-          <div id="founding-team" className="scroll-mt-28 md:scroll-mt-40">
-            <Title title="Founding Team" description="" />
+          <div id="executive-team" className="scroll-mt-28 md:scroll-mt-40">
+            <Title title="Executive Team" description="Đội ngũ nòng cốt Cardano2VN gồm những thành viên chủ chốt, trực tiếp định hướng chiến lược và phát triển dự án trên Cardano." />
           </div>
           
           <div id="about-section" className="scroll-mt-28 md:scroll-mt-40 mb-16 text-left">
@@ -669,7 +669,7 @@ export default function MemberPageClient() {
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900" suppressHydrationWarning>
       <BackgroundMotion />
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="about-top">
-        <div id="founding-team" className="scroll-mt-28 md:scroll-mt-40">
+        <div id="executive-team" className="scroll-mt-28 md:scroll-mt-40">
           <Title title="Executive Team" description="Đội ngũ nòng cốt Cardano2VN gồm những thành viên chủ chốt, trực tiếp định hướng chiến lược và phát triển dự án trên Cardano." />
         </div>
         
