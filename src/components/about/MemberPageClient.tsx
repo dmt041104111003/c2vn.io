@@ -670,7 +670,7 @@ export default function MemberPageClient() {
       <BackgroundMotion />
       <section className="mx-auto max-w-7xl px-6 py-20 lg:px-8" id="about-top">
         <div id="founding-team" className="scroll-mt-28 md:scroll-mt-40">
-          <Title title="Founding Team" description="" />
+          <Title title="Executive Team" description="Đội ngũ nòng cốt Cardano2VN gồm những thành viên chủ chốt, trực tiếp định hướng chiến lược và phát triển dự án trên Cardano." />
         </div>
         
         <div id="about-section" className="scroll-mt-28 md:scroll-mt-40">
@@ -679,20 +679,19 @@ export default function MemberPageClient() {
 
         <div className="mx-auto mb-16 scroll-mt-28 md:scroll-mt-40" id="our-cardano-team">
           <div className="rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 backdrop-blur-sm">
-            <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Our Cardano Team</h3>
+            <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Đội ngũ Cardano2VN</h3>
             <p className="mb-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              We are a passionate team of Cardano enthusiasts, developers, and community builders dedicated to advancing the Cardano ecosystem in
-              Vietnam. Our mission is to bridge the gap between traditional technology and blockchain innovation, making Cardano accessible to
-              everyone.
+              Cardano2VN là đội ngũ các chuyên gia và nhà phát triển giàu kinh nghiệm, cùng chung mục tiêu thúc đẩy việc ứng dụng và mở rộng hệ sinh thái
+              Cardano tại Việt Nam và khu vực.
             </p>
             <p className="mb-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              With expertise spanning from smart contract development and DeFi protocols to community education and governance participation, we work
-              together to create sustainable solutions that benefit the entire Cardano community. Our diverse backgrounds in education, blockchain
-              development, product management, and community building enable us to approach challenges from multiple perspectives.
+              Nhóm quy tụ nhiều thành viên có thành tích nổi bật trong các dự án quốc tế, được tài trợ bởi Project Catalyst, và đạt giải thưởng tại các cuộc
+              thi công nghệ. Với nền tảng chuyên môn vững chắc trong phát triển sản phẩm blockchain, hợp đồng thông minh, và quản lý dự án, Cardano2VN hướng
+              tới xây dựng những giải pháp an toàn, minh bạch và hiệu quả, mang tính ứng dụng cao cho cộng đồng.
             </p>
             <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              Join us in building the future of decentralized finance and governance on Cardano. Together, we're creating the infrastructure for
-              trust-based distributed work and fostering a vibrant, inclusive Cardano ecosystem in Vietnam.
+              Với năng lực, kinh nghiệm và sự tận tâm, Cardano2VN cam kết trở thành đối tác tin cậy và chuyên nghiệp, đồng hành cùng các dự án trong hành trình
+              phát triển bền vững trên nền tảng Cardano.
             </p>
           </div>
         </div>
