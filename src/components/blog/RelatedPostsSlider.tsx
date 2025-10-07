@@ -139,9 +139,17 @@ export default function RelatedPostsSlider({ posts }: RelatedPostsSliderProps) {
                         </div>
                       )}
 
-                      <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                        {post.title}
-                      </h3>
+                      <div className="relative">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                          {post.title}
+                        </h3>
+                        <div className="absolute left-0 top-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                          <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
+                            {post.title}
+                            <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+                          </div>
+                        </div>
+                      </div>
 
                       <div className="text-xs text-gray-600 dark:text-gray-400">
                         <div className="flex items-center justify-between">
