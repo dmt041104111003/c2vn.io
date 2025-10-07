@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL 
     || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
   const origin = envSiteUrl.replace(/\/$/, '');
@@ -14,7 +15,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   let post: any = null;
   try {
     const dbPost = await prisma.post.findUnique({
-      where: { slug: params.slug },
+      where: { slug },
       select: {
         id: true,
         title: true,
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   } catch (err) {
   }
 
-  const fallbackTitle = decodeURIComponent(params.slug)
+  const fallbackTitle = decodeURIComponent(slug)
     .split('-')
     .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : w))
     .join(' ');
@@ -105,7 +106,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title,
     description,
     alternates: {
-      canonical: `${origin}/blog/${params.slug}`,
+      canonical: `${origin}/blog/${slug}`,
     },
     openGraph: {
       title,
@@ -114,7 +115,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         { url: image, width: 1200, height: 630, alt: title },
         { url: `${origin}/images/og-image.png`, width: 1200, height: 630, alt: `${title} (fallback)` },
       ],
-      url: `${origin}/blog/${params.slug}`,
+      url: `${origin}/blog/${slug}`,
       type: 'article',
     },
     twitter: {
@@ -129,10 +130,10 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       metadataBase: new URL(origin),
       title: fallbackTitle || 'Blog Detail | Cardano2vn',
       description: fallbackDescription,
-      alternates: { canonical: `${origin}/blog/${params.slug}` },
+      alternates: { canonical: `${origin}/blog/${slug}` },
       openGraph: {
         type: 'article',
-        url: `${origin}/blog/${params.slug}`,
+        url: `${origin}/blog/${slug}`,
         title: fallbackTitle || 'Blog Detail | Cardano2vn',
         description: fallbackDescription,
         images: [{ url: `${origin}/images/og-image.png`, width: 1200, height: 630, alt: fallbackTitle || 'Blog Detail | Cardano2vn' }],
@@ -147,6 +148,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default function BlogDetailPage({ params }: { params: { slug: string } }) {
-  return <BlogDetailClient slug={params.slug} />;
-} 
+export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <BlogDetailClient slug={slug} />;
+}
