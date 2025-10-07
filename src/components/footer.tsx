@@ -1,11 +1,38 @@
+"use client";
 // import Image from "next/image";
 import Link from "next/link";
 // import { images } from "~/public/images";
 import { ThemeToggle } from "./ui/theme-toggle";
 import StarIcon from "./ui/StarIcon";
 import Logo from "./ui/logo";
+import { useEffect, useState } from "react";
 
 export default function Footer() {
+  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [onlineUsers, setOnlineUsers] = useState<number>(0);
+
+  useEffect(() => {
+    let intervalId: any;
+    const fetchCounts = async () => {
+      try {
+        const [uRes, oRes] = await Promise.all([
+          fetch('/api/public/stats/users', { cache: 'no-store' }),
+          fetch('/api/public/stats/online', { cache: 'no-store' })
+        ]);
+        if (uRes.ok) {
+          const uJson = await uRes.json();
+          setTotalUsers(uJson?.data?.total ?? 0);
+        }
+        if (oRes.ok) {
+          const oJson = await oRes.json();
+          setOnlineUsers(oJson?.data?.total ?? 0);
+        }
+      } catch {}
+    };
+    fetchCounts();
+    intervalId = setInterval(fetchCounts, 10000);
+    return () => intervalId && clearInterval(intervalId);
+  }, []);
   return (
     <div className="relative z-30 border-t dark:border-white/20 bg-white/80 dark:bg-black/20  text-gray-900 dark:text-white">
       <footer className="relative mx-auto max-w-7xl px-4 sm:px-6 py-16 lg:px-8">
@@ -104,6 +131,14 @@ export default function Footer() {
 
                 <span>|</span>
                 <span>© 2025 Cardano2VN. All rights reserved.</span>
+                <span>|</span>
+                <span className="text-gray-500">
+                  Online: <strong className="text-gray-700 dark:text-gray-200">{onlineUsers}</strong>
+                </span>
+                <span className="text-gray-300">|</span>
+                <span className="text-gray-500">
+                  Total users: <strong className="text-gray-700 dark:text-gray-200">{totalUsers}</strong>
+                </span>
               </div>
             </div>
           </div>
