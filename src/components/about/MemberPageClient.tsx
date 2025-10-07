@@ -826,7 +826,7 @@ export default function MemberPageClient() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
             <div className="w-full lg:w-1/2">
-              <Title title="Get in Touch" description="We value your feedback and ideas. Share your thoughts, suggestions, or let us know if you'd like to collaborate with us." />
+              <Title title="Get in Touch" description="Chúng tôi trân trọng mọi ý kiến và đóng góp của bạn. Hãy chia sẻ suy nghĩ, đề xuất của bạn hoặc cho chúng tôi biết nếu bạn muốn hợp tác cùng Cardano2vn." />
             </div>
             <div className="w-full lg:w-1/2">
               <AboutContactForm

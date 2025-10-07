@@ -6,11 +6,11 @@ import { useToastContext } from '~/components/toast-provider';
 import { ContactForm } from './ContactForm';
 import ContactFormManager from './ContactFormManager';
 import { ContactFormData, FormErrors } from '~/constants/contact';
-import ContactFormQuoteBlock from './ContactFormQuoteBlock';
 import ContactFormImage from './ContactFormImage';
 import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
 import { useQuery } from '@tanstack/react-query';
+import Title from "~/components/title";
 
 type TabType = "form" | "manage";
 
@@ -411,13 +411,11 @@ export default function ContactFormSection() {
         <div className={`grid items-center gap-12 ${activeTab === "manage" ? "lg:grid-cols-1" : "lg:grid-cols-2"}`}>
           {activeTab === "form" && (
             <div className="relative flex flex-col h-full justify-center">
-              <div className="relative w-full h-[600px] lg:h-[600px]">
-                <ContactFormImage imageUrl={selectedCourseImage} />
-                {!selectedCourse && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-6">
-                    <ContactFormQuoteBlock />
-                  </div>
-                )}
+              <div className="relative w-full">
+                <Title 
+                  title="Từ Zero đến Builder: Biến ý tưởng thành dApp thực tế." 
+                  description="Tham gia chương trình đào tạo Blockchain chuyên sâu của chúng tôi, nơi bạn không chỉ học, mà còn trực tiếp xây dựng những ứng dụng phi tập trung có giá trị cho cộng đồng." 
+                />
               </div>
             </div>
           )}
