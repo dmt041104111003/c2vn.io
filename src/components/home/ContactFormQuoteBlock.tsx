@@ -33,7 +33,7 @@ export default function ContactFormQuoteBlock({ title, description, hasSelectedC
     : displayDescription;
 
   return (
-    <div className="bg-blue-50/80 dark:bg-gray-800/80 rounded-xl p-8 shadow-lg flex flex-col items-center w-full max-w-2xl mx-auto">
+    <div className="bg-blue-50/80 dark:bg-gray-800/80 rounded-xl p-8 shadow-lg flex flex-col items-center w-full h-full max-w-none mx-auto">
       <div className="mb-4 flex items-center gap-4 w-full">
         <StarIcon size="lg" className="w-16 h-16" />
         <div className="flex-1">
