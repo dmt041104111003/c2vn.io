@@ -208,8 +208,6 @@ img[alt*="Cardano2vn"] {
   z-index: 1000;
 }
 
-/* Hide FumaDocs GitHub button if present */
-.docs-isolated-container a[href*="github.com"],
 .docs-isolated-container [data-fumadocs-header] a[href*="github.com"],
 .docs-isolated-container [data-fumadocs-sidebar] a[href*="github.com"] {
   display: none !important;
