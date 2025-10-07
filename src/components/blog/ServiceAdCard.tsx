@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import WalletPickerModal from "~/components/our-service/WalletPickerModal";
 import { useToastContext } from "~/components/toast-provider";
@@ -231,7 +232,10 @@ export default function ServiceAdCard({
   return (
     <div className="w-full max-w-sm">
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-base font-semibold text-gray-900 dark:text-white">Our Services</h4>
+        <h4 className="text-base font-semibold text-gray-900 dark:text-white inline-flex items-center gap-2">
+          <Image src="/images/common/arrow.png" alt="arrow" width={40} height={40} />
+          Our Services
+        </h4>
       </div>
       
       <div className="rounded-md ring-1 ring-gray-200/50 dark:ring-gray-700/50 bg-white/40 dark:bg-gray-900/30 backdrop-blur-sm divide-y divide-gray-200/70 dark:divide-gray-700/60 overflow-hidden">
