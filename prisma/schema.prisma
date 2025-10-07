@@ -144,6 +144,17 @@ model VideoSection {
   updatedAt    DateTime @updatedAt
 }
 
+model PostView {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  viewedAt  DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@index([userId])
+}
+
 model Tag {
   id        String    @id @default(uuid())
   name      String

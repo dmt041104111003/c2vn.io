@@ -22,6 +22,7 @@ import { BlogPostDetail, BlogTag } from '~/constants/posts';
 import { Comment } from '~/constants/comment';
 import { scrollToCommentWithRetry } from '~/lib/mention-highlight';
 import BackgroundMotion from "~/components/ui/BackgroundMotion";
+// client-side seen storage removed; rely on API only
 
 export default function BlogDetailClient({ slug }: { slug: string }) {
   const { data: session } = useSession();
@@ -32,6 +33,31 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
   const [isReacting, setIsReacting] = useState(false);
   const proseRef = useRef<HTMLDivElement>(null);
   const { showSuccess, showError } = useToastContext();
+  const [hasSeen, setHasSeen] = useState(false);
+  const [totalViews, setTotalViews] = useState<number | null>(null);
+
+  useEffect(() => {
+    const run = async () => {
+      try {
+        if (!slug) return;
+        if (isLoggedIn) {
+          await fetch('/api/blog/seen', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postId: slug }),
+            credentials: 'include',
+          }).catch(() => {});
+          const res = await fetch(`/api/blog/seen?postId=${encodeURIComponent(slug)}`, { credentials: 'include' });
+          const data = await res.json().catch(() => ({}));
+          setHasSeen(!!data?.data?.seen);
+          if (typeof data?.data?.totalViews === 'number') setTotalViews(data.data.totalViews);
+        } else {
+          setHasSeen(false);
+        }
+      } catch {}
+    };
+    run();
+  }, [slug, isLoggedIn]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -400,6 +426,16 @@ export default function BlogDetailClient({ slug }: { slug: string }) {
           
           <div>
             <TipTapPreview content={post.content} />
+          </div>
+
+          <div className="mt-6 text-gray-500 dark:text-gray-400">
+            {hasSeen && <span className="italic mr-3">Seen</span>}
+            {typeof totalViews === 'number' && (
+              <span className="inline-flex items-center gap-1">
+                <span className="h-1 w-1 rounded-full bg-gray-400 inline-block align-middle" />
+                <span>Views: {totalViews}</span>
+              </span>
+            )}
           </div>
 
           {post.githubRepo && (

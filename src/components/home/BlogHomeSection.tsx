@@ -168,6 +168,17 @@ export default function ProtocolSection() {
                     <Link 
                       href={`/blog/${post.slug || post.id}`}
                       className="flex gap-4 p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                      onClick={() => {
+                        const pid = post.slug || post.id;
+                        try {
+                          fetch('/api/blog/seen', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'include',
+                            body: JSON.stringify({ postId: pid }),
+                          }).catch(() => {});
+                        } catch {}
+                      }}
                     >
                       {/* Thumbnail */}
                       <div className="relative w-24 h-16 flex-shrink-0 rounded-lg overflow-hidden">
