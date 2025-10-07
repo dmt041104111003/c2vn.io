@@ -8,8 +8,7 @@ export const runtime = 'nodejs';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL 
-    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+  const envSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   const origin = envSiteUrl.replace(/\/$/, '');
 
   let post: any = null;

@@ -22,11 +22,6 @@ export default function ShareModal({ isOpen, onClose, blogTitle, blogUrl }: Shar
     onClose();
   };
 
-  const handleZaloShare = () => {
-    const url = `https://zalo.me/share?u=${encodeURIComponent(blogUrl)}&t=${encodeURIComponent(blogTitle)}`;
-    window.open(url, '_blank', 'width=600,height=400');
-    onClose();
-  };
 
   const handleTelegramShare = () => {
     const url = `https://t.me/share/url?url=${encodeURIComponent(blogUrl)}&text=${encodeURIComponent(blogTitle)}`;
@@ -77,23 +72,7 @@ export default function ShareModal({ isOpen, onClose, blogTitle, blogUrl }: Shar
             <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
 
-          <button 
-            onClick={handleZaloShare}
-            className="w-full group relative overflow-hidden bg-transparent border border-gray-300 dark:border-gray-600/50 hover:border-blue-500/50 rounded-xl p-4 transition-all duration-300 transform hover:scale-[1.02] hover:bg-blue-500/10"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center shadow-lg border border-blue-500/30">
-                <svg className="w-7 h-7 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
-              <div className="text-left">
-                <div className="font-bold text-gray-900 dark:text-white text-lg">Zalo</div>
-                <div className="text-gray-600 dark:text-gray-400 text-sm">Share on Zalo</div>
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
+          
 
           <button 
             onClick={handleTelegramShare}
