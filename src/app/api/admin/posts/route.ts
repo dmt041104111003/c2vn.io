@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
           author: { select: { name: true } },
           tags: { select: { tag: { select: { id: true, name: true } } } },
           media: { select: { url: true, type: true, id: true } },
-          _count: { select: { PostView: true } as any },
+          _count: { select: { postViews: true } as any },
         },
       }),
       prisma.post.count({ where })
