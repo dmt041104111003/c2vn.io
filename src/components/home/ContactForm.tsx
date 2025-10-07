@@ -29,36 +29,105 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
     gcTime: 10 * 60 * 1000, 
     refetchOnWindowFocus: false,
   });
-  const uniqueLocations: string[] = useMemo(() => {
-    const list: any[] = Array.isArray(courses) ? (courses as any[]) : [];
-    const names = list
-      .map((c: any) => (typeof c?.location === 'string' ? c.location : ''))
-      .filter((v: string) => v.length > 0);
-    const canonicalize = (s: string) =>
-      s
-        .normalize('NFKC')
-        .replace(/\u00A0/g, ' ') 
-        .replace(/\s+/g, ' ')
-        .trim()
-        .toLowerCase();
-    const map = new Map<string, string>();
-    for (const raw of names) {
-      const display = raw
-        .normalize('NFKC')
-        .replace(/\u00A0/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      if (!display) continue;
-      const key = canonicalize(display);
-      if (!map.has(key)) map.set(key, display);
-    }
-    return Array.from(map.values());
-  }, [courses]);
 
   return (
          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden max-w-2xl mx-auto">
        <form onSubmit={onSubmit} className="p-4 sm:p-5 space-y-2 sm:space-y-3">
          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Course *
+            </label>
+            <select
+              name="your-course"
+              value={typedFormData["your-course"]}
+              onChange={e => {
+                onInputChange(e);
+                if (onCourseChange) onCourseChange(e.target.value);
+                
+                const selectedCourse = courses?.find((course: any) => course.name === e.target.value);
+                if (selectedCourse?.locationRel?.name) {
+                  const locationSelect = document.querySelector('select[name="event-location"]') as HTMLSelectElement;
+                  if (locationSelect) {
+                    locationSelect.value = selectedCourse.locationRel.name;
+                    locationSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                  }
+                }
+              }}
+              aria-label="Course"
+              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
+            >
+              <option value="">Select Course</option>
+              {coursesError && <option value="">Error loading courses</option>}
+              {courses?.map((course: any) => {
+                console.log('Rendering course option:', course);
+                return (
+                  <option key={course.id} value={course.name}>
+                    {course.name}
+                  </option>
+                );
+              })}
+            </select>
+            {selectedCourseImage && (
+              <div className="mt-2">
+                <img
+                  src={selectedCourseImage}
+                  alt="Selected course"
+                  className="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
+              </div>
+            )}
+            {typedErrors["your-course"] && (
+              <p className="text-red-500 text-xs mt-1 flex items-start sm:items-center">
+                <svg className="w-3 h-3 mr-1 flex-shrink-0 mt-0.5 sm:mt-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span className="break-words leading-relaxed">{typedErrors["your-course"]}</span>
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Course Location
+            </label>
+            <select
+              name="event-location"
+              value={typedFormData["event-location"]}
+              onChange={onInputChange}
+              aria-label="Course Location"
+              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
+            >
+              <option value="">Select Course Location</option>
+              {Array.isArray(courses) && (courses as any[])
+                .map((c: any) => c.locationRel?.name)
+                .filter((v: any) => typeof v === 'string' && v.trim().length > 0)
+                .reduce((acc: string[], curr: string) => {
+                  const key = curr.trim().toLowerCase();
+                  if (!acc.some(a => a.toLowerCase() === key)) acc.push(curr.trim());
+                  return acc;
+                }, [])
+                .map((loc: string) => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+            </select>
+          </div>
+           
+          <div className="md:col-span-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Enter referral code
+            </label>
+            <input
+              type="text"
+              name="email-intro"
+              placeholder="Enter referral code (optional)"
+              value={typedFormData["email-intro"]}
+              onChange={onInputChange}
+              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
+              aria-label="Enter referral code"
+            />
+          </div>
+          
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Full Name *
@@ -139,32 +208,6 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
           
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Course Location
-            </label>
-            <select
-              name="event-location"
-              value={typedFormData["event-location"]}
-              onChange={onInputChange}
-              aria-label="Course Location"
-              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
-            >
-              <option value="">Select Course Location</option>
-              {Array.isArray(courses) && (courses as any[])
-                .map((c: any) => c.locationRel?.name)
-                .filter((v: any) => typeof v === 'string' && v.trim().length > 0)
-                .reduce((acc: string[], curr: string) => {
-                  const key = curr.trim().toLowerCase();
-                  if (!acc.some(a => a.toLowerCase() === key)) acc.push(curr.trim());
-                  return acc;
-                }, [])
-                .map((loc: string) => (
-                  <option key={loc} value={loc}>{loc}</option>
-                ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Telegram ID (optional)
             </label>
             <input
@@ -176,74 +219,6 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
                              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
             />
           </div>
-          
-                               <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Course *
-            </label>
-            <select
-              name="your-course"
-              value={typedFormData["your-course"]}
-              onChange={e => {
-                onInputChange(e);
-                if (onCourseChange) onCourseChange(e.target.value);
-                
-                const selectedCourse = courses?.find((course: any) => course.name === e.target.value);
-                if (selectedCourse?.locationRel?.name) {
-                  const locationSelect = document.querySelector('select[name="event-location"]') as HTMLSelectElement;
-                  if (locationSelect) {
-                    locationSelect.value = selectedCourse.locationRel.name;
-                    locationSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                  }
-                }
-              }}
-              aria-label="Course"
-              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
-            >
-              <option value="">Select Course</option>
-              {coursesError && <option value="">Error loading courses</option>}
-              {courses?.map((course: any) => {
-                console.log('Rendering course option:', course);
-                return (
-                  <option key={course.id} value={course.name}>
-                    {course.name}
-                  </option>
-                );
-              })}
-            </select>
-            {selectedCourseImage && (
-              <div className="mt-2">
-                <img
-                  src={selectedCourseImage}
-                  alt="Selected course"
-                  className="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
-                />
-              </div>
-            )}
-            {typedErrors["your-course"] && (
-              <p className="text-red-500 text-xs mt-1 flex items-start sm:items-center">
-                <svg className="w-3 h-3 mr-1 flex-shrink-0 mt-0.5 sm:mt-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                <span className="break-words leading-relaxed">{typedErrors["your-course"]}</span>
-              </p>
-            )}
-          </div>
-           
-                       <div className="md:col-span-2">
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Enter referral code
-              </label>
-              <input
-                type="text"
-                name="email-intro"
-                placeholder="Enter referral code (optional)"
-                value={typedFormData["email-intro"]}
-                onChange={onInputChange}
-                className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
-                aria-label="Enter referral code"
-              />
-            </div>
           
           {typedErrors.contact && (
             <div className="md:col-span-2">

@@ -1,6 +1,6 @@
 "use client";
 
-// import Action from "~/components/action";
+import Action from "~/components/action";
 import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -353,7 +353,7 @@ export default function VideoSection() {
           </div>
         </div>
       </div>
-      {/* <Action title="Scroll" href="#trust" /> */}
+      <Action title="Scroll" href="#trust" />
     </section>
   );
 }
