@@ -52,6 +52,7 @@ export interface Course {
   description?: string;
   price?: string;
   location?: string;
+  locationRel?: { id: string; name: string };
   startDate?: string;
   publishStatus: 'DRAFT' | 'PUBLISHED';
   isActive: boolean;

@@ -260,23 +260,25 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
           )}
         </div>
 
-        <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <select
-            value={publishStatus}
-            onChange={(e) => setPublishStatus(e.target.value as 'DRAFT' | 'PUBLISHED')}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            title="Select publish status"
-          >
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-          </select>
-          <button
-            type="submit"
-            disabled={createMutation.isPending}
-            className="w-full px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-2 border-blue-500 dark:border-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 transition-colors font-medium"
-          >
-            {createMutation.isPending ? 'Adding...' : 'Add'}
-          </button>
+        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-2 gap-4">
+            <select
+              value={publishStatus}
+              onChange={(e) => setPublishStatus(e.target.value as 'DRAFT' | 'PUBLISHED')}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              title="Select publish status"
+            >
+              <option value="DRAFT">Draft</option>
+              <option value="PUBLISHED">Published</option>
+            </select>
+            <button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="w-full px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-2 border-blue-500 dark:border-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 disabled:opacity-50 transition-colors font-medium"
+            >
+              {createMutation.isPending ? 'Adding...' : 'Add'}
+            </button>
+          </div>
         </div>
       </form>
     </div>
