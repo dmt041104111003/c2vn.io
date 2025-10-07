@@ -1,6 +1,5 @@
 "use client";
 
-import Action from "~/components/action";
 import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -31,7 +30,6 @@ async function fetchVideos(): Promise<Video[]> {
 
 export default function VideoSection() {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
-  const [showAllVideos, setShowAllVideos] = useState(false);
   const playerRef = useRef<any>(null);
   const [ytReady, setYtReady] = useState(false);
 
@@ -69,7 +67,7 @@ export default function VideoSection() {
     return 0;
   }) : [];
 
-  const displayedVideos = showAllVideos ? sortedVideos : sortedVideos.slice(0, 2);
+  const displayedVideos = sortedVideos;
 
   function getYoutubeIdFromUrl(url: string) {
     if (!url) return null;
@@ -285,7 +283,7 @@ export default function VideoSection() {
               </motion.div>
 
               <div className="rounded-md ring-1 ring-gray-200 dark:ring-gray-700 bg-white dark:bg-gray-800 shadow-sm">
-                <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                <div className="divide-y divide-gray-200 dark:divide-gray-700 max-h-96 overflow-y-auto custom-scrollbar">
                   {displayedVideos.map((video, idx) => (
                     <motion.div
                       key={video.id}
@@ -330,30 +328,11 @@ export default function VideoSection() {
                   ))}
                 </div>
                 
-                {sortedVideos.length > 2 && (
-                  <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                    <motion.button
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: false, amount: 0.3 }}
-                      transition={{ duration: 0.5, delay: 0.4 }}
-                      whileHover={{ 
-                        scale: 1.05,
-                        transition: { duration: 0.2 }
-                      }}
-                      onClick={() => setShowAllVideos(!showAllVideos)}
-                      className="w-full text-center text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      {showAllVideos ? "Show Less" : "Show More"}
-                    </motion.button>
-                  </div>
-                )}
               </div>
             </motion.div>
           </div>
         </div>
       </div>
-      <Action title="Scroll" href="#trust" />
     </section>
   );
 }
