@@ -7,6 +7,7 @@ export interface VideoItem {
   title: string;
   thumbnailUrl: string;
   isFeatured: boolean;
+  order: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,26 +19,19 @@ export interface VideoSectionEditorProps {
   videoUrl: string;
   videoTitle: string;
   channelName: string;
+  order: number;
   isValidUrl: boolean | null;
   isAdding: boolean;
   onVideoUrlChange: (url: string) => void;
   onVideoTitleChange: (title: string) => void;
   onChannelNameChange: (channel: string) => void;
+  onOrderChange: (order: number) => void;
   onAddVideo: () => void;
   thumbnailUrl?: string;
   submitLabel?: string;
   title?: string;
 }
 
-// VideoSectionPagination interfaces
-export interface VideoSectionPaginationProps {
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
-  startIndex: number;
-  onPageChange: (page: number) => void;
-}
 
 // VideoSectionStats interfaces
 export interface VideoSectionStatsProps {

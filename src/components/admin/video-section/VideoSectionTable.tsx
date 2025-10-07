@@ -70,6 +70,7 @@ export function VideoSectionTable({
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thumbnail</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Channel</th>
@@ -81,6 +82,11 @@ export function VideoSectionTable({
             {Array.isArray(videos) && videos.length > 0 ? (
               videos.map((video) => (
                 <tr key={video.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className={`text-sm font-medium ${video.isFeatured ? 'text-blue-600 font-bold' : 'text-gray-900'}`}>
+                      {video.isFeatured ? '0 (Featured)' : (video.order || 0)}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <img 
                       src={getThumbnailSrc(video)} 
@@ -155,7 +161,7 @@ export function VideoSectionTable({
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
                   No videos found.
                 </td>
               </tr>

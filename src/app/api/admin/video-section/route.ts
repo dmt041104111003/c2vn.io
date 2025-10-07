@@ -7,9 +7,10 @@ import { createSuccessResponse } from "~/lib/api-response";
 export const GET = withAdmin(async () => {
   try {
     const videos = await prisma.videoSection.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        { order: "asc" },
+        { createdAt: "desc" },
+      ],
     });
 
     return NextResponse.json(createSuccessResponse(videos));
@@ -20,7 +21,7 @@ export const GET = withAdmin(async () => {
 
 export const POST = withAdmin(async (req) => {
   const body = await req.json();
-  const { videoUrl, title, channelName } = body;
+  const { videoUrl, title, channelName, order } = body;
 
   if (!videoUrl) {
     return NextResponse.json(createErrorResponse('Missing videoUrl', 'MISSING_VIDEO_URL'), { status: 400 });
@@ -45,6 +46,13 @@ export const POST = withAdmin(async (req) => {
 
   const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
 
+  const maxOrder = await prisma.videoSection.findFirst({
+    where: { isFeatured: false },
+    orderBy: { order: 'desc' },
+    select: { order: true }
+  });
+  const nextOrder = maxOrder ? maxOrder.order + 1 : 1;
+
   const video = await prisma.videoSection.create({
     data: {
       videoId,
@@ -53,6 +61,7 @@ export const POST = withAdmin(async (req) => {
       title,
       thumbnailUrl,
       isFeatured: false,
+      order: nextOrder,
       createdAt: new Date(),
       updatedAt: new Date(),
     },

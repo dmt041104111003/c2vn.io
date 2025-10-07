@@ -21,17 +21,20 @@ export const DELETE = withAdmin(async (req) => {
 export const PATCH = withAdmin(async (req) => {
   const id = req.nextUrl.pathname.split("/").pop();
   const body = await req.json();
-  const { isFeatured, videoUrl, title, channelName, thumbnailUrl } = body as {
+  const { isFeatured, videoUrl, title, channelName, thumbnailUrl, order } = body as {
     isFeatured?: boolean;
     videoUrl?: string;
     title?: string;
     channelName?: string;
     thumbnailUrl?: string;
+    order?: number;
   };
 
   if (!id) {
     return NextResponse.json(createErrorResponse('Missing video ID', 'MISSING_VIDEO_ID'), { status: 400 });
   }
+
+  const data: Record<string, any> = {};
 
   if (isFeatured === true) {
     const existingFeatured = await prisma.videoSection.findFirst({
@@ -42,22 +45,43 @@ export const PATCH = withAdmin(async (req) => {
     });
 
     if (existingFeatured) {
+      const maxOrder = await prisma.videoSection.findFirst({
+        where: { isFeatured: false },
+        orderBy: { order: 'desc' },
+        select: { order: true }
+      });
+      const nextOrder = maxOrder ? maxOrder.order + 1 : 1;
+
       await prisma.videoSection.update({
         where: { id: existingFeatured.id },
-        data: { isFeatured: false },
+        data: { 
+          isFeatured: false,
+          order: nextOrder
+        },
       });
     }
-  }
 
-  const data: Record<string, any> = {};
-  if (typeof isFeatured === "boolean") {
-    data.isFeatured = isFeatured;
+    data.isFeatured = true;
+    data.order = 0;
+  } else if (isFeatured === false) {
+    const maxOrder = await prisma.videoSection.findFirst({
+      where: { isFeatured: false },
+      orderBy: { order: 'desc' },
+      select: { order: true }
+    });
+    const nextOrder = maxOrder ? maxOrder.order + 1 : 1;
+    
+    data.isFeatured = false;
+    data.order = nextOrder;
   }
   if (typeof title === "string") {
     data.title = title;
   }
   if (typeof channelName === "string") {
     data.channelName = channelName;
+  }
+  if (typeof order === "number") {
+    data.order = order;
   }
 
   if (typeof videoUrl === "string") {

@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AdminHeader } from "../common/AdminHeader";
 import { AdminFilters } from "../common/AdminFilters";
 import { VideoSectionTable } from "./VideoSectionTable";
-import { VideoSectionPagination } from "./VideoSectionPagination";
+import { Pagination } from "~/components/ui/pagination";
 import { VideoSectionStats } from "./VideoSectionStats";
 import { VideoSectionEditor } from "./VideoSectionEditor";
 import AdminTableSkeleton from "../common/AdminTableSkeleton";
@@ -34,6 +34,7 @@ export function VideoSectionPageClient() {
   const [newVideoUrl, setNewVideoUrl] = React.useState("");
   const [newVideoTitle, setNewVideoTitle] = React.useState("");
   const [newChannelName, setNewChannelName] = React.useState("");
+  const [newOrder, setNewOrder] = React.useState(0);
   const [isValidUrl, setIsValidUrl] = React.useState<boolean | null>(null);
   const [isAdding, setIsAdding] = React.useState(false);
   // Save-less flow: no modifiedVideos tracking needed
@@ -70,6 +71,7 @@ export function VideoSectionPageClient() {
           title: newVideoTitle,
           channelName: newChannelName,
           thumbnailUrl: newThumbnailUrl,
+          ...(isEditing && !editingVideo?.isFeatured && { order: newOrder }),
         }),
       });
 
@@ -156,12 +158,17 @@ export function VideoSectionPageClient() {
     setNewChannelName(channel);
   };
 
+  const handleOrderChange = (order: number) => {
+    setNewOrder(order);
+  };
+
   const handleCloseModal = () => {
     setShowAddModal(false);
     setEditingVideo(null);
     setNewVideoUrl("");
     setNewVideoTitle("");
     setNewChannelName("");
+    setNewOrder(0);
     setIsValidUrl(null);
   };
 
@@ -179,7 +186,7 @@ export function VideoSectionPageClient() {
     }
     
     return matchesSearch && matchesFilter;
-  }) : [];
+  }).sort((a, b) => (a.order || 0) - (b.order || 0)) : [];
 
   const totalPages = Math.ceil(filteredVideos.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -280,16 +287,16 @@ export function VideoSectionPageClient() {
                 setNewVideoUrl(`https://www.youtube.com/watch?v=${video.videoId}`);
                 setNewVideoTitle(video.title);
                 setNewChannelName(video.channelName);
+                setNewOrder(video.order || 0);
                 setIsValidUrl(true);
               }}
             />
             
-            <VideoSectionPagination
+            <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={filteredVideos.length}
               itemsPerPage={ITEMS_PER_PAGE}
-              startIndex={startIndex}
               onPageChange={setCurrentPage}
             />
           </div>
@@ -302,11 +309,13 @@ export function VideoSectionPageClient() {
         videoUrl={newVideoUrl}
         videoTitle={newVideoTitle}
         channelName={newChannelName}
+        order={newOrder}
         isValidUrl={isValidUrl}
         isAdding={isAdding}
         onVideoUrlChange={handleVideoUrlChange}
         onVideoTitleChange={handleVideoTitleChange}
         onChannelNameChange={handleChannelNameChange}
+        onOrderChange={handleOrderChange}
         onAddVideo={handleAddVideo}
         thumbnailUrl={newThumbnailUrl}
         submitLabel={editingVideo ? "Save Changes" : "Add Video"}

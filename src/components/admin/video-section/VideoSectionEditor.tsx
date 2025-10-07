@@ -12,11 +12,13 @@ export function VideoSectionEditor({
   videoUrl,
   videoTitle,
   channelName,
+  order,
   isValidUrl,
   isAdding,
   onVideoUrlChange,
   onVideoTitleChange,
   onChannelNameChange,
+  onOrderChange,
   onAddVideo,
   thumbnailUrl,
   submitLabel,
@@ -78,6 +80,25 @@ export function VideoSectionEditor({
             onChange={(e) => onChannelNameChange(e.target.value)}
             className="w-full px-3 py-2 border rounded-md"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Order</label>
+          <input
+            type="number"
+            placeholder="Enter order number..."
+            value={order}
+            onChange={(e) => onOrderChange(parseInt(e.target.value) || 0)}
+            className="w-full px-3 py-2 border rounded-md"
+            min="0"
+            disabled={order === 0}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {order === 0 
+              ? "Featured videos automatically have order 0 (highest priority)"
+              : "Lower numbers appear first in the video list"
+            }
+          </p>
         </div>
 
         {videoId && (
