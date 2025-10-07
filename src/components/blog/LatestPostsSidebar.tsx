@@ -80,7 +80,17 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
                 <span className="absolute left-0 top-0 h-full w-0.5 bg-indigo-400/80 opacity-0 group-hover:opacity-100 transition-opacity" />
               )}
               
-              <Link href={`/blog/${post.slug || post.id}`} className="flex items-center gap-3 min-w-0 flex-1">
+              <Link href={`/blog/${post.slug || post.id}`} className="flex items-center gap-3 min-w-0 flex-1" onClick={() => {
+                const pid = post.slug || post.id;
+                try {
+                  fetch('/api/blog/seen', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ postId: pid }),
+                  }).catch(() => {});
+                } catch {}
+              }}>
                 {/* Image */}
                 <div className="relative w-10 h-10 flex-shrink-0 overflow-hidden rounded-lg">
                   <img

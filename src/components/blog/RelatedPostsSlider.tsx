@@ -100,7 +100,17 @@ export default function RelatedPostsSlider({ posts }: RelatedPostsSliderProps) {
                 className="flex flex-col"
               >
                 <div className="w-full rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl h-full flex flex-col overflow-hidden">
-                  <Link className="flex-1 flex flex-col" href={`/blog/${post.slug || post.id}`}>
+                  <Link className="flex-1 flex flex-col" href={`/blog/${post.slug || post.id}`} onClick={() => {
+                    const pid = post.slug || post.id;
+                    try {
+                      fetch('/api/blog/seen', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ postId: pid }),
+                      }).catch(() => {});
+                    } catch {}
+                  }}>
                     <div className="relative h-48 overflow-hidden">
                       <img
                         alt={post.title}
