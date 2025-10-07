@@ -70,9 +70,17 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
               <>
                 <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/85 via-black/55 to-transparent dark:from-black/70 dark:via-black/45 dark:to-transparent pointer-events-none" />
                 <div className="absolute bottom-4 left-4 right-4 text-white z-10">
-                  <h4 className="block max-w-full text-lg font-semibold truncate text-white drop-shadow-xl mb-1">
-                    {event.title.length > maxChars ? event.title.slice(0, maxChars) + "..." : event.title}
-                  </h4>
+                  <div className="relative group">
+                    <h4 className="block max-w-full text-lg font-semibold truncate text-white drop-shadow-xl mb-1">
+                      {event.title.length > maxChars ? event.title.slice(0, maxChars) + "..." : event.title}
+                    </h4>
+                    <div className="absolute left-0 -top-9 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                      <div className="bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
+                        {event.title}
+                        <div className="absolute left-4 -bottom-2 border-t-8 border-t-gray-900 border-x-8 border-x-transparent"></div>
+                      </div>
+                    </div>
+                  </div>
                   <p className="block text-sm text-white/90 drop-shadow">
                     {event.location}
                   </p>
