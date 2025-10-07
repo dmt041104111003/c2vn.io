@@ -11,7 +11,7 @@ import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
 import { useQuery } from '@tanstack/react-query';
 import Title from "~/components/title";
-
+import StarIcon from "~/components/ui/StarIcon";
 type TabType = "form" | "manage";
 
 export default function ContactFormSection() {
@@ -388,7 +388,6 @@ export default function ContactFormSection() {
         throw new Error('Network response was not ok');
       }
     } catch (error) {
-      console.error('Send error:', error);
       showError("Failed to send message. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -410,10 +409,22 @@ export default function ContactFormSection() {
           {activeTab === "form" && (
             <div className="relative flex flex-col h-full justify-center">
               <div className="relative w-full">
-                <Title 
-                  title="Từ Zero đến Builder: Biến ý tưởng thành dApp thực tế." 
-                  description="Tham gia chương trình đào tạo Blockchain chuyên sâu của chúng tôi, nơi bạn không chỉ học, mà còn trực tiếp xây dựng những ứng dụng phi tập trung có giá trị cho cộng đồng." 
-                />
+                <div className="relative mb-16">
+                  <div className="mb-6 flex items-center gap-4">
+                    <StarIcon size="lg" className="w-16 h-16" />
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white lg:text-6xl">Từ Zero đến Builder</h1>
+                  </div>
+                  <div className="max-w-3xl">
+                    <p className="text-xl text-gray-600 dark:text-gray-300">
+                      Tham gia chương trình đào tạo Blockchain chuyên sâu của chúng tôi, nơi bạn không chỉ học, mà còn trực tiếp xây dựng những ứng dụng phi tập trung có giá trị cho cộng đồng.
+                    </p>
+                  </div>
+                </div>
+                {selectedCourseImage && (
+                  <div className="mt-6 relative w-full h-[500px]">
+                    <ContactFormImage imageUrl={selectedCourseImage} />
+                  </div>
+                )}
               </div>
             </div>
           )}
