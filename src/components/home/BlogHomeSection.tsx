@@ -196,7 +196,10 @@ export default function ProtocolSection() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         {/* Title */}
-                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <h3
+                          className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                          title={post.title}
+                        >
                           {post.title}
                         </h3>
 

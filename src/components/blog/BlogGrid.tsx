@@ -149,7 +149,10 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
                     </div>
                   )}
                   
-                  <h3 className="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2 mb-1">
+                  <h3
+                    className="font-semibold text-sm text-gray-900 dark:text-white line-clamp-2 mb-1"
+                    title={post.title}
+                  >
                     {post.title}
                   </h3>
                   <div className="text-xs text-gray-600 dark:text-gray-400">
