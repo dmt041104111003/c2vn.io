@@ -165,15 +165,6 @@ export default function WalletList({ wallets }: WalletListProps) {
                   className="w-8 h-8 rounded-full"
                   loading="lazy"
                 />
-              ) : wallet.id === "sol" ? (
-                <Image
-                  src="/images/wallets/solana.png"
-                  alt="Sol Wallet"
-                  width={32}
-                  height={32}
-                  className="w-8 h-8"
-                  loading="lazy"
-                />
               ) : wallet.id === "facebook" ? (
                 <Image
                   src="/images/wallets/facebook.png"
