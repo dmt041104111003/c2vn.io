@@ -21,7 +21,7 @@ export const GET = withAdmin(async () => {
 
 export const POST = withAdmin(async (req) => {
   const body = await req.json();
-  const { videoUrl, title, channelName, order } = body;
+  const { videoUrl, title, channelName, order, description } = body;
 
   if (!videoUrl) {
     return NextResponse.json(createErrorResponse('Missing videoUrl', 'MISSING_VIDEO_URL'), { status: 400 });
@@ -63,18 +63,21 @@ export const POST = withAdmin(async (req) => {
     }
   }
 
+  const createData: any = {
+    videoId,
+    channelName,
+    videoUrl,
+    title,
+    thumbnailUrl,
+    isFeatured: false,
+    order: order || 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  if (typeof description === 'string') createData.description = description;
+
   const video = await prisma.videoSection.create({
-    data: {
-      videoId,
-      channelName,
-      videoUrl,
-      title,
-      thumbnailUrl,
-      isFeatured: false,
-      order: order || 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
+    data: createData,
   });
 
   return NextResponse.json(createSuccessResponse(video) );

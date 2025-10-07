@@ -24,6 +24,8 @@ export function VideoSectionEditor({
   thumbnailUrl,
   submitLabel,
   title,
+  description,
+  onDescriptionChange,
 }: VideoSectionEditorProps) {
   const [videoId, setVideoId] = React.useState<string | null>(null);
 
@@ -81,6 +83,18 @@ export function VideoSectionEditor({
             onChange={(e) => onChannelNameChange(e.target.value)}
             className="w-full px-3 py-2 border rounded-md"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Short Description</label>
+          <textarea
+            placeholder="Enter a short description (optional)"
+            value={description || ""}
+            onChange={(e) => onDescriptionChange?.(e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          <p className="text-xs text-gray-500 mt-1">This will appear as a tooltip in the video list.</p>
         </div>
 
         <div>

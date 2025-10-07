@@ -35,6 +35,7 @@ export function VideoSectionPageClient() {
   const [newVideoTitle, setNewVideoTitle] = React.useState("");
   const [newChannelName, setNewChannelName] = React.useState("");
   const [newOrder, setNewOrder] = React.useState(0);
+  const [newDescription, setNewDescription] = React.useState("");
   const [isValidUrl, setIsValidUrl] = React.useState<boolean | null>(null);
   const [isAdding, setIsAdding] = React.useState(false);
   // Save-less flow: no modifiedVideos tracking needed
@@ -70,6 +71,7 @@ export function VideoSectionPageClient() {
           videoUrl: newVideoUrl,
           title: newVideoTitle,
           channelName: newChannelName,
+          description: newDescription,
           thumbnailUrl: newThumbnailUrl,
           order: newOrder,
         }),
@@ -154,6 +156,7 @@ export function VideoSectionPageClient() {
     setNewVideoTitle("");
     setNewChannelName("");
     setNewOrder(0);
+    setNewDescription("");
     setIsValidUrl(null);
   };
 
@@ -306,6 +309,8 @@ export function VideoSectionPageClient() {
         isFeatured={editingVideo?.isFeatured || false}
         submitLabel={editingVideo ? "Save Changes" : "Add Video"}
         title={editingVideo ? "Edit Video" : "Add New Video"}
+        description={newDescription}
+        onDescriptionChange={setNewDescription}
       />
     </div>
   );
