@@ -64,9 +64,9 @@ export default function PoolCard({
               )}
             </div>
           </div>
-          <div className="rounded-lg bg-gray-50 dark:bg-gray-900/40 p-3 border border-gray-200/60 dark:border-gray-700/60">
+          <div className="rounded-lg bg-gray-50 dark:bg-gray-900/40 p-3 border border-gray-200/60 dark:border-gray-700/60 min-w-0">
             <div className="text-[12px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Live Stake</div>
-            <div className="mt-1 text-base font-semibold text-gray-900 dark:text-white">
+            <div className="mt-1 text-base font-semibold text-gray-900 dark:text-white whitespace-nowrap">
               {loading ? "…" : (
                 (() => {
                   if (!stake) return "-";
@@ -85,9 +85,9 @@ export default function PoolCard({
               )}
             </div>
           </div>
-          <div className="rounded-lg bg-gray-50 dark:bg-gray-900/40 p-3 border border-gray-200/60 dark:border-gray-700/60">
+          <div className="rounded-lg bg-gray-50 dark:bg-gray-900/40 p-3 border border-gray-200/60 dark:border-gray-700/60 min-w-0">
             <div className="text-[12px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Pledge</div>
-            <div className="mt-1 text-base font-semibold text-gray-900 dark:text-white">
+            <div className="mt-1 text-base font-semibold text-gray-900 dark:text-white whitespace-nowrap">
               {loading ? "…" : (
                 (() => {
                   if (!pledge) return "-";

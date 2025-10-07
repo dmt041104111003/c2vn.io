@@ -54,9 +54,9 @@ export default function DrepCard({
             </button>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <div className="text-[13px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Voting Power</div>
-            <div className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+            <div className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white whitespace-nowrap">
               {loading ? "…" : (
                 (() => {
                   // expect format like "1,234,567.890 ₳"

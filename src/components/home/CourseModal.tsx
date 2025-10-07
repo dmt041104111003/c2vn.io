@@ -215,10 +215,10 @@ export default function CourseModal({ course, courses = [], initialIndex = 0, is
                         {/* Course Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {/* Price */}
-                            <div className="flex items-center gap-2 text-sm">
+                            <div className="flex items-center gap-2 text-sm min-w-0">
                               <span className="text-gray-700 dark:text-gray-300">
                                 <span
-                                  className={`ml-1 inline-flex items-center px-3 py-1.5 rounded-full text-lg font-bold ${
+                                  className={`ml-1 inline-flex items-center px-3 py-1.5 rounded-full text-lg font-bold whitespace-nowrap ${
                                     currentCourse.price === 'free' || !currentCourse.price
                                       ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                                       : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
