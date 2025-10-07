@@ -248,9 +248,9 @@ export default function VideoSection() {
           >
             <div className="mb-4 lg:mb-6 flex items-center gap-2 lg:gap-4">
               <StarIcon size="lg" className="w-16 h-16" />
-              <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">The Cardano2vn Videos</h2>
+              <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">Videos</h2>
             </div>
-            <p className="max-w-3xl text-base lg:text-xl text-gray-700 dark:text-gray-300">Watch our latest videos and memorable moments.</p>
+            <p className="max-w-3xl text-base lg:text-xl text-gray-700 dark:text-gray-300">Xem những video mới nhất và những khoảnh khắc đáng nhớ về chúng tôi.</p>
           </motion.div>
 
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">

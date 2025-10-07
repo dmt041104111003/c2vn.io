@@ -78,8 +78,8 @@ export default function BlogPageClient() {
           transition={{ duration: 0.6 }}
         >
           <Title
-            title="Cardano2vn Blog"
-            description="Insights, updates, and stories from the Andamio ecosystem. Explore our journey building trust protocols for distributed work."
+            title="Blog"
+            description="Chào mừng đến với blog kỹ thuật của cardano2vn – nguồn tài nguyên dành cho nhà đầu tư, nhà phát triển muốn chinh phục hệ sinh thái Cardano và Midnight. Chúng tôi tập trung vào việc cung cấp các bài viết phân tích, hướng dẫn chi tiết và chuyên sâu về kỹ thuật công nghệ, các ngôn ngữ lập trình hợp đồng thông minh như Plutus, Opshin, Aiken trên Cardano, Compact trên Midnight, giúp bạn tự tin xây dựng và phát triển các ứng dụng phi tập trung đột phá."
           />
         </motion.div>
         
