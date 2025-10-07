@@ -80,7 +80,7 @@ export default function RelatedPostsSlider({ posts }: RelatedPostsSliderProps) {
       </div>
       
       <div className="relative">
-        <div className="grid max-w-none gap-16 lg:grid-cols-3">
+        <div className="grid max-w-none gap-8 md:gap-10 lg:gap-8 lg:grid-cols-3">
           <AnimatePresence mode="wait">
             {getCurrentPosts().map((post, idx) => (
               <motion.article
@@ -99,7 +99,7 @@ export default function RelatedPostsSlider({ posts }: RelatedPostsSliderProps) {
                 }}
                 className="flex flex-col"
               >
-                <div className="rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl h-full flex flex-col overflow-hidden">
+                <div className="w-full rounded-xl border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-2xl h-full flex flex-col overflow-hidden">
                   <Link className="flex-1 flex flex-col" href={`/blog/${post.slug || post.id}`}>
                     <div className="relative h-48 overflow-hidden">
                       <img
