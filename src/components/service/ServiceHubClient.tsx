@@ -10,21 +10,21 @@ const cards = [
     href: "/about",
     title: "Our Team",
     description:
-      "Meet the people driving Cardano2vn's vision, from product developers to blockchain experts and community builders.",
+      "Gặp gỡ những con người đứng sau tầm nhìn của Cardano2vn, từ các nhà phát triển sản phẩm đến chuyên gia blockchain và những người xây dựng cộng đồng.",
     cta: "Meet the Team",
   },
   {
     href: "/project",
     title: "Our project catalyst",
     description:
-      "Discover how we leverage blockchain and innovative tools to build trust, governance, and contribution management.",
+      "Khám phá cách chúng tôi ứng dụng blockchain và các công cụ sáng tạo để xây dựng niềm tin, tăng cường quản trị và quản lý đóng góp.",
     cta: "Learn More",
   },
   {
     href: "/our-service",
     title: "Our Service",
     description:
-      "Support the ecosystem via our SPO and DRep initiatives and explore services we provide to the community.",
+      "Hỗ trợ hệ sinh thái thông qua các sáng kiến SPO và DRep, đồng thời khám phá những dịch vụ chúng tôi cung cấp cho cộng đồng.",
     cta: "Explore",
   },
 ];
@@ -41,27 +41,27 @@ export default function ServiceHubClient() {
           transition={{ duration: 0.6 }}
         >
           <Title
-            title="Cardano2vn Service"
-            description="Jump to About, Projects, and Our Service — discover who we are, what we build, and how we support the ecosystem."
+            title="About Us"
+            description="Truy cập nhanh About, Projects và Our Service — khám phá Cardano2vn: chúng tôi là ai, đang xây gì và cách chúng tôi đóng góp cho hệ sinh thái."
           />
         </motion.div>
 
         <div className="mx-auto mb-16">
           <div className="rounded-sm border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 p-8 backdrop-blur-sm">
-            <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Our Cardano Team</h3>
+            <h3 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Đội ngũ Cardano2VN</h3>
             <p className="mb-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              We are a passionate team of Cardano enthusiasts, developers, and community builders dedicated to advancing the Cardano ecosystem in
-              Vietnam. Our mission is to bridge the gap between traditional technology and blockchain innovation, making Cardano accessible to
-              everyone.
+              Cardano2VN là một tập thể gồm những người đam mê Cardano, các nhà phát triển và những người xây dựng cộng đồng, cùng chung mục tiêu
+              thúc đẩy hệ sinh thái Cardano tại Việt Nam. Sứ mệnh của chúng tôi là kết nối giữa công nghệ truyền thống và đổi mới trên blockchain,
+              giúp mọi người dễ dàng tiếp cận Cardano hơn.
             </p>
             <p className="mb-4 text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              With expertise spanning from smart contract development and DeFi protocols to community education and governance participation, we work
-              together to create sustainable solutions that benefit the entire Cardano community. Our diverse backgrounds in education, blockchain
-              development, product management, and community building enable us to approach challenges from multiple perspectives.
+              Với kinh nghiệm trải rộng từ phát triển smart contract, giao thức DeFi đến giáo dục cộng đồng và tham gia quản trị, chúng tôi hợp tác
+              để tạo ra các giải pháp bền vững mang lại giá trị cho toàn bộ cộng đồng Cardano. Nền tảng đa dạng về giáo dục, phát triển blockchain,
+              quản lý sản phẩm và xây dựng cộng đồng giúp chúng tôi nhìn nhận vấn đề từ nhiều góc độ.
             </p>
             <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-              Join us in building the future of decentralized finance and governance on Cardano. Together, we're creating the infrastructure for
-              trust-based distributed work and fostering a vibrant, inclusive Cardano ecosystem in Vietnam.
+              Hãy đồng hành cùng chúng tôi xây dựng tương lai của tài chính phi tập trung và quản trị trên Cardano. Cùng nhau, chúng ta kiến tạo nền
+              tảng cho mô hình làm việc phân tán dựa trên niềm tin và nuôi dưỡng một hệ sinh thái Cardano sôi động, cởi mở tại Việt Nam.
             </p>
           </div>
         </div>

@@ -21,7 +21,7 @@ export const navbars = [
   {
     id: 4,
     target: "",
-    title: "Service",
+    title: "About Us",
     href: "/service",
   },
 

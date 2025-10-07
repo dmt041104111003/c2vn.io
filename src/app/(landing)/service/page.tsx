@@ -2,25 +2,25 @@ import type { Metadata } from "next";
 import ServiceHubClient from "~/components/service/ServiceHubClient";
 
 export const metadata: Metadata = {
-  title: "Service | Cardano2vn",
-  description: "Explore About, Projects, and Our Service from one place.",
+  title: "About Us | Cardano2vn",
+  description: "Learn about our team, projects, and services in one place.",
   keywords: [
     "Cardano",
-    "Service",
+    "About Us",
     "About",
     "Projects",
     "Our Service",
     "Community",
   ],
   openGraph: {
-    title: "Service | Cardano2vn",
-    description: "Explore About, Projects, and Our Service from one place.",
+    title: "About Us | Cardano2vn",
+    description: "Learn about our team, projects, and services in one place.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Service | Cardano2vn",
-    description: "Explore About, Projects, and Our Service from one place.",
+    title: "About Us | Cardano2vn",
+    description: "Learn about our team, projects, and services in one place.",
   },
 };
 
