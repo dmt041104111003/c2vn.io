@@ -12,26 +12,24 @@ export default function Title({ title, description }: { title: string; descripti
     <div className="relative mb-16">
       <div className="mb-6 flex items-center gap-4">
         <StarIcon size="lg" className="w-16 h-16" />
-        <div className="relative group">
+        <div className="relative group inline-block">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white lg:text-6xl" aria-label={description}>{title}</h1>
-          <div
-            role="tooltip"
-            className="pointer-events-none absolute left-0 top-full mt-2 hidden max-w-[80vw] rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-700 shadow-lg group-hover:block dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 z-[99999]"
-          >
-            {description}
-            <div className="absolute left-4 -top-2 border-b-8 border-b-gray-200 dark:border-b-gray-700 border-x-8 border-x-transparent"></div>
+          <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[99999]">
+            <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-nowrap relative shadow-lg border border-gray-900/20 dark:border-gray-100/20">
+              {description}
+              <div className="absolute left-full top-1/2 -translate-y-1/2 border-l-4 border-l-gray-900 dark:border-l-gray-100 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+            </div>
           </div>
         </div>
       </div>
-      <div className="relative group max-w-3xl">
+      <div className="relative group max-w-3xl inline-block">
         <p className="text-xl text-gray-600 dark:text-gray-300" aria-label={description}>{truncated}</p>
         {truncated !== description && (
-          <div
-            role="tooltip"
-            className="pointer-events-none absolute left-0 top-full mt-2 hidden max-w-[90vw] rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-700 shadow-lg group-hover:block dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 z-[99999]"
-          >
-            {description}
-            <div className="absolute left-4 -top-2 border-b-8 border-b-gray-200 dark:border-b-gray-700 border-x-8 border-x-transparent"></div>
+          <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[99999]">
+            <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-nowrap relative shadow-lg border border-gray-900/20 dark:border-gray-100/20">
+              {description}
+              <div className="absolute left-full top-1/2 -translate-y-1/2 border-l-4 border-l-gray-900 dark:border-l-gray-100 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+            </div>
           </div>
         )}
       </div>
