@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Eye } from "lucide-react";
 import { useState } from 'react';
 import Modal from '../common/Modal';
 import { Project, ProjectTableProps } from "~/constants/catalyst";
@@ -55,12 +55,6 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
                   <div className="text-sm font-medium text-gray-900 line-clamp-1">
                     {project.fund && `${project.fund}: `}{project.title}
                   </div>
-                  <button
-                    onClick={() => onViewDetails(project)}
-                    className="text-blue-600 hover:text-blue-900 text-xs mt-1 text-left"
-                  >
-                    View Details
-                  </button>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -89,11 +83,18 @@ export function ProjectTable({ projects, onEdit, onDelete, onViewDetails }: Proj
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-end space-x-2">
                   <button
+                    onClick={() => onViewDetails(project)}
+                    className="text-green-600 hover:text-green-900"
+                    title="View details"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button
                     onClick={() => onEdit(project)}
                     className="text-blue-600 hover:text-blue-900"
                     title="Edit project"
                   >
-                                          <Edit className="h-4 w-4" />
+                    <Edit className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(project)}

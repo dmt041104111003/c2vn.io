@@ -1,5 +1,6 @@
 import Modal from "~/components/admin/common/Modal";
 import { Project, ProjectDetailsModalProps } from "~/constants/catalyst";
+import { TipTapPreview } from "~/components/ui/tiptap-preview";
 
 export function ProjectDetailsModal({ project, isOpen, onClose }: ProjectDetailsModalProps) {
   if (!project) return null;
@@ -32,7 +33,9 @@ export function ProjectDetailsModal({ project, isOpen, onClose }: ProjectDetails
 
         <div>
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Description</h4>
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{project.description}</p>
+          <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
+            <TipTapPreview content={project.description} />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
