@@ -11,8 +11,8 @@ export default function ContactFormQuoteBlock({ title, description, hasSelectedC
   const [isTitleExpanded, setIsTitleExpanded] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   
-  const defaultTitle = 'Register for a C2VN course';
-  const defaultDescription = `Register now to join our Blockchain training programs and gain practical knowledge for the future of Web3.`;
+  const defaultTitle = 'Từ Zero đến Builder: Biến ý tưởng thành dApp thực tế.';
+  const defaultDescription = `Tham gia chương trình đào tạo Blockchain chuyên sâu của chúng tôi, nơi bạn không chỉ học, mà còn trực tiếp xây dựng những ứng dụng phi tập trung có giá trị cho cộng đồng.`;
   
   if (hasSelectedCourse && !title && !description) {
     return null;
