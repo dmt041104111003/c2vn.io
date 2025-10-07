@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
           author: { select: { name: true } },
           tags: { select: { tag: { select: { id: true, name: true } } } },
           media: { select: { url: true, type: true, id: true } },
+          _count: { select: { PostView: true } as any },
         },
       }),
       prisma.post.count({ where })
@@ -121,6 +122,7 @@ export async function GET(request: NextRequest) {
         author: post.author?.name || 'Admin',
         tags: post.tags?.map((t: any) => t.tag) || [],
         ...reactionCount,
+        totalViews: (post as any)._count?.postViews || 0,
       };
     });
     const totalPages = Math.ceil(total / limit);
