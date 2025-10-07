@@ -412,7 +412,7 @@ export default function ContactFormSection() {
                 <div className="relative mb-16">
                   <div className="mb-6 flex items-center gap-4">
                     <StarIcon size="lg" className="w-16 h-16" />
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white lg:text-6xl">Từ Zero đến Builder</h1>
+                    <h2 className="text-2xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white">Từ Zero đến Builder</h2>
                   </div>
                   <div className="max-w-3xl">
                     <p className="text-xl text-gray-600 dark:text-gray-300">
