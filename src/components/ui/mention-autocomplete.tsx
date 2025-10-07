@@ -246,17 +246,11 @@ export default function MentionAutocomplete({
                  disabled={user.isBanned}
                >
                  <div className="flex-shrink-0">
-                   {user.image ? (
-                     <img
-                       src={user.image}
-                       alt={user.displayName}
-                       className="w-6 h-6 rounded-full object-cover"
-                     />
-                   ) : (
-                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium">
-                       {user.displayName.charAt(0).toUpperCase()}
-                     </div>
-                   )}
+                   <img
+                     src={user.image || "/images/common/loading.png"}
+                     alt={user.displayName}
+                     className="w-6 h-6 rounded-full object-cover"
+                   />
                  </div>
                  <div className="flex-1 min-w-0">
                    <div className="font-medium text-gray-900 dark:text-white truncate flex items-center gap-2">

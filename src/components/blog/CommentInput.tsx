@@ -143,15 +143,11 @@ export default function CommentInput({ onSubmit, user }: CommentInputProps) {
       ) : (
         <div className="flex items-start gap-3">
           <div className="relative">
-            {user && user.image ? (
-              <img
-                src={user.image}
-                alt="avatar"
-                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex-shrink-0"></div>
-            )}
+            <img
+              src={user?.image || "/images/common/loading.png"}
+              alt="avatar"
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            />
             <button 
               className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center"
               title="Change commenting identity"

@@ -214,22 +214,23 @@ export default function CourseModal({ course, courses = [], initialIndex = 0, is
                         
                         {/* Course Info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                          {/* Price */}
-                          <div className="flex items-center gap-2 text-sm">
-                            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                            </svg>
-                            <span className="text-gray-700 dark:text-gray-300">
-                              <strong>Price:</strong> 
-                              <span className={`ml-1 inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                                currentCourse.price === 'free' || !currentCourse.price
-                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' 
-                                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                              }`}>
-                                {currentCourse.price === 'free' || !currentCourse.price ? 'Free' : `${currentCourse.price} ₳`}
+                        {/* Price */}
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="text-gray-700 dark:text-gray-300">
+                                <span
+                                  className={`ml-1 inline-flex items-center px-3 py-1.5 rounded-full text-lg font-bold ${
+                                    currentCourse.price === 'free' || !currentCourse.price
+                                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                                      : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                                  }`}
+                                >
+                                  {currentCourse.price === 'free' || !currentCourse.price
+                                    ? 'Free'
+                                    : `${currentCourse.price} ₳`}
+                                </span>
                               </span>
-                            </span>
-                          </div>
+                            </div>
+
 
                           {(currentCourse.location || currentCourse.locationRel?.name) && (
                             <div className="flex items-center gap-2 text-sm">

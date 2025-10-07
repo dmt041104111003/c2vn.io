@@ -300,11 +300,11 @@ export default function CommentItem({ comment, onSubmitReply, onDeleteComment, o
       <div className={comment.parentCommentId ? 'pl-2 md:pl-4 w-full max-w-full' : 'w-full max-w-full'}>
         <div className={`space-y-3 transition-colors duration-200 ${isParentHighlight ? 'bg-blue-100/50 dark:bg-blue-900/30' : ''}`} style={{wordBreak: 'break-word'}}>
           <div className="flex items-start gap-3">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="avatar" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-            ) : (
-              <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${comment.avatar || 'from-blue-500 to-purple-600'} flex-shrink-0`}></div>
-            )}
+            <img 
+              src={avatarUrl || "/images/common/loading.png"} 
+              alt="avatar" 
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0" 
+            />
             <div className="flex-1 min-w-0">
               <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl px-3 py-2">
                 <div className="flex items-center gap-2 mb-1">
@@ -423,11 +423,11 @@ export default function CommentItem({ comment, onSubmitReply, onDeleteComment, o
             <div className="ml-11">
               <div className="bg-gray-100 dark:bg-gray-800/30 rounded-2xl p-3 border border-gray-200 dark:border-gray-700/50">
                 <div className="flex items-start gap-3">
-                  {user?.image ? (
-                    <img src={user.image} alt="avatar" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex-shrink-0"></div>
-                  )}
+                  <img 
+                    src={user?.image || "/images/common/loading.png"} 
+                    alt="avatar" 
+                    className="w-6 h-6 rounded-full object-cover flex-shrink-0" 
+                  />
                   <div className="flex-1 relative">
                     <form onSubmit={(e) => handleSubmitReply(e, comment.id)} className="relative">
                       <div className="relative">

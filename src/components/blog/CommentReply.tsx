@@ -158,11 +158,11 @@ export default function CommentReply({
   return (
     <div className="space-y-3">
       <div className="flex items-start gap-3">
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="avatar" className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
-        ) : (
-          <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${reply.avatar || 'from-blue-500 to-purple-600'} flex-shrink-0`}></div>
-        )}
+        <img 
+          src={avatarUrl || "/images/common/loading.png"} 
+          alt="avatar" 
+          className="w-6 h-6 rounded-full object-cover flex-shrink-0" 
+        />
         <div className="flex-1 min-w-0">
           <div className="bg-gray-800/20 rounded-xl px-3 py-2">
             <div className="flex items-center gap-2 mb-1">
@@ -204,11 +204,11 @@ export default function CommentReply({
           <div className="bg-gray-800/30 rounded-2xl p-3 border border-gray-700/50">
             <div className="flex items-start gap-3">
               <div className="relative">
-                {user?.image && (user.image.startsWith('http') || user.image.startsWith('data:image')) ? (
-                  <img src={user.image} alt="avatar" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex-shrink-0"></div>
-                )}
+                <img 
+                  src={user?.image || "/images/common/loading.png"} 
+                  alt="avatar" 
+                  className="w-8 h-8 rounded-full object-cover flex-shrink-0" 
+                />
                 <button 
                   className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-600 rounded-full flex items-center justify-center"
                   title="Change replying identity"
