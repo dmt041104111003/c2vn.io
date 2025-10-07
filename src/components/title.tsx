@@ -1,5 +1,6 @@
 import StarIcon from "~/components/ui/StarIcon";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 export default function Title({ title, description }: { title: string; description: string }) {
   const halfLength = Math.ceil(description.length / 2);
@@ -17,6 +18,11 @@ export default function Title({ title, description }: { title: string; descripti
   const [descTipVisible, setDescTipVisible] = useState(false);
   const [titleTipStyle, setTitleTipStyle] = useState<React.CSSProperties>({});
   const [descTipStyle, setDescTipStyle] = useState<React.CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   function placeTooltip(anchor: HTMLElement | null, tip: HTMLElement | null, setStyle: (s: React.CSSProperties) => void) {
     if (!anchor || !tip) return;
@@ -61,12 +67,13 @@ export default function Title({ title, description }: { title: string; descripti
         >
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white lg:text-6xl" aria-label={description}>{title}</h1>
         </div>
-        {titleTipVisible && (
-          <div ref={titleTipRef} style={titleTipStyle} className="pointer-events-none z-[99999]">
+        {mounted && titleTipVisible && createPortal(
+          <div ref={titleTipRef} style={titleTipStyle} className="pointer-events-none z-[2147483647] fixed">
             <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-pre-line shadow-lg border border-gray-900/20 dark:border-gray-100/20">
               {description}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
       <div
@@ -78,12 +85,13 @@ export default function Title({ title, description }: { title: string; descripti
       >
         <p className="text-xl text-gray-600 dark:text-gray-300" aria-label={description}>{truncated}</p>
       </div>
-      {descTipVisible && truncated !== description && (
-        <div ref={descTipRef} style={descTipStyle} className="pointer-events-none z-[99999]">
+      {mounted && descTipVisible && truncated !== description && createPortal(
+        <div ref={descTipRef} style={descTipStyle} className="pointer-events-none z-[2147483647] fixed">
           <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-pre-line shadow-lg border border-gray-900/20 dark:border-gray-100/20">
             {description}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
