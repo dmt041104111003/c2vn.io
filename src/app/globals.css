@@ -208,10 +208,53 @@ img[alt*="Cardano2vn"] {
   z-index: 1000;
 }
 
-/* Hide theme toggle in docs */
-.docs-isolated-container [data-fumadocs-theme-toggle] {
+/* Hide FumaDocs GitHub button if present */
+.docs-isolated-container a[href*="github.com"],
+.docs-isolated-container [data-fumadocs-header] a[href*="github.com"],
+.docs-isolated-container [data-fumadocs-sidebar] a[href*="github.com"] {
   display: none !important;
 }
+
+.docs-isolated-container [data-fumadocs-theme-toggle] {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  position: sticky;
+  bottom: 12px;
+  padding: 8px 12px;
+  background: transparent;
+  z-index: 11;
+}
+
+.docs-isolated-container [data-fumadocs-theme-toggle] button {
+  position: relative;
+  width: 64px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.docs-isolated-container [data-fumadocs-theme-toggle] button::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  transform: translateX(0) rotate(0deg);
+  transition: transform 300ms cubic-bezier(.2,.8,.2,1);
+}
+
+.dark .docs-isolated-container [data-fumadocs-theme-toggle] button::before {
+  transform: translateX(28px) rotate(360deg);
+}
+
 
 /* Ensure dropdown menus appear above all content */
 [data-slot="dropdown-menu-content"],

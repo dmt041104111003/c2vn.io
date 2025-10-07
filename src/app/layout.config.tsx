@@ -11,6 +11,7 @@ export const baseOptions: BaseLayoutProps = {
       </div>
     ),
   },
-  githubUrl: 'https://github.com/cardano2vn',
-  // disableThemeSwitch: true,
+  // githubUrl removed to hide GitHub button in docs header
+  // Disable FumaDocs built-in toggle (we inject our own)
+  disableThemeSwitch: true,
 };
