@@ -6,7 +6,7 @@ import { useToastContext } from '~/components/toast-provider';
 import { ContactForm } from './ContactForm';
 import ContactFormManager from './ContactFormManager';
 import { ContactFormData, FormErrors } from '~/constants/contact';
-// import ContactFormImage from './ContactFormImage';
+import ContactFormImage from './ContactFormImage';
 import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
 import { useQuery } from '@tanstack/react-query';
@@ -42,7 +42,6 @@ export default function ContactFormSection() {
           setIsAdmin(data?.data?.role?.name === 'ADMIN');
         }
       } catch (error) {
-        console.error('Error checking admin status:', error);
         setIsAdmin(false);
       }
     };
@@ -160,7 +159,6 @@ export default function ContactFormSection() {
           
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
       }
     };
 
