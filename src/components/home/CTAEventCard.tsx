@@ -56,15 +56,20 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
               <span className="text-gray-500 dark:text-gray-400">Image not available</span>
             </div>
             {editMode && (
-              <div
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onEditClick?.(index);
                 }}
-                className="absolute top-0 right-0 p-1.5 rounded-full cursor-pointer bg-transparent"
+                className="absolute top-3 right-3 z-10 rounded-md bg-red-500/80 hover:bg-red-600/90 transition-colors w-8 h-8 flex items-center justify-center shadow-lg focus:outline-none focus:ring-2 focus:ring-white/60"
+                title="Remove image"
+                aria-label="Remove image"
               >
-                <XIcon className="h-6 w-6 text-red-700 dark:text-red-400" />
-              </div>
+                <span className="relative block w-3.5 h-3.5">
+                  <span className="absolute left-1/2 top-1/2 w-full h-[2px] bg-white rotate-45 -translate-x-1/2 -translate-y-1/2"></span>
+                  <span className="absolute left-1/2 top-1/2 w-full h-[2px] bg-white -rotate-45 -translate-x-1/2 -translate-y-1/2"></span>
+                </span>
+              </button>
             )}
             {!editMode && (
               <>
