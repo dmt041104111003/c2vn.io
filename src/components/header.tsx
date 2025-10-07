@@ -665,7 +665,7 @@ export default function Header() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="fixed top-0 z-50 w-full border-b border-gray-200 dark:border-white/20 bg-white/80 dark:bg-black/20 backdrop-blur-sm"
     >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           <motion.section
             initial={{ opacity: 0, y: -10 }}

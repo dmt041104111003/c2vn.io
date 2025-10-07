@@ -168,7 +168,7 @@ function ProjectPageContent() {
   return (
     <main className="relative pt-20 bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900">
       <BackgroundMotion />
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 lg:px-8">
         <div>
           <Title
             title="Catalyst Cardano2vn Roadmap"

@@ -8,8 +8,8 @@ import Logo from "./ui/logo";
 export default function Footer() {
   return (
     <div className="relative z-30 border-t dark:border-white/20 bg-white/80 dark:bg-black/20  text-gray-900 dark:text-white">
-      <footer className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="absolute left-6 right-6 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      <footer className="relative mx-auto max-w-7xl px-4 sm:px-6 py-16 lg:px-8">
+        <div className="absolute left-4 right-4 sm:left-6 sm:right-6 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
         <div className="flex flex-col">
           <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2">
             <div className="relative">

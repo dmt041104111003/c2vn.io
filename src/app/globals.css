@@ -1,6 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img[alt*="Cardano2VN Logo"], 
+img[alt*="Cardano2vn"] {
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
 /* thêm theme*/
 @import "fumadocs-ui/css/ocean.css";
 @import "fumadocs-ui/css/preset.css";

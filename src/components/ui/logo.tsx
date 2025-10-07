@@ -16,9 +16,10 @@ export default function Logo({ className = '', compact = false, showText = true,
     return (
       <img
         src="/images/common/loading.png"
-        className={className || 'h-8 w-auto'}
+        className={className || 'h-8 w-auto flex-shrink-0 object-contain'}
         alt="Cardano2VN Logo"
         draggable={false}
+        style={{ aspectRatio: '1/1' }}
       />
     );
   }
@@ -28,17 +29,18 @@ export default function Logo({ className = '', compact = false, showText = true,
     const titleSize = size === 'sm' ? 'text-base' : size === 'lg' ? 'text-xl' : 'text-lg';
     const subtitleSize = size === 'sm' ? 'text-[10px]' : size === 'lg' ? 'text-xs' : 'text-[11px]';
     return (
-      <div className={`flex items-center gap-3 ${className}`}>
+      <div className={`flex items-center gap-2 sm:gap-3 ${className}`}>
         <img
           src="/images/common/loading.png"
-          className={`${imgSize} w-auto`}
+          className={`${imgSize} w-auto flex-shrink-0 object-contain`}
           alt="Cardano2VN Logo"
           draggable={false}
+          style={{ aspectRatio: '1/1' }}
         />
         {showText && (
-          <div className="leading-tight">
-            <div className={`${titleSize} font-semibold text-gray-900 dark:text-white`}>CARDANO2VN.IO</div>
-            <div className={`${subtitleSize} uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400`}>BREAK THE BLOCKS</div>
+          <div className="leading-tight min-w-0 flex-shrink">
+            <div className={`${titleSize} font-semibold text-gray-900 dark:text-white break-words`}>CARDANO2VN.IO</div>
+            <div className={`${subtitleSize} uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 break-words`}>BREAK THE BLOCKS</div>
           </div>
         )}
       </div>

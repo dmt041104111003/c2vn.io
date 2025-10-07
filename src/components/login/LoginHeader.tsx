@@ -1,23 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import { images } from "~/public/images";
+import Logo from "~/components/ui/logo";
 import { routers } from "~/constants/routers";
 
 export default function LoginHeader() {
   return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-3">
-        <Link href={routers.home}>
-          <Image
-            src={images.logo}
-            alt="Cardano2vn"
-            className="h-12 md:h-16 w-auto"
-            loading="lazy"
-          />
+    <div className="flex items-center justify-between w-full min-w-0">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
+        <Link href={routers.home} className="flex-shrink-0">
+          <Logo layout="inline" size="lg" />
         </Link>
       </div>
       
-      <div className="flex items-center gap-2 md:gap-4">
+      <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
         <div className="w-4 h-4 md:w-6 md:h-6 flex items-center justify-center hover:opacity-80 transition-opacity">
           <Image
             src="/images/wallets/google.png"
