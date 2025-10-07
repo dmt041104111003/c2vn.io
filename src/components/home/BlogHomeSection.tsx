@@ -231,6 +231,28 @@ export default function ProtocolSection() {
                                 </span>
                               </>
                             )}
+                            {Array.isArray(post.tags) && post.tags.length > 0 && (
+                              <>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                  {post.tags.slice(0, 2).map((tag: any, i: number) => {
+                                    const name = typeof tag === 'string' ? tag : (tag?.name || '');
+                                    if (!name) return null;
+                                    return (
+                                      <span
+                                        key={i}
+                                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                                      >
+                                        {name}
+                                      </span>
+                                    );
+                                  })}
+                                  {post.tags.length > 2 && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">+{post.tags.length - 2}</span>
+                                  )}
+                                </span>
+                              </>
+                            )}
                           </div>
                           <span className="ml-4 truncate max-w-[40%] text-right">{post.author || "Admin"}</span>
                         </div>
