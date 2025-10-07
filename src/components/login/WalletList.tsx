@@ -2,13 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useCardanoWallet } from "~/hooks/useCardanoWallet";
-import { useMetaMask } from "~/hooks/useMetaMask";
 import { useToastContext } from "~/components/toast-provider";
 import { WalletListProps } from '~/constants/login';
 
 export default function WalletList({ wallets }: WalletListProps) {
   const { connect, disconnect, isConnecting, error, walletUser, isAuthenticated, isWalletInstalled, hasLoggedIn } = useCardanoWallet();
-  const { connect: connectMetaMask, disconnect: disconnectMetaMask, isConnecting: isConnectingMetaMask, error: metaMaskError, walletUser: metaMaskUser, isAuthenticated: isMetaMaskAuthenticated, hasLoggedIn: hasMetaMaskLoggedIn } = useMetaMask();
   const { showError, showSuccess, showInfo } = useToastContext();
   const lastSuccessRef = useRef<string>("");
   const lastErrorRef = useRef<string>("");
@@ -33,18 +31,7 @@ export default function WalletList({ wallets }: WalletListProps) {
         setConnectingWalletId(null);
       }
     } else if (walletId === "metamask") {
-      if (isMetaMaskAuthenticated) {
-        await disconnectMetaMask();
-        showSuccess("Logout Successful", "Your MetaMask wallet has been disconnected successfully.");
-      } else {
-        setConnectingWalletId(walletId);
-        showInfo("Connecting...", "Please wait while we connect to your MetaMask wallet.");
-        try {
-          await connectMetaMask();
-        } finally {
-          setConnectingWalletId(null);
-        }
-      }
+      showInfo("MetaMask (Beta)", "MetaMask integration is currently in beta testing. Please use Cardano wallets for full functionality.");
     } else if (walletId === "nami") {
       showInfo("Nami Wallet Upgraded", "Nami has been upgraded to Lace! Please use Lace wallet with Nami mode enabled.");
     } else if (walletId === "priority") {
@@ -63,11 +50,6 @@ export default function WalletList({ wallets }: WalletListProps) {
   };
 
 
-  useEffect(() => {
-    if (metaMaskError) {
-      showError("MetaMask Connection Error", metaMaskError);
-    }
-  }, [metaMaskError, showError]);
 
   useEffect(() => {
     if (hasLoggedIn && walletUser) {
@@ -102,7 +84,7 @@ export default function WalletList({ wallets }: WalletListProps) {
       const injectedKey = cardanoIdToInjectedKey[walletId];
       return Object.keys(injected).some((k) => k.toLowerCase() === injectedKey.toLowerCase());
     }
-    return ["google", "github", "metamask"].includes(walletId);
+    return ["google", "github"].includes(walletId);
     // return ["google", "github"].includes(walletId);
   };
 
@@ -122,7 +104,7 @@ export default function WalletList({ wallets }: WalletListProps) {
             <button
               key={wallet.id}
               onClick={() => handleWalletClick(wallet.id)}
-              disabled={(((wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "metamask") && connectingWalletId === wallet.id)) || !isActive}
+              disabled={(((wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi") && connectingWalletId === wallet.id)) || !isActive}
               // disabled={disabled}
               className={`w-full p-3 rounded-lg border transition-all duration-200 flex items-center gap-3 ${
                 isActive 
@@ -130,7 +112,7 @@ export default function WalletList({ wallets }: WalletListProps) {
                   ? "border-gray-200 hover:bg-gray-100 hover:border-gray-300 hover:shadow-sm bg-white dark:border-white/10 dark:bg-gray-900 dark:hover:bg-gray-800 dark:hover:border-white/20" 
                   : "border-gray-100 bg-gray-50 cursor-not-allowed opacity-60 dark:border-white/5 dark:bg-gray-900/40"
                              } ${
-                 (wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "metamask") && connectingWalletId === wallet.id ? "opacity-50 cursor-not-allowed" : ""
+                 (wallet.id === "eternal" || wallet.id === "lace" || wallet.id === "yoroi") && connectingWalletId === wallet.id ? "opacity-50 cursor-not-allowed" : ""
                }`}
             >
               <span className={`text-sm font-medium flex-1 ${
@@ -150,7 +132,7 @@ export default function WalletList({ wallets }: WalletListProps) {
                 </span>
               )}
               
-                             {wallet.id === "eternal" || wallet.id === "nami" || wallet.id === "typhon" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "gero" || wallet.id === "nufi" || wallet.id === "priority" || wallet.id === "metamask" ? (
+                             {wallet.id === "eternal" || wallet.id === "nami" || wallet.id === "typhon" || wallet.id === "lace" || wallet.id === "yoroi" || wallet.id === "gero" || wallet.id === "nufi" || wallet.id === "priority" ? (
                 connectingWalletId === wallet.id ? (
                   <div className="w-8 h-8 flex items-center justify-center">
                     <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

@@ -3,7 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { prisma } from "~/lib/prisma"
 import { CardanoWalletProvider } from "~/lib/cardano-auth-provider"
-import { MetaMaskAuthProvider } from "~/lib/metamask-auth-provider"
 import { generateWalletAvatar } from '~/lib/wallet-avatar';
 import cloudinary from '~/lib/cloudinary';
 import { isValidAvatarUrl, validateBase64Image } from '~/lib/avatar-validator';
@@ -46,7 +45,6 @@ export const authOptions = {
       clientSecret: process.env.GITHUB_SECRET!,
     }),
     CardanoWalletProvider(),
-    MetaMaskAuthProvider(),
   ],
   pages: {
     signIn: "/",
@@ -63,9 +61,6 @@ export const authOptions = {
         account?: { provider?: string };
       };
       if (user && account?.provider === "cardano-wallet") {
-        (token as TokenWithAddress).address = user.address;
-      }
-      if (user && account?.provider === "metamask-wallet") {
         (token as TokenWithAddress).address = user.address;
       }
       if (user && account?.provider === "google") {
@@ -328,106 +323,6 @@ export const authOptions = {
         }
       }
       
-      if (account?.provider === "metamask-wallet") {
-        try {
-          let retries = 3;
-          while (retries > 0) {
-            try {
-              await prisma.$connect();
-              break;
-            } catch (connectError) {
-              retries--;
-              if (retries === 0) {
-                return true;
-              }
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-          }
-          
-          let dbUser = await prisma.user.findUnique({
-            where: { wallet: user.address },
-            select: { id: true, name: true, image: true, roleId: true, wallet: true }
-          });
-
-          if (!dbUser) {
-            let userRole = roleCache.get("USER");
-            if (!userRole) {
-              userRole = await prisma.role.findFirst({
-                where: { name: "USER" },
-                select: { id: true }
-              });
-              if (userRole) {
-                roleCache.set("USER", userRole);
-              }
-            }
-
-            if (!userRole) {
-              throw new Error("Role USER not exist");
-            }
-
-            let avatar: string | null = user.image || null;
-            if (!avatar && user.address) {
-              const dataImage = generateWalletAvatar(user.address);
-              const uploadRes = await cloudinary.uploader.upload(dataImage, { 
-                resource_type: 'image',
-                transformation: [
-                  { width: 400, height: 400, crop: 'fill', quality: 'auto' }
-                ]
-              });
-              avatar = uploadRes.url;
-            } else if (avatar && avatar.startsWith('data:image')) {
-              if (validateBase64Image(avatar)) {
-                try {
-                  const uploadRes = await cloudinary.uploader.upload(avatar, { 
-                    resource_type: 'image',
-                    transformation: [
-                      { width: 400, height: 400, crop: 'fill', quality: 'auto' }
-                    ]
-                  });
-                  avatar = uploadRes.url;
-                } catch (uploadError) {
-                  avatar = null;
-                }
-              } else {
-                avatar = null;
-              }
-            }
-
-            dbUser = await prisma.user.create({
-              data: {
-                wallet: user.address,
-                name: user.name || null,
-                image: avatar,
-                roleId: userRole.id,
-              },
-              select: { id: true, name: true, image: true, roleId: true, wallet: true }
-            });
-            
-          } else {
-            if (dbUser && !dbUser.image && dbUser.wallet) {
-              const dataImage = generateWalletAvatar(dbUser.wallet);
-              const uploadRes = await cloudinary.uploader.upload(dataImage, { resource_type: 'image' });
-              await prisma.user.update({
-                where: { id: dbUser.id },
-                data: { image: uploadRes.url },
-              });
-            } else if (dbUser && dbUser.image && dbUser.image.startsWith('data:image')) {
-              const uploadRes = await cloudinary.uploader.upload(dbUser.image, { resource_type: 'image' });
-              await prisma.user.update({
-                where: { id: dbUser.id },
-                data: { image: uploadRes.url },
-              });
-            }
-          }
-          
-          return true;
-        } catch (e) {
-          if (e instanceof Error && e.message.includes("Can't reach database server")) {
-            return false; 
-          }
-          return false;
-        }
-      }
       
       if (account?.provider === "cardano-wallet") {
         try {
