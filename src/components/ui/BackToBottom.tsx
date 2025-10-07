@@ -127,9 +127,15 @@ export default function BackToBottom() {
           <motion.svg
             viewBox="0 0 100 100"
             className="w-16 h-16 text-gray-900 dark:text-gray-100"
+            animate={{ y: [0, 6, 0] }}
             whileHover={{ y: 4, scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            transition={{
+              y: { duration: 0.9, repeat: Infinity, repeatType: "loop", ease: "easeInOut" },
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+            }}
           >
             <polygon
               points="50,85 25,60 35,60 35,15 65,15 65,60 75,60"

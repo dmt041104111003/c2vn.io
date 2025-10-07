@@ -37,9 +37,15 @@ export default function BackToTop() {
           <motion.svg
             viewBox="0 0 100 100"
             className="w-16 h-16 text-gray-900 dark:text-gray-100"
+            animate={{ y: [0, -6, 0] }}
             whileHover={{ y: -4, scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            transition={{
+              y: { duration: 0.9, repeat: Infinity, repeatType: "loop", ease: "easeInOut" },
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+            }}
           >
             <polygon
               points="50,15 25,40 35,40 35,85 65,85 65,40 75,40"
