@@ -61,12 +61,29 @@ function ProjectPageContent() {
       setIsInitialized(true);
       const params = new URLSearchParams();
       params.set('typeFilter', 'catalyst');
+      const allFunds = Array.from(new Set(projects.map((p: any) => p.fund))).filter(Boolean) as string[];
+      if (allFunds.length > 0) {
+        const highestFund = allFunds.sort((a, b) => parseInt(b.replace(/\D/g, '')) - parseInt(a.replace(/\D/g, '')))[0] || 'all';
+        params.set('fund', highestFund);
+        setFundFilter(highestFund);
+      }
       router.push(`${pathname}?${params.toString()}`);
       return;
     }
     
     if (urlTypeFilter && (urlTypeFilter === 'catalyst' || urlTypeFilter === 'project')) {
       setTypeFilter(urlTypeFilter);
+      if (urlTypeFilter === 'catalyst' && !urlFund) {
+        const allFunds = Array.from(new Set(projects.map((p: any) => p.fund))).filter(Boolean) as string[];
+        if (allFunds.length > 0) {
+          const highestFund = allFunds.sort((a, b) => parseInt(b.replace(/\D/g, '')) - parseInt(a.replace(/\D/g, '')))[0] || 'all';
+          setFundFilter(highestFund);
+          const params = new URLSearchParams(searchParams.toString());
+          params.set('fund', highestFund);
+          router.push(`${pathname}?${params.toString()}`);
+          return;
+        }
+      }
     }
     
     if (urlYear) {
