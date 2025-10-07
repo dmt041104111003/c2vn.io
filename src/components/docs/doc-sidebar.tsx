@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, ChevronRight, ExternalLink, X } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, X, Home } from "lucide-react";
 import { docCategories, DocCategory, DocSidebarProps } from "~/constants/docs";
 import { useState } from "react";
 
@@ -115,6 +115,9 @@ export default function DocSidebar({ onClose }: DocSidebarProps) {
                             : "text-gray-700 hover:bg-gray-100"
                         }`}
                       >
+                        {section.id === "back-to-home" && (
+                          <Home className="h-3 w-3 lg:h-4 lg:w-4 mr-2" />
+                        )}
                         <span className="flex-1">{section.title}</span>
                         {section.external && (
                         <ExternalLink className="h-3 w-3 lg:h-4 lg:w-4 ml-2" />

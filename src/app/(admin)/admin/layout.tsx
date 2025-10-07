@@ -119,7 +119,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="flex items-center gap-3 px-4 pt-4 pb-2">
                 <UserAvatar user={user} />
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+                  <h1 className="text-xl font-bold text-gray-900">{user?.name || "Admin"}</h1>
                   <div className="flex flex-col items-start w-[160px] mt-1">
                     <span className="text-xs text-gray-400 w-full">{user?.id ? compact(user.id) : "No ID"}</span>
                     <span className="text-xs text-gray-400 w-full">{user?.address ? compact(user.address) : "No address"}</span>
@@ -174,7 +174,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-3 px-4 pt-4 pb-2">
             <UserAvatar user={user} />
             <div className="flex flex-col min-w-0">
-              <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+              <h1 className="text-xl font-bold text-gray-900">{user?.name || "Admin"}</h1>
               <div className="flex flex-col items-start w-[160px] mt-1">
                 <span className="text-xs text-gray-400 w-full">{user?.id ? compact(user.id) : "No ID"}</span>
                 <span className="text-xs text-gray-400 w-full">{user?.address ? compact(user.address) : "No address"}</span>

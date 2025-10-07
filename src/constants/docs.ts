@@ -65,10 +65,11 @@ export const docCategories: DocCategory[] = [
   },
   {
     id: "external-links",
-    title: "",
+    title: "__________",
     sections: [
-      { id: "glossary", title: "Glossary", href: "https://docs.cardano.org/glossary", external: true },
-      { id: "faqs", title: "FAQs", href: "https://docs.cardano.org/faqs", external: true },
+      { id: "back-to-home", title: "Back to home", href: "/", external: false },
+      { id: "c2vn-lms", title: "C2VN LMS", href: "/lms", external: false },
+     
     ],
   },
 ];

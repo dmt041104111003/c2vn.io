@@ -3,6 +3,7 @@
 import { Menu, Home } from "lucide-react";
 import Link from "next/link";
 import { DocHeaderProps } from '~/constants/docs';
+import Logo from "~/components/ui/logo";
 
 export default function DocHeader({ onMenuClick }: DocHeaderProps) {
   return (
@@ -20,13 +21,16 @@ export default function DocHeader({ onMenuClick }: DocHeaderProps) {
         </div>
         
         <div className="flex items-center justify-between">
-          <Link 
-            href="/"
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200 hover:bg-gray-100 rounded-md"
-          >
-            <Home className="w-4 h-4" />
-            <span>Back to Home</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Logo layout="inline" size="sm" />
+            <Link 
+              href="/"
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200 hover:bg-gray-100 rounded-md"
+            >
+              <Home className="w-4 h-4" />
+              <span>Back to Home</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
