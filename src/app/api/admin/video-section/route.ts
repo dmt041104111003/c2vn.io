@@ -46,12 +46,22 @@ export const POST = withAdmin(async (req) => {
 
   const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
 
-  const maxOrder = await prisma.videoSection.findFirst({
-    where: { isFeatured: false },
-    orderBy: { order: 'desc' },
-    select: { order: true }
-  });
-  const nextOrder = maxOrder ? maxOrder.order + 1 : 1;
+  if (order !== undefined && order !== null) {
+    if (order < 1) {
+      return NextResponse.json(createErrorResponse('Order must be 1 or greater', 'INVALID_ORDER'), { status: 400 });
+    }
+
+    const existingOrder = await prisma.videoSection.findFirst({
+      where: {
+        order: order,
+        isFeatured: false,
+      },
+    });
+
+    if (existingOrder) {
+      return NextResponse.json(createErrorResponse(`Order ${order} already exists. Please choose a different order number.`, 'ORDER_ALREADY_EXISTS'), { status: 409 });
+    }
+  }
 
   const video = await prisma.videoSection.create({
     data: {
@@ -61,7 +71,7 @@ export const POST = withAdmin(async (req) => {
       title,
       thumbnailUrl,
       isFeatured: false,
-      order: nextOrder,
+      order: order || 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     },

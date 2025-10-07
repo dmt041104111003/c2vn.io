@@ -15,6 +15,7 @@ interface Video {
   title: string;
   thumbnailUrl: string;
   isFeatured: boolean;
+  order: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,6 +65,11 @@ export default function VideoSection() {
   const sortedVideos = Array.isArray(videos) ? videos.sort((a, b) => {
     if (a.isFeatured && !b.isFeatured) return -1;
     if (!a.isFeatured && b.isFeatured) return 1;
+    
+    if (!a.isFeatured && !b.isFeatured) {
+      return (a.order || 0) - (b.order || 0);
+    }
+    
     return 0;
   }) : [];
 
@@ -122,9 +128,18 @@ export default function VideoSection() {
       const PlayerState = YT?.PlayerState || {};
       if (event?.data === PlayerState.ENDED) {
         const list = Array.isArray(sortedVideos) ? sortedVideos : [];
-        const idx = list.findIndex(v => v.id === currentVideo.id);
-        const next = idx >= 0 && idx + 1 < list.length ? list[idx + 1] : list[0];
-        if (next && next.id !== currentVideo.id) setCurrentVideo(next);
+        const currentIdx = list.findIndex(v => v.id === currentVideo.id);
+        
+        let nextVideo;
+        if (currentIdx >= 0 && currentIdx + 1 < list.length) {
+          nextVideo = list[currentIdx + 1];
+        } else {
+          nextVideo = list.find(v => v.isFeatured) || list[0];
+        }
+        
+        if (nextVideo && nextVideo.id !== currentVideo.id) {
+          setCurrentVideo(nextVideo);
+        }
       }
     };
 

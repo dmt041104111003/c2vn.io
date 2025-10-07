@@ -6,9 +6,10 @@ import { createSuccessResponse } from "~/lib/api-response";
 export async function GET() {
   try {
     const videos = await prisma.videoSection.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        { order: "asc" },
+        { createdAt: "desc" },
+      ],
     });
 
     return NextResponse.json(createSuccessResponse(videos));

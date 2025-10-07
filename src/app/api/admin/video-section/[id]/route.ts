@@ -46,7 +46,6 @@ export const PATCH = withAdmin(async (req) => {
 
     if (existingFeatured) {
       const maxOrder = await prisma.videoSection.findFirst({
-        where: { isFeatured: false },
         orderBy: { order: 'desc' },
         select: { order: true }
       });
@@ -65,7 +64,6 @@ export const PATCH = withAdmin(async (req) => {
     data.order = 0;
   } else if (isFeatured === false) {
     const maxOrder = await prisma.videoSection.findFirst({
-      where: { isFeatured: false },
       orderBy: { order: 'desc' },
       select: { order: true }
     });
@@ -80,7 +78,22 @@ export const PATCH = withAdmin(async (req) => {
   if (typeof channelName === "string") {
     data.channelName = channelName;
   }
-  if (typeof order === "number") {
+  if (typeof order === "number" && order > 0) {
+    const existingOrder = await prisma.videoSection.findFirst({
+      where: {
+        order: order,
+        isFeatured: false,
+        NOT: { id },
+      },
+    });
+
+    if (existingOrder) {
+      return NextResponse.json(
+        createErrorResponse(`Order ${order} already exists. Please choose a different order number.`, "ORDER_ALREADY_EXISTS"),
+        { status: 409 }
+      );
+    }
+
     data.order = order;
   }
 

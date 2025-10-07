@@ -90,13 +90,13 @@ export function VideoSectionEditor({
             value={order}
             onChange={(e) => onOrderChange(parseInt(e.target.value) || 0)}
             className="w-full px-3 py-2 border rounded-md"
-            min="0"
+            min="1"
             disabled={order === 0}
           />
           <p className="text-xs text-gray-500 mt-1">
             {order === 0 
               ? "Featured videos automatically have order 0 (highest priority)"
-              : "Lower numbers appear first in the video list"
+              : "Enter order number (1, 2, 3...). Lower numbers appear first."
             }
           </p>
         </div>

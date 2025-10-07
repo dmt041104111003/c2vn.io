@@ -14,7 +14,7 @@ import NotFoundInline from "~/components/ui/not-found-inline";
 import { VideoItem } from "~/constants/video-section";
 import { useNotifications } from "~/hooks/useNotifications";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 6;
 
 async function fetchVideos(): Promise<VideoItem[]> {
   const res = await fetch("/api/admin/video-section");
@@ -71,7 +71,7 @@ export function VideoSectionPageClient() {
           title: newVideoTitle,
           channelName: newChannelName,
           thumbnailUrl: newThumbnailUrl,
-          ...(isEditing && !editingVideo?.isFeatured && { order: newOrder }),
+          order: newOrder,
         }),
       });
 
@@ -109,21 +109,6 @@ export function VideoSectionPageClient() {
 
   const handleCheckboxChange = async (videoId: string, field: "isFeatured", value: boolean) => {
     try {
-      if (field === "isFeatured" && value === true && Array.isArray(videos)) {
-        const updates: Promise<Response>[] = [];
-        videos.forEach(v => {
-          if (v.id === videoId) return;
-          if (v.isFeatured) {
-            updates.push(fetch(`/api/admin/video-section/${v.id}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ isFeatured: false }),
-            }));
-          }
-        });
-        if (updates.length > 0) await Promise.all(updates);
-      }
-
       const res = await fetch(`/api/admin/video-section/${videoId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
