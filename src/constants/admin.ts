@@ -50,6 +50,7 @@ export interface Course {
   image?: string;
   title?: string;
   description?: string;
+  price?: string;
   location?: string;
   startDate?: string;
   publishStatus: 'DRAFT' | 'PUBLISHED';
@@ -74,6 +75,7 @@ export interface CourseEditModalProps {
     publishStatus: 'DRAFT' | 'PUBLISHED',
     image?: string,
     description?: string,
+    price?: string,
     location?: string,
     startDate?: string,
     locationId?: string,

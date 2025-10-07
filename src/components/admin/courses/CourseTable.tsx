@@ -59,6 +59,9 @@ export function CourseTable({
               Title
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Price
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Publish Status
             </th>
             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -71,6 +74,15 @@ export function CourseTable({
             <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
               <td className="px-6 py-4">
                 <TruncatedText text={course.name} maxLength={30} />
+              </td>
+              <td className="px-6 py-4">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  course.price === 'free' || !course.price
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                    : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                }`}>
+                  {course.price === 'free' || !course.price ? 'Free' : `${course.price} ₳`}
+                </span>
               </td>
               <td className="px-6 py-4">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

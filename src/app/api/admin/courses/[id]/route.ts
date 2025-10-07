@@ -29,7 +29,7 @@ export const PUT = withAdmin(async (req) => {
   }
 
   const body = await req.json();
-  const { name, image, description, location, locationId, locationName, startDate, publishStatus } = body;
+  const { name, image, description, price, location, locationId, locationName, startDate, publishStatus } = body;
 
   if (!name) {
     return NextResponse.json(createErrorResponse('Name is required', 'MISSING_NAME'), { status: 400 });
@@ -66,6 +66,7 @@ export const PUT = withAdmin(async (req) => {
       name: normalizedName,
       image: image || null,
       description: description || null,
+      price: price || "free",
       location: finalLocation || null,
       locationId: finalLocationId,
       startDate: startDate ? new Date(startDate) : null,

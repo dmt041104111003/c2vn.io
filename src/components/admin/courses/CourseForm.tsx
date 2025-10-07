@@ -18,6 +18,7 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const [newName, setNewName] = useState('');
   const [newImage, setNewImage] = useState('');
   const [newDescription, setNewDescription] = useState('');
+  const [newPrice, setNewPrice] = useState('free');
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [newLocationName, setNewLocationName] = useState('');
@@ -35,11 +36,11 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
   const [publishStatus, setPublishStatus] = useState<'DRAFT' | 'PUBLISHED'>('DRAFT');
 
   const createMutation = useMutation({
-    mutationFn: async ({ name, image, description, locationId, locationName, startDate, publishStatus }: { name: string; image?: string; description?: string; locationId?: string; locationName?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
+    mutationFn: async ({ name, image, description, price, locationId, locationName, startDate, publishStatus }: { name: string; image?: string; description?: string; price?: string; locationId?: string; locationName?: string; startDate?: string; publishStatus: 'DRAFT' | 'PUBLISHED' }) => {
       const response = await fetch('/api/admin/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, image, description, locationId, locationName, startDate, publishStatus })
+        body: JSON.stringify({ name, image, description, price, locationId, locationName, startDate, publishStatus })
       });
       if (!response.ok) {
         const error = await response.json();
@@ -60,6 +61,7 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       setNewName('');
       setNewImage('');
       setNewDescription('');
+      setNewPrice('free');
       setSelectedLocationId('');
       setNewLocationName('');
       setNewStartDate('');
@@ -101,6 +103,7 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
       name: newName.trim(), 
       image: newImage, 
       description: newDescription.trim(), 
+      price: newPrice,
       ...(selectedLocationId && selectedLocationId !== '__OTHER__' ? { locationId: selectedLocationId } : {} as any),
       ...(isOther && newLocationName.trim() ? { locationName: newLocationName.trim() } : {} as any),
       startDate: newStartDate || undefined,
@@ -152,7 +155,38 @@ export default function CourseForm({ courses = [], onSuccess }: CourseFormProps)
           </button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Price
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={newPrice}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === 'free' || value === '') {
+                    setNewPrice(value);
+                  } else {
+                    // Chỉ cho phép số và dấu phẩy, tối đa 2 chữ số sau dấu phẩy
+                    const regex = /^\d*\.?\d{0,2}$/;
+                    if (regex.test(value)) {
+                      setNewPrice(value);
+                    }
+                  }
+                }}
+                placeholder="free"
+                className="w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm font-medium">
+                ₳
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Enter "free" for free courses or amount in ADA (max 2 decimal places)
+            </p>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Location (Optional)

@@ -16,7 +16,7 @@ export const GET = withAdmin(async () => {
 });
 
 export const POST = withAdmin(async (req) => {
-  const { name, image, description, locationId, locationName, startDate, publishStatus } = await req.json();
+  const { name, image, description, price, locationId, locationName, startDate, publishStatus } = await req.json();
   
   if (!name) {
     return NextResponse.json(createErrorResponse('Missing course name', 'MISSING_NAME'), { status: 400 });
@@ -48,6 +48,7 @@ export const POST = withAdmin(async (req) => {
       name: normalizedName, 
       image: image || null, 
       description: description || null, 
+      price: price || "free",
       locationId: finalLocationId,
       startDate: startDate ? new Date(startDate) : null,
       publishStatus 

@@ -287,6 +287,7 @@ model Course {
   name        String   @unique
   image       String?
   description String?
+  price       String   @default("free")
   locationId  String?
   locationRel Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
   startDate   DateTime?

@@ -14,6 +14,7 @@ export default function CourseEditModal({
   const [name, setName] = useState('');
   const [image, setImage] = useState('');
   const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('free');
   const [location, setLocation] = useState('');
   const [locationName, setLocationName] = useState('');
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
@@ -53,6 +54,7 @@ export default function CourseEditModal({
         setName(c.name);
         setImage(c.image || '');
         setDescription(c.description || '');
+        setPrice(c.price || 'free');
         setLocation(c.location || '');
         if (c.startDate) {
           const d = new Date(c.startDate);
@@ -86,6 +88,7 @@ export default function CourseEditModal({
       publishStatus,
       image,
       description.trim(),
+      price,
       location.trim(),
       startDate,
       selectedLocationId && selectedLocationId !== '__OTHER__' ? selectedLocationId : undefined,
@@ -123,7 +126,37 @@ export default function CourseEditModal({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Price
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={price}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === 'free' || value === '') {
+                    setPrice(value);
+                  } else {
+                    const regex = /^\d*\.?\d{0,2}$/;
+                    if (regex.test(value)) {
+                      setPrice(value);
+                    }
+                  }
+                }}
+                placeholder="free"
+                className="w-full px-3 py-2 pr-8 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm font-medium">
+                ₳
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Enter "free" for free courses or amount in ADA (max 2 decimal places)
+            </p>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Location (Optional)
