@@ -21,13 +21,14 @@ export const DELETE = withAdmin(async (req) => {
 export const PATCH = withAdmin(async (req) => {
   const id = req.nextUrl.pathname.split("/").pop();
   const body = await req.json();
-  const { isFeatured, videoUrl, title, channelName, thumbnailUrl, order } = body as {
+  const { isFeatured, videoUrl, title, channelName, thumbnailUrl, order, description } = body as {
     isFeatured?: boolean;
     videoUrl?: string;
     title?: string;
     channelName?: string;
     thumbnailUrl?: string;
     order?: number;
+    description?: string;
   };
 
   if (!id) {
@@ -77,6 +78,9 @@ export const PATCH = withAdmin(async (req) => {
   }
   if (typeof channelName === "string") {
     data.channelName = channelName;
+  }
+  if (typeof description === "string") {
+    data.description = description;
   }
   if (typeof order === "number" && order > 0) {
     const existingOrder = await prisma.videoSection.findFirst({

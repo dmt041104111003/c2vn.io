@@ -163,7 +163,7 @@ export default function CourseSection() {
           </div>
 
           {activeTab === "latest" ? (
-            <div className="grid max-w-none gap-16 lg:grid-cols-3">
+            <div className="grid max-w-none gap-8 md:gap-10 lg:gap-8 lg:grid-cols-3">
               {isLoading ? (
                 [...Array(3)].map((_, idx) => (
                   <motion.div
@@ -217,10 +217,18 @@ export default function CourseSection() {
 
                         {/* Content Section - Compact */}
                         <div className="p-4 flex flex-col">
-                          {/* Title - Compact */}
-                          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                            {course.title || course.name}
-                          </h3>
+                          {/* Title - Compact with tooltip */}
+                          <div className="relative">
+                            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                              {course.title || course.name}
+                            </h3>
+                            <div className="absolute left-0 top-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                              <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-sm relative">
+                                {course.title || course.name}
+                                <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+                              </div>
+                            </div>
+                          </div>
 
                           {/* Footer - Compact */}
                           <div className="text-xs text-gray-600 dark:text-gray-400">
@@ -320,9 +328,17 @@ export default function CourseSection() {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                            {course.title || course.name}
-                          </h3>
+                          <div className="relative">
+                            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                              {course.title || course.name}
+                            </h3>
+                            <div className="absolute left-0 top-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                              <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-sm relative">
+                                {course.title || course.name}
+                                <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+                              </div>
+                            </div>
+                          </div>
 
                           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                             <span>

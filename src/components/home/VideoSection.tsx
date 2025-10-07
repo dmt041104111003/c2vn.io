@@ -13,6 +13,7 @@ interface Video {
   channelName: string;
   videoUrl: string;
   title: string;
+  description?: string;
   thumbnailUrl: string;
   isFeatured: boolean;
   order: number;
@@ -272,7 +273,19 @@ export default function VideoSection() {
               <div className="relative w-full aspect-video rounded-lg lg:rounded-xl overflow-hidden mb-4 lg:mb-6 shadow-lg lg:shadow-2xl">
                 <div id="video-player" className="w-full h-full"></div>
               </div>
-              <h3 className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white mb-1 lg:mb-2 line-clamp-2">{currentVideo.title}</h3>
+              <div className="relative group">
+                <h3 className="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white mb-1 lg:mb-2 line-clamp-2">
+                  {currentVideo.title}
+                </h3>
+                {currentVideo.description && (
+                  <div className="absolute left-0 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                    <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-2 rounded-lg shadow-lg whitespace-pre-line max-w-[90vw] md:max-w-2xl relative">
+                      {currentVideo.description}
+                      <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
               <p className="text-sm lg:text-lg text-gray-600 dark:text-gray-400 font-medium">{currentVideo.channelName}</p>
             </motion.div>
 
@@ -325,9 +338,19 @@ export default function VideoSection() {
                       
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1 leading-tight">
-                            {video.title}
-                          </p>
+                          <div className="relative">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1 leading-tight">
+                              {video.title}
+                            </p>
+                            {video.description && (
+                              <div className="absolute left-0 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20">
+                                <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-2 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
+                                  {video.description}
+                                  <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 mt-1">
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                               {video.channelName}

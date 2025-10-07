@@ -136,6 +136,7 @@ model VideoSection {
   channelName   String
   videoUrl     String
   title        String
+  description  String?
   thumbnailUrl String
   isFeatured   Boolean  @default(false)
   order        Int      @default(0)

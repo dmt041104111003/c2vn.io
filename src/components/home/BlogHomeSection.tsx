@@ -198,7 +198,7 @@ export default function ProtocolSection() {
                         {/* Title with tooltip */}
                         <div className="relative group">
                           <h3
-                            className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                            className="text-base font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
                           >
                             {post.title}
                           </h3>
@@ -228,6 +228,28 @@ export default function ProtocolSection() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03 8 9 8s9 3.582 9 8z" />
                                   </svg>
                                   {post.totalComments}
+                                </span>
+                              </>
+                            )}
+                            {Array.isArray(post.tags) && post.tags.length > 0 && (
+                              <>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                  {post.tags.slice(0, 2).map((tag: any, i: number) => {
+                                    const name = typeof tag === 'string' ? tag : (tag?.name || '');
+                                    if (!name) return null;
+                                    return (
+                                      <span
+                                        key={i}
+                                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                                      >
+                                        {name}
+                                      </span>
+                                    );
+                                  })}
+                                  {post.tags.length > 2 && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">+{post.tags.length - 2}</span>
+                                  )}
                                 </span>
                               </>
                             )}

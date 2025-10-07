@@ -5,6 +5,7 @@ export interface VideoItem {
   channelName: string;
   videoUrl: string;
   title: string;
+  description?: string;
   thumbnailUrl: string;
   isFeatured: boolean;
   order: number;
@@ -31,6 +32,8 @@ export interface VideoSectionEditorProps {
   thumbnailUrl?: string;
   submitLabel?: string;
   title?: string;
+  description?: string;
+  onDescriptionChange?: (desc: string) => void;
 }
 
 
@@ -58,6 +61,7 @@ export interface Video {
   isYouTube?: boolean;
   thumbnailUrl?: string;
   visible: boolean;
+  description?: string;
 }
 
 export interface VideoSectionData {
