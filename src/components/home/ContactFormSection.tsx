@@ -6,7 +6,7 @@ import { useToastContext } from '~/components/toast-provider';
 import { ContactForm } from './ContactForm';
 import ContactFormManager from './ContactFormManager';
 import { ContactFormData, FormErrors } from '~/constants/contact';
-import ContactFormImage from './ContactFormImage';
+// import ContactFormImage from './ContactFormImage';
 import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
 import { useQuery } from '@tanstack/react-query';

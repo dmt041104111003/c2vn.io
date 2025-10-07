@@ -113,19 +113,8 @@ export default function LandingMediaSection({ mediaItems }: LandingMediaSectionP
                     ></div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                     
-                    {/* Text "cardano2vn" với ngoặc kép */}
                     <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-white text-sm font-bold">
-                      "cardano2vn"
-                    </div>
-                    
-                    {/* Ngoặc kép trái */}
-                    <div className="absolute bottom-2 left-2 text-white text-lg font-bold">
-                      "
-                    </div>
-                    
-                    {/* Ngoặc kép phải */}
-                    <div className="absolute bottom-2 right-2 text-white text-lg font-bold">
-                      "
+                      cardano2vn
                     </div>
                   </motion.div>
                 );
