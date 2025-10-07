@@ -4,7 +4,7 @@ import StatsPageClient from "~/components/stats/StatsPageClient";
 export const metadata: Metadata = {
   title: "Our Service | Cardano2VN",
   description:
-    "Discover our SPO (Stake Pool Operator) and DREP (Delegated Representative) services. Learn how to support our Cardano community initiatives.",
+    "Khám phá các dịch vụ SPO (Nhà vận hành Stake Pool) và DREP (Đại diện được ủy quyền) của chúng tôi. Tìm hiểu cách bạn có thể hỗ trợ các sáng kiến cộng đồng Cardano mà chúng tôi đang thực hiện.",
   keywords: [
     "SPO",
     "Stake Pool Operator",

@@ -23,7 +23,7 @@ function StatsPageContent() {
         >
           <Title
             title="Our Service"
-            description="Discover our SPO (Stake Pool Operator) and DREP (Delegated Representative) services. Learn how to support our Cardano community initiatives."
+            description="Khám phá các dịch vụ SPO (Nhà vận hành Stake Pool) và DREP (Đại diện được ủy quyền) của chúng tôi. Tìm hiểu cách bạn có thể hỗ trợ các sáng kiến cộng đồng Cardano mà chúng tôi đang thực hiện."
           />
         </motion.div>
    

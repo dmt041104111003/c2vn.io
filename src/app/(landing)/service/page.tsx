@@ -3,7 +3,7 @@ import ServiceHubClient from "~/components/service/ServiceHubClient";
 
 export const metadata: Metadata = {
   title: "About Us | Cardano2vn",
-  description: "Learn about our team, projects, and services in one place.",
+  description: "Tìm hiểu về đội ngũ chúng tôi, dự án và dịch vụ của chúng tôi tại một nơi.",
   keywords: [
     "Cardano",
     "About Us",
@@ -14,13 +14,13 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "About Us | Cardano2vn",
-    description: "Learn about our team, projects, and services in one place.",
+    description: "Tìm hiểu về đội ngũ chúng tôi, dự án và dịch vụ của chúng tôi tại một nơi.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "About Us | Cardano2vn",
-    description: "Learn about our team, projects, and services in one place.",
+    description: "Tìm hiểu về đội ngũ chúng tôi, dự án và dịch vụ của chúng tôi tại một nơi.",
   },
 };
 
