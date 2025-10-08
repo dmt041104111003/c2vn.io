@@ -120,7 +120,7 @@ export default function BackToBottom() {
           <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
             <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-nowrap relative shadow-lg">
               {getTooltipText()}
-              <div className="absolute right-full top-1/2 -translate-y-1/2 border-r-4 border-r-gray-800 dark:border-r-blue-300 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-r-4 border-r-blue-400 dark:border-r-white border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
             </div>
           </div>
 
