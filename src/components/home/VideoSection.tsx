@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { createPortal } from "react-dom";
 import VideoSectionSkeleton from "./VideoSectionSkeleton";
 import NotFoundInline from "~/components/ui/not-found-inline";
 import StarIcon from "../ui/StarIcon";
@@ -34,6 +35,9 @@ export default function VideoSection() {
   const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const playerRef = useRef<any>(null);
   const [ytReady, setYtReady] = useState(false);
+  const [hoveredVideoId, setHoveredVideoId] = useState<string | null>(null);
+  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
 
   const {
     data: videos = [],
@@ -45,6 +49,10 @@ export default function VideoSection() {
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -61,6 +69,36 @@ export default function VideoSection() {
 
   const handleVideoSelect = (video: Video) => {
     setCurrentVideo(video);
+  };
+
+  const updateTooltipPosition = (element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const tooltipWidth = 320;
+    const tooltipHeight = 100; 
+    const margin = 12;
+
+    let left = rect.left;
+    let top = rect.bottom + margin;
+
+    if (left + tooltipWidth > viewportWidth - margin) {
+      left = viewportWidth - tooltipWidth - margin;
+    }
+    if (left < margin) {
+      left = margin;
+    }
+
+    if (top + tooltipHeight > viewportHeight - margin) {
+      top = rect.top - tooltipHeight - margin;
+    }
+
+    setTooltipStyle({
+      position: 'fixed',
+      left: Math.max(margin, left),
+      top: Math.max(margin, top),
+      zIndex: 9999
+    });
   };
 
   const sortedVideos = Array.isArray(videos) ? videos.sort((a, b) => {
@@ -338,18 +376,24 @@ export default function VideoSection() {
                       
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="min-w-0 flex-1">
-                          <div className="relative">
+                          <div 
+                            className="relative"
+                            onMouseEnter={(e) => {
+                              if (video.description) {
+                                setHoveredVideoId(video.id);
+                                updateTooltipPosition(e.currentTarget);
+                              }
+                            }}
+                            onMouseMove={(e) => {
+                              if (hoveredVideoId === video.id) {
+                                updateTooltipPosition(e.currentTarget);
+                              }
+                            }}
+                            onMouseLeave={() => setHoveredVideoId(null)}
+                          >
                             <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-1 leading-tight">
                               {video.title}
                             </p>
-                            {video.description && (
-                              <div className="absolute left-0 top-full mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[9999]">
-                                <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-2 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
-                                  {video.description}
-                                  <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
-                                </div>
-                              </div>
-                            )}
                           </div>
                           <div className="flex items-center gap-2 mt-1">
                             <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -371,6 +415,19 @@ export default function VideoSection() {
           </div>
         </div>
       </div>
+      
+      {mounted && hoveredVideoId && (() => {
+        const hoveredVideo = displayedVideos.find(v => v.id === hoveredVideoId);
+        return hoveredVideo?.description && createPortal(
+          <div style={tooltipStyle} className="pointer-events-none">
+            <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-2 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
+              {hoveredVideo.description}
+              <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+            </div>
+          </div>,
+          document.body
+        );
+      })()}
     </section>
   );
 }
