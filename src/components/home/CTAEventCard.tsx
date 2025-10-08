@@ -3,10 +3,18 @@
 import { motion } from "framer-motion";
 import { XIcon, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Event, EventCardProps } from "~/constants/events";
 
 export default function EventCard({ event, index, editMode, onEditClick, onUpload, className, onImageClick }: EventCardProps) {
   const [maxChars, setMaxChars] = useState(30);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const updateMaxChars = () => {
@@ -20,6 +28,36 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
     window.addEventListener("resize", updateMaxChars);
     return () => window.removeEventListener("resize", updateMaxChars);
   }, []);
+
+  const updateTooltipPosition = (element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const tooltipWidth = 320;
+    const tooltipHeight = 100; 
+    const margin = 12;
+
+    let left = rect.left;
+    let top = rect.top - tooltipHeight - margin;
+
+    if (left + tooltipWidth > viewportWidth - margin) {
+      left = viewportWidth - tooltipWidth - margin;
+    }
+    if (left < margin) {
+      left = margin;
+    }
+
+    if (top < margin) {
+      top = rect.bottom + margin;
+    }
+
+    setTooltipStyle({
+      position: 'fixed',
+      left: Math.max(margin, left),
+      top: Math.max(margin, top),
+      zIndex: 9999
+    });
+  };
 
   const handleImageClick = () => {
     if (!editMode && event.imageUrl && onImageClick) {
@@ -75,16 +113,24 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
               <>
                 <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/85 via-black/55 to-transparent dark:from-black/70 dark:via-black/45 dark:to-transparent pointer-events-none" />
                 <div className="absolute bottom-4 left-4 right-4 text-white z-10">
-                  <div className="relative group">
+                  <div 
+                    className="relative group"
+                    onMouseEnter={(e) => {
+                      if (event.title.length > maxChars) {
+                        setShowTooltip(true);
+                        updateTooltipPosition(e.currentTarget);
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (showTooltip) {
+                        updateTooltipPosition(e.currentTarget);
+                      }
+                    }}
+                    onMouseLeave={() => setShowTooltip(false)}
+                  >
                     <h4 className="block max-w-full text-lg font-semibold truncate text-white drop-shadow-xl mb-1">
                       {event.title.length > maxChars ? event.title.slice(0, maxChars) + "..." : event.title}
                     </h4>
-                    <div className="absolute left-0 -top-9 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                      <div className="bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
-                        {event.title}
-                        <div className="absolute left-4 -bottom-2 border-t-8 border-t-gray-900 border-x-8 border-x-transparent"></div>
-                      </div>
-                    </div>
                   </div>
                   <p className="block text-sm text-white/90 drop-shadow">
                     {event.location}
@@ -113,6 +159,15 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
       </div>
     </motion.div>
 
+    {mounted && showTooltip && event.title.length > maxChars && createPortal(
+      <div style={tooltipStyle} className="pointer-events-none">
+        <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-2 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
+          {event.title}
+          <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+        </div>
+      </div>,
+      document.body
+    )}
     </>
   );
 }
