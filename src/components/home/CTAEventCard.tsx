@@ -161,9 +161,9 @@ export default function EventCard({ event, index, editMode, onEditClick, onUploa
 
     {mounted && showTooltip && event.title.length > maxChars && createPortal(
       <div style={tooltipStyle} className="pointer-events-none">
-        <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-2 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
+        <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs px-3 py-2 rounded-lg shadow-lg whitespace-pre-line max-w-[80vw] md:max-w-md relative">
           {event.title}
-          <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
+          <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-white border-x-8 border-x-transparent"></div>
         </div>
       </div>,
       document.body
