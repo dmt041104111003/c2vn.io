@@ -1,6 +1,8 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+import { createPortal } from "react-dom";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface LatestPost {
@@ -23,6 +25,14 @@ interface LatestPostsSidebarProps {
 }
 
 export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSidebarProps) {
+  const [hoveredPostId, setHoveredPostId] = useState<string | null>(null);
+  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { data: postsData, isLoading } = useQuery({
     queryKey: ["latest-posts"],
     queryFn: async () => {
@@ -33,6 +43,36 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
   });
 
   const latestPosts: LatestPost[] = postsData?.data || [];
+
+  const updateTooltipPosition = (element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const tooltipWidth = 280;
+    const tooltipHeight = 60; 
+    const margin = 12;
+
+    let left = rect.left;
+    let top = rect.bottom + margin;
+
+    if (left + tooltipWidth > viewportWidth - margin) {
+      left = viewportWidth - tooltipWidth - margin;
+    }
+    if (left < margin) {
+      left = margin;
+    }
+
+    if (top + tooltipHeight > viewportHeight - margin) {
+      top = rect.top - tooltipHeight - margin;
+    }
+
+    setTooltipStyle({
+      position: 'fixed',
+      left: Math.max(margin, left),
+      top: Math.max(margin, top),
+      zIndex: 9999
+    });
+  };
 
   if (isLoading) {
     return (
@@ -116,18 +156,24 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
                 </div>
                 
                 <div className="min-w-0 flex-1">
-                  <div className={`relative text-sm font-medium ${
-                    isCurrentPost 
-                      ? "text-blue-700 dark:text-blue-300" 
-                      : "text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
-                  }`}>
+                  <div 
+                    className={`relative text-sm font-medium ${
+                      isCurrentPost 
+                        ? "text-blue-700 dark:text-blue-300" 
+                        : "text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                    }`}
+                    onMouseEnter={(e) => {
+                      setHoveredPostId(post.id);
+                      updateTooltipPosition(e.currentTarget);
+                    }}
+                    onMouseMove={(e) => {
+                      if (hoveredPostId === post.id) {
+                        updateTooltipPosition(e.currentTarget);
+                      }
+                    }}
+                    onMouseLeave={() => setHoveredPostId(null)}
+                  >
                     <span className="block truncate">{post.title}</span>
-                  <div className="absolute left-0 top-full mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[2147483647]">
-                      <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[70vw] relative">
-                        {post.title}
-                        <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-gray-100 border-x-8 border-x-transparent"></div>
-                      </div>
-                    </div>
                   </div>
                   <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                     <span>
@@ -147,6 +193,19 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
           );
         })}
       </div>
+      
+      {mounted && hoveredPostId && (() => {
+        const hoveredPost = latestPosts.find(p => p.id === hoveredPostId);
+        return hoveredPost && createPortal(
+          <div style={tooltipStyle} className="pointer-events-none">
+            <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs px-3 py-1.5 rounded-lg shadow-lg whitespace-pre-line max-w-[70vw] relative">
+              {hoveredPost.title}
+              <div className="absolute left-4 -top-2 border-b-8 border-b-gray-900 dark:border-b-white border-x-8 border-x-transparent"></div>
+            </div>
+          </div>,
+          document.body
+        );
+      })()}
     </div>
   );
 }
