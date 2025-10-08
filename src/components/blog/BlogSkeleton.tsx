@@ -6,11 +6,11 @@ interface BlogSkeletonProps {
   postCount?: number;
 }
 
-export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
+  export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
   const getSkeletonLayout = () => {
     if (postCount >= 7) {
       return {
-        className: 'lg:grid-cols-3',
+        className: 'grid-cols-1 grid-rows-7 lg:grid-cols-3 lg:grid-rows-5',
         content: (
           <>
             <div className="lg:col-span-1 space-y-4">
@@ -116,9 +116,65 @@ export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
           </>
         )
       };
+    } else if (postCount === 6) {
+      return {
+        className: 'grid-cols-1 grid-rows-6 lg:grid-cols-3 lg:grid-rows-4',
+        content: (
+          <>
+            {/* Right tall */}
+            <motion.div className="row-span-2 col-start-auto lg:col-start-3 lg:row-start-1">
+              <div className="rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 shadow-lg overflow-hidden h-full">
+                <div className="h-64 sm:h-72 lg:h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              </div>
+            </motion.div>
+            {/* Top-left big area */}
+            <motion.div className="col-span-1 lg:col-span-2 row-span-2 lg:row-start-1">
+              <div className="rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 shadow-lg overflow-hidden h-full">
+                <div className="h-64 sm:h-72 lg:h-80 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              </div>
+            </motion.div>
+            {/* Bottom cells */}
+            {Array.from({ length: 4 }).map((_, i) => (
+              <motion.div key={i} className={`row-span-1 lg:row-span-1 ${i < 2 ? 'lg:row-start-3' : 'lg:row-start-4'} ${i % 2 === 0 ? 'lg:col-start-1' : 'lg:col-start-2'}`}>
+                <div className="rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 shadow-lg overflow-hidden h-36 lg:h-40">
+                  <div className="h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                </div>
+              </motion.div>
+            ))}
+          </>
+        )
+      };
+    } else if (postCount === 5) {
+      return {
+        className: 'grid-cols-1 grid-rows-5 lg:grid-cols-3 lg:grid-rows-4',
+        content: (
+          <>
+            {/* Right tall */}
+            <motion.div className="row-span-2 col-start-auto lg:col-start-3 lg:row-start-1">
+              <div className="rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 shadow-lg overflow-hidden h-full">
+                <div className="h-64 sm:h-72 lg:h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              </div>
+            </motion.div>
+            {/* Top-left big */}
+            <motion.div className="col-span-1 lg:col-span-2 row-span-2 lg:row-start-1">
+              <div className="rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 shadow-lg overflow-hidden h-full">
+                <div className="h-64 sm:h-72 lg:h-80 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+              </div>
+            </motion.div>
+            {/* Bottom three */}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <motion.div key={i} className={`row-span-1 lg:row-span-2 lg:row-start-3 lg:col-start-${i + 1}`}>
+                <div className="rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 shadow-lg overflow-hidden h-36 lg:h-40">
+                  <div className="h-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                </div>
+              </motion.div>
+            ))}
+          </>
+        )
+      };
     } else if (postCount === 4) {
       return {
-        className: 'lg:grid-cols-2',
+        className: 'grid-cols-1 grid-rows-4 lg:grid-cols-2 lg:grid-rows-2',
         content: (
           <>
             {Array.from({ length: 4 }).map((_, i) => (
@@ -153,7 +209,7 @@ export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
       };
     } else if (postCount === 3) {
       return {
-        className: 'lg:grid-cols-2',
+        className: 'grid-cols-1 grid-rows-3',
         content: (
           <>
             {Array.from({ length: 3 }).map((_, i) => (
@@ -188,7 +244,7 @@ export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
       };
     } else if (postCount === 2) {
       return {
-        className: 'lg:grid-cols-2',
+        className: 'grid-cols-1 grid-rows-2',
         content: (
           <>
             {Array.from({ length: 2 }).map((_, i) => (
@@ -223,9 +279,9 @@ export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
       };
     } else {
       return {
-        className: 'lg:grid-cols-1',
+        className: 'grid-cols-1 grid-rows-1',
         content: (
-          <div className="space-y-6">
+          <>
             {Array.from({ length: 1 }).map((_, i) => (
               <motion.div
                 key={i}
@@ -253,7 +309,7 @@ export default function BlogSkeleton({ postCount = 7 }: BlogSkeletonProps) {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </>
         )
       };
     }

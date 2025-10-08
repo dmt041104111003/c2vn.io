@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { motion } from "framer-motion";
 import { BlogPost, BlogMedia } from '~/constants/posts';
 
@@ -14,6 +15,17 @@ interface BlogGridProps {
 }
 
 export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
+  const PAGE_SIZE = 7;
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const totalPages = Math.ceil(Math.max(0, posts.length - 0) / PAGE_SIZE);
+
+  const getPageSlice = (all: BlogPost[], page: number) => {
+    if (all.length <= PAGE_SIZE) return all;
+    const start = (page - 1) * PAGE_SIZE;
+    return all.slice(start, start + PAGE_SIZE);
+  };
+
+  const pagedPosts = posts.length > PAGE_SIZE ? getPageSlice(posts, currentPage) : posts;
   const renderPostCard = (post: BlogPost, index: number, isLarge = false, fullWidth = false, isHorizontal = false) => {
     let imageUrl = "/images/common/loading.png";
     if (Array.isArray(post.media) && post.media.length > 0) {
@@ -251,74 +263,134 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
   };
 
   const getGridLayout = () => {
-    if (posts.length >= 7) {
+    if (pagedPosts.length === 7) {
       return {
-        className: 'lg:grid-cols-3',
+        className: 'grid-cols-1 grid-rows-7 lg:grid-cols-3 lg:grid-rows-5',
         content: (
           <>
-            <div className="lg:col-span-1 space-y-4">
-              {posts.slice(1, 6).map((post, index) => 
-                renderPostCard(post, index + 1, false)
-              )}
+            <div className="col-span-1 row-span-5">
+              <div className="flex flex-col gap-4 h-full">
+                {pagedPosts.slice(2, 7).map((post, idx) => (
+                  <div key={post.id} className="min-h-0">
+                    {renderPostCard(post, idx + 2, false)}
+                  </div>
+                ))}
+              </div>
             </div>
-            
-            <div className="lg:col-span-2 flex flex-col space-y-2">
-              {posts[0] && (
-                <div className="flex-1">
-                  {renderPostCard(posts[0], 0, true)}
-                </div>
-              )}
-              {posts[6] && (
-                <div className="flex-shrink-0">
-                  {renderPostCard(posts[6], 6, false, false, true)}
-                </div>
-              )}
+
+            {pagedPosts[0] && (
+              <div className="col-span-2 col-start-2 row-span-4 row-start-1">
+                {renderPostCard(pagedPosts[0], 0, true)}
+              </div>
+            )}
+
+            {pagedPosts[1] && (
+              <div className="col-span-2 col-start-2 row-start-5">
+                {renderPostCard(pagedPosts[1], 1, false, false, true)}
+              </div>
+            )}
+          </>
+        )
+      };
+    } else if (pagedPosts.length === 6) {
+      return {
+        className: 'grid-cols-1 grid-rows-6 lg:grid-cols-3 lg:grid-rows-4',
+        content: (
+          <>
+            <div className="row-span-2 col-start-3 row-start-1">
+              {renderPostCard(pagedPosts[1] ?? pagedPosts[0], 1, true)}
+            </div>
+            <div className="col-span-2 row-span-2 col-start-1 row-start-1">
+              {renderPostCard(pagedPosts[0], 0, true)}
+            </div>
+            <div className="row-span-2 row-start-3 col-start-1">
+              {renderPostCard(pagedPosts[2] ?? pagedPosts[0], 2, true)}
+            </div>
+            <div className="row-span-2 row-start-3 col-start-2">
+              {renderPostCard(pagedPosts[3] ?? pagedPosts[1], 3, true)}
+            </div>
+            <div className="col-start-3 row-start-3">
+              {renderPostCard(pagedPosts[4] ?? pagedPosts[2], 4, false, false, true)}
+            </div>
+            <div className="col-start-3 row-start-4">
+              {renderPostCard(pagedPosts[5] ?? pagedPosts[3], 5, false, false, true)}
             </div>
           </>
         )
       };
-    } else if (posts.length === 4) {
+    } else if (pagedPosts.length === 5) {
       return {
-        className: 'lg:grid-cols-2',
+        className: 'grid-cols-1 grid-rows-5 lg:grid-cols-3 lg:grid-rows-4',
         content: (
           <>
-            {posts.map((post, index) => 
-              renderPostCard(post, index, true, true) 
-            )}
+            <div className="row-span-2 col-start-3 row-start-1">
+              {renderPostCard(pagedPosts[1] ?? pagedPosts[0], 1, true)}
+            </div>
+            <div className="col-span-2 row-span-2 col-start-1 row-start-1">
+              {renderPostCard(pagedPosts[0], 0, true)}
+            </div>
+            <div className="row-span-2 row-start-3 col-start-1">
+              {renderPostCard(pagedPosts[2] ?? pagedPosts[0], 2, true)}
+            </div>
+            <div className="row-span-2 row-start-3 col-start-2">
+              {renderPostCard(pagedPosts[3] ?? pagedPosts[1], 3, true)}
+            </div>
+            <div className="row-span-2 row-start-3 col-start-3">
+              {renderPostCard(pagedPosts[4] ?? pagedPosts[2], 4, true)}
+            </div>
           </>
         )
       };
-    } else if (posts.length === 3) {
+    } else if (pagedPosts.length === 4) {
       return {
-        className: 'lg:grid-cols-2',
+        className: 'grid-cols-1 grid-rows-4 lg:grid-cols-2 lg:grid-rows-2',
         content: (
           <>
-            {posts.map((post, index) => 
-              renderPostCard(post, index, true, true) 
-            )}
+            {pagedPosts.map((post, index) => (
+              <div key={post.id} className="min-h-0">
+                {renderPostCard(post, index, true, true)}
+              </div>
+            ))}
           </>
         )
       };
-    } else if (posts.length === 2) {
+    } else if (pagedPosts.length === 3) {
       return {
-        className: 'lg:grid-cols-2',
+        className: 'grid-cols-1 grid-rows-3',
         content: (
           <>
-            {posts.map((post, index) => 
-              renderPostCard(post, index, true, true) 
-            )}
+            {pagedPosts.map((post, index) => (
+              <div key={post.id}>
+                {renderPostCard(post, index, true, true)}
+              </div>
+            ))}
+          </>
+        )
+      };
+    } else if (pagedPosts.length === 2) {
+      return {
+        className: 'grid-cols-1 grid-rows-2',
+        content: (
+          <>
+            {pagedPosts.map((post, index) => (
+              <div key={post.id}>
+                {renderPostCard(post, index, true, true)}
+              </div>
+            ))}
           </>
         )
       };
     } else {
       return {
-        className: 'lg:grid-cols-1',
+        className: 'grid-cols-1 grid-rows-1',
         content: (
-          <div className="space-y-6">
-            {posts.map((post, index) => 
-              renderPostCard(post, index, true, true) 
-            )}
-          </div>
+          <>
+            {pagedPosts.map((post, index) => (
+              <div key={post.id}>
+                {renderPostCard(post, index, true, true)}
+              </div>
+            ))}
+          </>
         )
       };
     }
@@ -327,8 +399,32 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
   const layout = getGridLayout();
 
   return (
-    <motion.section className={`grid gap-6 ${layout.className}`}>
-      {layout.content}
-    </motion.section>
+    <>
+      <motion.section className={`grid gap-6 ${layout.className}`}>
+        {layout.content}
+      </motion.section>
+
+      {posts.length > PAGE_SIZE && (
+        <div className="mt-6 flex items-center justify-center gap-2">
+          <button
+            className="px-3 py-1.5 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            Page {currentPage} / {totalPages}
+          </span>
+          <button
+            className="px-3 py-1.5 text-sm rounded-md border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </>
   );
 }
