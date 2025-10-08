@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export default function Title({ title, description }: { title: string; description: string }) {
-  const halfLength = Math.ceil(description.length / 2);
-  const halfSlice = description.slice(0, halfLength);
-  const lastSpaceIndex = halfSlice.lastIndexOf(" ");
-  const truncated = description.length > halfLength
-    ? (lastSpaceIndex > 0 ? halfSlice.slice(0, lastSpaceIndex) : halfSlice).trim() + "…"
+  const maxLength = 200;
+  const slice = description.slice(0, maxLength);
+  const lastSpaceIndex = slice.lastIndexOf(" ");
+  const truncated = description.length > maxLength
+    ? (lastSpaceIndex > 0 ? slice.slice(0, lastSpaceIndex) : slice).trim() + "…"
     : description;
 
   const titleAnchorRef = useRef<HTMLDivElement>(null);
