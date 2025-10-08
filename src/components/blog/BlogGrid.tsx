@@ -265,7 +265,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
   const getGridLayout = () => {
     if (pagedPosts.length === 7) {
       return {
-        className: 'grid-cols-1 grid-rows-7 lg:grid-cols-3 lg:grid-rows-5',
+        className: 'grid-cols-1 lg:grid-cols-3 lg:grid-rows-5',
         content: (
           <>
             {pagedPosts.slice(2, 7).map((post, idx) => (
@@ -290,7 +290,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
       };
     } else if (pagedPosts.length === 6) {
       return {
-        className: 'grid-cols-1 grid-rows-6 lg:grid-cols-3 lg:grid-rows-4',
+        className: 'grid-cols-1 lg:grid-cols-3 lg:grid-rows-4',
         content: (
           <>
             <div className="row-span-2 col-start-3 row-start-1">
@@ -316,7 +316,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
       };
     } else if (pagedPosts.length === 5) {
       return {
-        className: 'grid-cols-1 grid-rows-5 lg:grid-cols-3 lg:grid-rows-4',
+        className: 'grid-cols-1 lg:grid-cols-3 lg:grid-rows-4',
         content: (
           <>
             <div className="row-span-2 col-start-3 row-start-1">
@@ -339,7 +339,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
       };
     } else if (pagedPosts.length === 4) {
       return {
-        className: 'grid-cols-1 grid-rows-4 lg:grid-cols-2 lg:grid-rows-2',
+        className: 'grid-cols-1 lg:grid-cols-2 lg:grid-rows-2',
         content: (
           <>
             {pagedPosts.map((post, index) => (
@@ -352,7 +352,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
       };
     } else if (pagedPosts.length === 3) {
       return {
-        className: 'grid-cols-1 grid-rows-3',
+        className: 'grid-cols-1',
         content: (
           <>
             {pagedPosts.map((post, index) => (
@@ -365,7 +365,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
       };
     } else if (pagedPosts.length === 2) {
       return {
-        className: 'grid-cols-1 grid-rows-2',
+        className: 'grid-cols-1',
         content: (
           <>
             {pagedPosts.map((post, index) => (
@@ -378,7 +378,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
       };
     } else {
       return {
-        className: 'grid-cols-1 grid-rows-1',
+        className: 'grid-cols-1',
         content: (
           <>
             {pagedPosts.map((post, index) => (
