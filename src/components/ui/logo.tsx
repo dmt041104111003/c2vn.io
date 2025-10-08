@@ -39,7 +39,7 @@ export default function Logo({ className = '', compact = false, showText = true,
         />
         {showText && (
           <div className="leading-tight min-w-0 flex-shrink">
-            <div className={`${titleSize} font-semibold text-gray-900 dark:text-white break-words`}>CARDANO2VN.IO</div>
+            <div className={`${titleSize} font-semibold text-[#003C8C] dark:text-[#00A3FF] break-words`}>CARDANO2VN.IO</div>
             <div className={`${subtitleSize} uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 break-words`}>BREAK THE BLOCKS</div>
           </div>
         )}
