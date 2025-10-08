@@ -118,9 +118,9 @@ export default function BackToBottom() {
           className="fixed bottom-8 left-6 z-50 cursor-pointer group"
         >
           <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-            <div className="bg-gray-900 dark:from-blue-400 dark:to-blue-600 text-white dark:text-white text-sm px-3 py-2 rounded-lg whitespace-nowrap relative shadow-lg">
+            <div className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm px-3 py-2 rounded-lg whitespace-nowrap relative shadow-lg">
               {getTooltipText()}
-              <div className="absolute right-full top-1/2 -translate-y-1/2 border-r-4 border-r-gray-900 dark:border-r-blue-400 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+              <div className="absolute right-full top-1/2 -translate-y-1/2 border-r-4 border-r-gray-900 dark:border-r-gray-100 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
             </div>
           </div>
 
