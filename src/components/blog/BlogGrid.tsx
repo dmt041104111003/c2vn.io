@@ -57,8 +57,8 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
         }}
         className="relative group"
       >
-        <div className={`rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-lg transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-xl overflow-hidden`}>
-          <a href={`/blog/${post.slug || post.id}`} className={isLarge ? "block" : isHorizontal ? "flex gap-4 p-4" : "flex gap-3 p-3"}>
+        <div className={`rounded-lg border border-gray-200 dark:border-white/20 bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-lg transition-all duration-300 hover:border-gray-300 dark:hover:border-white/40 hover:shadow-xl overflow-hidden w-full max-w-full ${isLarge ? 'h-full' : ''}`}>
+          <a href={`/blog/${post.slug || post.id}`} className={isLarge ? "flex flex-col w-full h-full" : isHorizontal ? "flex gap-4 p-4 w-full h-24 lg:h-28 items-center" : "flex gap-3 p-3 w-full"}>
             {isLarge ? (
               <>
                 <div className={`relative overflow-hidden ${fullWidth ? 'h-64 sm:h-80 lg:h-96' : isLarge ? 'h-64 sm:h-72 lg:h-80' : 'h-32 sm:h-40 lg:h-48'}`}>
@@ -75,7 +75,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
                 
-                <div className="p-4">
+                <div className="p-4 flex flex-col gap-3 flex-1">
                   {/* Tags */}
                   {Array.isArray(post.tags) && post.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-2">
@@ -104,7 +104,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
                   <h2 className="font-bold text-lg lg:text-xl text-gray-900 dark:text-white mb-2 line-clamp-2">
                     {post.title}
                   </h2>
-                  <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                  <div className="mt-auto flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{post.author || "Admin"}</span>
                       <span>•</span>
@@ -268,24 +268,20 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
         className: 'grid-cols-1 grid-rows-7 lg:grid-cols-3 lg:grid-rows-5',
         content: (
           <>
-            <div className="col-span-1 row-span-5">
-              <div className="flex flex-col gap-4 h-full">
-                {pagedPosts.slice(2, 7).map((post, idx) => (
-                  <div key={post.id} className="min-h-0">
-                    {renderPostCard(post, idx + 2, false)}
-                  </div>
-                ))}
+            {pagedPosts.slice(2, 7).map((post, idx) => (
+              <div key={post.id} className={`lg:col-start-1 lg:row-start-${idx + 1}`}>
+                {renderPostCard(post, idx + 2, false)}
               </div>
-            </div>
+            ))}
 
             {pagedPosts[0] && (
-              <div className="col-span-2 col-start-2 row-span-4 row-start-1">
+              <div className="lg:col-span-2 lg:col-start-2 lg:row-span-4 lg:row-start-1">
                 {renderPostCard(pagedPosts[0], 0, true)}
               </div>
             )}
 
             {pagedPosts[1] && (
-              <div className="col-span-2 col-start-2 row-start-5">
+              <div className="lg:col-span-2 lg:col-start-2 lg:row-start-5">
                 {renderPostCard(pagedPosts[1], 1, false, false, true)}
               </div>
             )}
@@ -400,7 +396,7 @@ export default function BlogGrid({ posts, pageSize }: BlogGridProps) {
 
   return (
     <>
-      <motion.section className={`grid gap-6 ${layout.className}`}>
+      <motion.section className={`grid gap-2 ${layout.className}`}>
         {layout.content}
       </motion.section>
 
