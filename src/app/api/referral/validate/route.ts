@@ -16,13 +16,10 @@ export const POST = async (req: Request) => {
       return NextResponse.json(createErrorResponse('Device data is required', 'MISSING_DEVICE_DATA'), { status: 400 });
     }
 
-    const userAgent = req.headers.get('user-agent') || '';
-    const serverDeviceInfo = extractDeviceInfoFromRequest(req);
-    const combinedDeviceData = { ...serverDeviceInfo, ...deviceData };
-    const fingerprint = generateDeviceFingerprint(userAgent, combinedDeviceData);
+    const fingerprint = generateDeviceFingerprint(deviceData.userAgent, deviceData);
 
     const existingDeviceUsage = await prisma.$queryRaw`
-      SELECT * FROM "ReferralSubmission" 
+      SELECT id FROM "ReferralSubmission" 
       WHERE "deviceFingerprint" = ${fingerprint}
       LIMIT 1
     `;
@@ -34,6 +31,11 @@ export const POST = async (req: Request) => {
     const referralUser = await prisma.user.findFirst({
       where: {
         referralCode: referralCode
+      },
+      select: {
+        id: true,
+        name: true,
+        referralCode: true
       }
     });
 
@@ -44,7 +46,8 @@ export const POST = async (req: Request) => {
     return NextResponse.json(createSuccessResponse({ 
       valid: true, 
       message: 'Referral code is valid and can be used',
-      referrerName: referralUser.name
+      referrerName: referralUser.name,
+      fingerprint: fingerprint 
     }));
 
   } catch (error) {

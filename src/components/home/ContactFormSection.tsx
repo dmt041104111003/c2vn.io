@@ -266,54 +266,70 @@ export default function ContactFormSection() {
     }
 
     if (name === "email-intro" && value.trim() && deviceData) {
-      try {
-        const response = await fetch('/api/referral/validate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            referralCode: value.trim(),
-            deviceData: deviceData
-          }),
-        });
-
-        const result = await response.json();
-        
-        if (!response.ok) {
-          if (result.error === 'DEVICE_ALREADY_USED') {
-            setErrors(prev => ({
-              ...prev,
-              "email-intro": "This device has already used a referral code"
-            }));
-          } else if (result.error === 'REFERRAL_NOT_FOUND') {
-            setErrors(prev => ({
-              ...prev,
-              "email-intro": "Referral code not found"
-            }));
-          } else if (result.error === 'INVALID_REFERRAL_CODE') {
-            setErrors(prev => ({
-              ...prev,
-              "email-intro": "Invalid referral code format"
-            }));
-          } else {
-            setErrors(prev => ({
-              ...prev,
-              "email-intro": "Failed to validate referral code"
-            }));
-          }
-        } else {
-          setErrors(prev => ({
-            ...prev,
-            "email-intro": undefined
-          }));
-        }
-      } catch (error) {
+      const cachedDeviceUsed = localStorage.getItem('deviceUsedReferral');
+      if (cachedDeviceUsed === 'true') {
         setErrors(prev => ({
           ...prev,
-          "email-intro": "Failed to validate referral code"
+          "email-intro": "This device has already used a referral code"
         }));
+        return;
       }
+      
+      setTimeout(async () => {
+        try {
+          const response = await fetch('/api/referral/validate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              referralCode: value.trim(),
+              deviceData: deviceData
+            }),
+          });
+
+          const result = await response.json();
+          
+          if (!response.ok) {
+            if (result.error === 'DEVICE_ALREADY_USED') {
+              localStorage.setItem('deviceUsedReferral', 'true');
+              setErrors(prev => ({
+                ...prev,
+                "email-intro": "This device has already used a referral code"
+              }));
+            } else if (result.error === 'REFERRAL_NOT_FOUND') {
+              setErrors(prev => ({
+                ...prev,
+                "email-intro": "Referral code not found"
+              }));
+            } else if (result.error === 'INVALID_REFERRAL_CODE') {
+              setErrors(prev => ({
+                ...prev,
+                "email-intro": "Invalid referral code format"
+              }));
+            } else {
+              setErrors(prev => ({
+                ...prev,
+                "email-intro": "Failed to validate referral code"
+              }));
+            }
+          } else {
+            if (result.data?.fingerprint) {
+              localStorage.setItem('deviceFingerprint', result.data.fingerprint);
+            }
+            
+            setErrors(prev => ({
+              ...prev,
+              "email-intro": undefined
+            }));
+          }
+        } catch (error) {
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": "Failed to validate referral code"
+          }));
+        }
+      }, 500); 
     }
   };
 

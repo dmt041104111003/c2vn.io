@@ -16,34 +16,25 @@ export interface DeviceFingerprint {
 }
 
 export function generateDeviceFingerprint(userAgent: string, additionalData?: Partial<DeviceFingerprint>): string {
-  const stableFingerprint = {
-    userAgent: userAgent || '',
+  const coreFingerprint = {
     platform: additionalData?.platform || 'unknown',
-    
     hardwareConcurrency: additionalData?.hardwareConcurrency || 0,
-    maxTouchPoints: additionalData?.maxTouchPoints || 0,
-    colorDepth: additionalData?.colorDepth || 0,
-    
     screenResolution: additionalData?.screenResolution || 'unknown',
-    
-    canvasFingerprint: additionalData?.canvasFingerprint || 'unknown',
+    colorDepth: additionalData?.colorDepth || 0,
+    maxTouchPoints: additionalData?.maxTouchPoints || 0,
   };
 
-  const fingerprintString = JSON.stringify(stableFingerprint);
-  return crypto.createHash('sha256').update(fingerprintString).digest('hex');
+  const fingerprintString = `p:${coreFingerprint.platform}|hc:${coreFingerprint.hardwareConcurrency}|sr:${coreFingerprint.screenResolution}|cd:${coreFingerprint.colorDepth}|mt:${coreFingerprint.maxTouchPoints}`;
+  const hash = crypto.createHash('sha256').update(fingerprintString).digest('hex');
+  return hash;
 }
 
 export function extractDeviceInfoFromRequest(req: Request): Partial<DeviceFingerprint> {
   const userAgent = req.headers.get('user-agent') || '';
-  const acceptLanguage = req.headers.get('accept-language') || '';
-  const acceptEncoding = req.headers.get('accept-encoding') || '';
-  const dnt = req.headers.get('dnt') || '';
   
   return {
     userAgent,
-    language: acceptLanguage.split(',')[0] || 'unknown',
     platform: extractPlatformFromUserAgent(userAgent),
-    doNotTrack: dnt,
   };
 }
 

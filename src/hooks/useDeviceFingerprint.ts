@@ -30,20 +30,7 @@ export function useDeviceFingerprint() {
           return;
         }
 
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
         let canvasFingerprint = '';
-        if (ctx) {
-          ctx.textBaseline = 'top';
-          ctx.font = '14px Arial';
-          ctx.fillStyle = '#f60';
-          ctx.fillRect(125, 1, 62, 20);
-          ctx.fillStyle = '#069';
-          ctx.fillText('Device fingerprint test', 2, 15);
-          ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
-          ctx.fillText('Device fingerprint test', 4, 17);
-          canvasFingerprint = canvas.toDataURL();
-        }
 
         const deviceInfo: DeviceFingerprintData = {
           userAgent: navigator.userAgent,
@@ -60,9 +47,15 @@ export function useDeviceFingerprint() {
           canvasFingerprint: canvasFingerprint || '',
         };
 
-        setDeviceData(deviceInfo);
+
+        const cachedFingerprint = localStorage.getItem('deviceFingerprint');
+        if (cachedFingerprint) {
+          setFingerprint(cachedFingerprint);
+        } else {
+          setFingerprint('generated');
+        }
         
-        setFingerprint('generated'); 
+        setDeviceData(deviceInfo); 
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {
