@@ -23,6 +23,11 @@ export default function AuthBannedPage() {
           const result = await response.json();
           if (result.success) {
             setBanDetails(result.data);
+            
+            // If ban has expired, redirect to home
+            if (!result.data.isBanned) {
+              window.location.href = '/';
+            }
           }
         }
       } catch (error) {
@@ -33,6 +38,11 @@ export default function AuthBannedPage() {
     };
 
     fetchBanDetails();
+    
+    // Auto-refresh every 30 seconds to check ban status
+    const interval = setInterval(fetchBanDetails, 30000);
+    
+    return () => clearInterval(interval);
   }, [deviceData]);
 
   if (loading) {
@@ -52,12 +62,7 @@ export default function AuthBannedPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 text-center">
-        {/* Icon */}
-        <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/20 mb-6">
-          <svg className="h-8 w-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-        </div>
+
         
         <h1 className="text-2xl font-bold text-red-700 dark:text-red-300 mb-4">
           Authentication Blocked
@@ -92,24 +97,19 @@ export default function AuthBannedPage() {
           </div>
         )}
 
-        {/* Countdown Timer */}
-        {hoursRemaining > 0 && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-            <p className="text-blue-800 dark:text-blue-200 font-semibold mb-2">
-              Access will be restored in:
-            </p>
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {hoursRemaining} hours
-            </div>
-          </div>
-        )}
+
         
         <div className="space-y-4">
           <button
             onClick={() => window.location.href = '/'}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            disabled={hoursRemaining > 0}
+            className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors ${
+              hoursRemaining > 0 
+                ? 'text-gray-400 bg-gray-300 cursor-not-allowed' 
+                : 'text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            }`}
           >
-            Return to Home
+            {hoursRemaining > 0 ? 'Access Restricted' : 'Return to Home'}
           </button>
           
           <div className="text-sm text-gray-500 dark:text-gray-400">
