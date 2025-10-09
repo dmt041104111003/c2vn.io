@@ -6,6 +6,8 @@ import { CardanoWalletProvider } from "~/lib/cardano-auth-provider"
 import { generateWalletAvatar } from '~/lib/wallet-avatar';
 import cloudinary from '~/lib/cloudinary';
 import { isValidAvatarUrl, validateBase64Image } from '~/lib/avatar-validator';
+import { generateDeviceFingerprint } from '~/lib/device-fingerprint';
+import { isDeviceBanned } from '~/lib/device-attempt-utils';
 
 const roleCache = new Map<string, any>();
 
@@ -54,10 +56,37 @@ export const authOptions = {
     async redirect({ baseUrl }: { baseUrl: string }) {
       return baseUrl
     },
+    async signIn({ user, account, profile, request }) {
+      try {
+        const userAgent = request?.headers?.get('user-agent') || '';
+        const deviceData = {
+          userAgent,
+          acceptLanguage: request?.headers?.get('accept-language') || '',
+          acceptEncoding: request?.headers?.get('accept-encoding') || '',
+          platform: request?.headers?.get('sec-ch-ua-platform') || '',
+          screenResolution: request?.headers?.get('sec-ch-ua') || ''
+        };
+
+        const deviceFingerprint = generateDeviceFingerprint(userAgent, deviceData);
+        const banned = await isDeviceBanned(deviceFingerprint);
+
+        if (banned) {
+          return false;
+        }
+
+        if (user) {
+          (user as any).deviceData = deviceData;
+        }
+
+        return true;
+      } catch (error) {
+        return true; 
+      }
+    },
     async jwt(params: unknown) {
       const { token, user, account } = params as {
         token: Record<string, unknown>;
-        user?: { address?: string; email?: string; image?: string; name?: string };
+        user?: { address?: string; email?: string; image?: string; name?: string; deviceData?: any };
         account?: { provider?: string };
       };
       if (user && account?.provider === "cardano-wallet") {
@@ -75,10 +104,31 @@ export const authOptions = {
         token.image = user.image;
         token.name = user.name;
       }
+      
+      if (user?.deviceData) {
+        token.deviceData = user.deviceData;
+      }
+      
       return token;
     },
     async session(params: unknown) {
       const { session, token } = params as { session: import("next-auth").Session & { expires?: string }; token: Record<string, unknown> };
+      
+      try {
+        const deviceData = (token as any).deviceData;
+        
+        if (deviceData) {
+          const deviceFingerprint = generateDeviceFingerprint(deviceData.userAgent, deviceData);
+          const banned = await isDeviceBanned(deviceFingerprint);
+
+          if (banned) {
+            return null;
+          }
+        }
+      } catch (error) {
+
+      }
+      
       if (typeof session.user === 'object' && session.user) {
         (session.user as Record<string, unknown> & { address?: string }).address = (token as TokenWithAddress).address;
         if (token.provider === "google" || token.provider === "github") {
