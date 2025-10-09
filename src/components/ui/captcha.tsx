@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 
 interface CaptchaProps {
-  onCaptchaChange: (isValid: boolean) => void;
+  onCaptchaChange: (payload: { isValid: boolean; token: string; answer: string }) => void;
 }
 
 export function Captcha({ onCaptchaChange }: CaptchaProps) {
   const [captchaText, setCaptchaText] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
   const [userInput, setUserInput] = useState("");
   const [isValid, setIsValid] = useState(false);
   const desktopCanvasRef = useRef<HTMLCanvasElement>(null);
   const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateCaptcha = () => {
+  const generateCaptcha = async () => {
     const desktopCanvas = desktopCanvasRef.current;
     const mobileCanvas = mobileCanvasRef.current;
     
@@ -22,12 +23,19 @@ export function Captcha({ onCaptchaChange }: CaptchaProps) {
     
     if (!desktopCtx || !mobileCtx) return;
 
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let text = "";
-    for (let i = 0; i < 6; i++) {
-      text += chars.charAt(Math.floor(Math.random() * chars.length));
+    try {
+      const res = await fetch('/api/captcha/new', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Failed to get captcha');
+      const data = await res.json();
+      const t = data?.data?.text || "";
+      const tok = data?.data?.token || "";
+      if (!t || !tok) throw new Error('Invalid captcha payload');
+      setCaptchaText(t);
+      setCaptchaToken(tok);
+    } catch (e) {
+      setCaptchaText("");
+      setCaptchaToken("");
     }
-    setCaptchaText(text);
 
     desktopCtx.clearRect(0, 0, desktopCanvas.width, desktopCanvas.height);
     desktopCtx.fillStyle = "#f3f4f6";
@@ -46,11 +54,11 @@ export function Captcha({ onCaptchaChange }: CaptchaProps) {
     }
     desktopCtx.font = `bold 24px Arial`;
     desktopCtx.fillStyle = "#1f2937";
-    for (let i = 0; i < text.length; i++) {
+    for (let i = 0; i < captchaText.length; i++) {
       desktopCtx.save();
       desktopCtx.translate(30 + i * 25, 35);
       desktopCtx.rotate((Math.random() - 0.5) * 0.3);
-      desktopCtx.fillText(text[i], 0, 0);
+      desktopCtx.fillText(captchaText[i], 0, 0);
       desktopCtx.restore();
     }
 
@@ -71,11 +79,11 @@ export function Captcha({ onCaptchaChange }: CaptchaProps) {
     }
     mobileCtx.font = `bold 18px Arial`;
     mobileCtx.fillStyle = "#1f2937";
-    for (let i = 0; i < text.length; i++) {
+    for (let i = 0; i < captchaText.length; i++) {
       mobileCtx.save();
       mobileCtx.translate(25 + i * 20, 35);
       mobileCtx.rotate((Math.random() - 0.5) * 0.3);
-      mobileCtx.fillText(text[i], 0, 0);
+      mobileCtx.fillText(captchaText[i], 0, 0);
       mobileCtx.restore();
     }
   };
@@ -84,18 +92,17 @@ export function Captcha({ onCaptchaChange }: CaptchaProps) {
     generateCaptcha();
   }, []);
 
-  // Reset captcha when component is remounted (key changes)
   useEffect(() => {
     setUserInput("");
     setIsValid(false);
-    onCaptchaChange(false);
+    onCaptchaChange({ isValid: false, token: "", answer: "" });
   }, []);
 
   useEffect(() => {
-    const valid = userInput.toUpperCase() === captchaText;
+    const valid = userInput.toUpperCase() === captchaText && !!captchaToken;
     setIsValid(valid);
-    onCaptchaChange(valid);
-  }, [userInput, captchaText, onCaptchaChange]);
+    onCaptchaChange({ isValid: valid, token: captchaToken, answer: userInput });
+  }, [userInput, captchaText, captchaToken, onCaptchaChange]);
 
   const handleRefresh = () => {
     setUserInput("");

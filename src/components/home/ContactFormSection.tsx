@@ -62,6 +62,8 @@ export default function ContactFormSection() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaValid, setCaptchaValid] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [captchaKey, setCaptchaKey] = useState(0); 
 
  
@@ -283,8 +285,6 @@ export default function ContactFormSection() {
     }
 
     setIsSubmitting(true);
-
-    const scriptURL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL_1 || '';
     
     try {
       if (formData["email-intro"]) {
@@ -348,14 +348,14 @@ export default function ContactFormSection() {
         }
       }
 
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
-      });
-
-      const response = await fetch(scriptURL, {
+      const response = await fetch('/api/contact/submit', {
         method: 'POST',
-        body: formDataToSend
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formData,
+          captchaToken,
+          captchaAnswer
+        })
       });
 
       if (response.ok) {
@@ -371,6 +371,8 @@ export default function ContactFormSection() {
         });
         setErrors({});
         setCaptchaValid(false);
+        setCaptchaToken("");
+        setCaptchaAnswer("");
         setCaptchaKey(prev => prev + 1);
         setSelectedCourse(null);
         setSelectedCourseImage('');
@@ -441,7 +443,11 @@ export default function ContactFormSection() {
                 captchaKey={captchaKey}
                 onInputChange={handleInputChange}
                 onSubmit={handleSubmit}
-                onCaptchaChange={setCaptchaValid}
+                onCaptchaChange={({ isValid, token, answer }) => {
+                  setCaptchaValid(isValid);
+                  setCaptchaToken(token);
+                  setCaptchaAnswer(answer);
+                }}
                 onCourseChange={handleCourseChange}
               />
             ) : activeTab === "manage" ? (
