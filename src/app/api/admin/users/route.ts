@@ -27,7 +27,6 @@ export const GET = withAdmin(async () => {
         updatedAt: user.updatedAt.toISOString(),
         avatar: user.image || null,
         referralCode: user.referralCode || null,
-        referralCount: user.referralCount || 0,
       };
     });
     

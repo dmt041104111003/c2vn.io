@@ -55,14 +55,6 @@ export const POST = withAuth(async (req, currentUser) => {
       ) RETURNING *
     `;
 
-    await prisma.user.update({
-      where: { id: referrer.id },
-      data: {
-        referralCount: {
-          increment: 1
-        }
-      }
-    });
 
     const submissionData = Array.isArray(submission) ? submission[0] : submission;
 

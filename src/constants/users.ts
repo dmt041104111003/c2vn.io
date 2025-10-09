@@ -13,7 +13,6 @@ export interface User {
   lastLogin?: string;
   avatar?: string;
   referralCode?: string;
-  referralCount?: number;
 }
 
 export interface UserTableProps {

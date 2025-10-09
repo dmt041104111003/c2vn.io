@@ -4,6 +4,39 @@ import { WalletAvatar } from '~/components/WalletAvatar';
 import { useToastContext } from "../../toast-provider";
 import { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
+import { useQuery } from '@tanstack/react-query';
+
+function ReferralCountCell({ userId, onViewReferrals }: { userId: string; onViewReferrals: () => void }) {
+  const { data: referralData, isLoading } = useQuery({
+    queryKey: ['user-referrals', userId],
+    queryFn: async () => {
+      const res = await fetch(`/api/user/${userId}/referrals`);
+      if (!res.ok) throw new Error('Failed to fetch referral count');
+      return res.json();
+    },
+    refetchInterval: 30000, 
+  });
+
+  const referralCount = referralData?.data?.referralCount || 0;
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-blue-600 font-medium">
+        {isLoading ? '...' : referralCount}
+      </span>
+      <span className="text-gray-500 text-sm">
+        referral{referralCount !== 1 ? 's' : ''}
+      </span>
+      <button
+        onClick={onViewReferrals}
+        className="ml-2 p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+        title="View referral details"
+      >
+        <Eye className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
 
 function UserAvatar({ user }: { user: User }) {
   const [imageError, setImageError] = useState(false);
@@ -341,21 +374,7 @@ export function UserTable({
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center gap-2">
-                  <span className="text-blue-600 font-medium">
-                    {user.referralCount || 0}
-                  </span>
-                  <span className="text-gray-500 text-sm">
-                    referral{(user.referralCount || 0) !== 1 ? 's' : ''}
-                  </span>
-                  <button
-                    onClick={() => handleViewReferrals(user)}
-                    className="ml-2 p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                    title="View referral details"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
-                </div>
+                <ReferralCountCell userId={user.id} onViewReferrals={() => handleViewReferrals(user)} />
               </td>
 
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -14,8 +14,7 @@ model User {
   name          String?
   image         String?
   provider      String?        // "google", "github", "cardano", etc.
-  referralCode  String?        @unique 
-  referralCount Int            @default(0)
+  referralCode  String?        @unique
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   roleId        String
@@ -28,6 +27,7 @@ model User {
   notifications Notification[] @relation("UserNotifications")
   role          Role           @relation(fields: [roleId], references: [id])
   referralSubmissions ReferralSubmission[] @relation("UserReferralSubmissions")
+  referrals          ReferralSubmission[] @relation("UserReferrals")
 
   @@index([createdAt])
   @@index([provider])
@@ -421,7 +421,8 @@ model ReferralSubmission {
   deviceFingerprint String? // Device fingerprint for tracking
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  user          User     @relation("UserReferralSubmissions", fields: [userId], references: [id])
+  user          User     @relation("UserReferralSubmissions", fields: [userId], references: [id], onDelete: Cascade)
+  referrer      User     @relation("UserReferrals", fields: [referrerId], references: [id], onDelete: Cascade)
 
   @@unique([userId]) // Each user can only submit once
   @@index([referralCode])

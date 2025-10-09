@@ -87,11 +87,17 @@ function MobileUserInfo({ session, onClose, onShowModal }: { session: any; onClo
   useEffect(() => {
     const fetchReferralStats = async () => {
       try {
-        const statsResponse = await fetch('/api/user/referrals?includeStats=true&limit=10');
-        if (statsResponse.ok) {
-          const statsData = await statsResponse.json();
-          if (statsData.success && statsData.data) {
-            setReferralCount(statsData.data.referralCount || 0);
+        const userResponse = await fetch('/api/user');
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          if (userData.success && userData.data?.id) {
+            const statsResponse = await fetch(`/api/user/${userData.data.id}/referrals`);
+            if (statsResponse.ok) {
+              const statsData = await statsResponse.json();
+              if (statsData.success && statsData.data) {
+                setReferralCount(statsData.data.referralCount || 0);
+              }
+            }
           }
         }
       } catch (error) {
@@ -306,11 +312,18 @@ function UserDropdown({ session, onClose, onShowModal, autoEdit = false }: { ses
   useEffect(() => {
     const fetchReferralStats = async () => {
       try {
-        const statsResponse = await fetch('/api/user/referrals?includeStats=true&limit=10');
-        if (statsResponse.ok) {
-          const statsData = await statsResponse.json();
-          if (statsData.success && statsData.data) {
-            setReferralCount(statsData.data.referralCount || 0);
+        // Lấy user ID từ session hoặc API
+        const userResponse = await fetch('/api/user');
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          if (userData.success && userData.data?.id) {
+            const statsResponse = await fetch(`/api/user/${userData.data.id}/referrals`);
+            if (statsResponse.ok) {
+              const statsData = await statsResponse.json();
+              if (statsData.success && statsData.data) {
+                setReferralCount(statsData.data.referralCount || 0);
+              }
+            }
           }
         }
       } catch (error) {
