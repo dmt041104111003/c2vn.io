@@ -418,6 +418,7 @@ model ReferralSubmission {
   wallet        String?  // Wallet from contact form
   course        String?  // Course from contact form
   message       String?  // Message from contact form
+  deviceFingerprint String? // Device fingerprint for tracking
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation("UserReferralSubmissions", fields: [userId], references: [id])
@@ -425,5 +426,44 @@ model ReferralSubmission {
   @@unique([userId]) // Each user can only submit once
   @@index([referralCode])
   @@index([referrerId])
+  @@index([deviceFingerprint])
   @@index([createdAt])
+}
+
+model DeviceFingerprint {
+  id            String   @id @default(uuid())
+  fingerprint   String   @unique // SHA256 hash of device info
+  userAgent     String
+  language      String?
+  platform      String?
+  screenResolution String?
+  timezone      String?
+  cookieEnabled Boolean?
+  doNotTrack    String?
+  hardwareConcurrency Int?
+  maxTouchPoints Int?
+  colorDepth    Int?
+  pixelRatio    Float?
+  canvasFingerprint String? // Canvas fingerprint for additional uniqueness
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  referralUsages ReferralDeviceUsage[]
+
+  @@index([fingerprint])
+  @@index([createdAt])
+}
+
+model ReferralDeviceUsage {
+  id                String   @id @default(uuid())
+  deviceFingerprintId String
+  referralCode      String   // Referral code used
+  usedAt            DateTime @default(now())
+  ipAddress         String?  // IP address for additional tracking
+  userAgent         String?  // User agent for additional tracking
+  deviceFingerprint DeviceFingerprint @relation(fields: [deviceFingerprintId], references: [id], onDelete: Cascade)
+
+  @@unique([deviceFingerprintId, referralCode]) // Each device can only use each referral code once
+  @@index([referralCode])
+  @@index([usedAt])
+  @@index([deviceFingerprintId])
 }

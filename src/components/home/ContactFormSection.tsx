@@ -6,6 +6,7 @@ import { useToastContext } from '~/components/toast-provider';
 import { ContactForm } from './ContactForm';
 import ContactFormManager from './ContactFormManager';
 import { ContactFormData, FormErrors } from '~/constants/contact';
+import { useDeviceFingerprint } from '~/hooks/useDeviceFingerprint';
 import ContactFormImage from './ContactFormImage';
 import ContactFormTabs from './ContactFormTabs';
 import ContactFormSkeleton from './ContactFormSkeleton';
@@ -64,7 +65,9 @@ export default function ContactFormSection() {
   const [captchaValid, setCaptchaValid] = useState(false);
   const [captchaText, setCaptchaText] = useState("");
   const [captchaAnswer, setCaptchaAnswer] = useState("");
-  const [captchaKey, setCaptchaKey] = useState(0); 
+  const [captchaKey, setCaptchaKey] = useState(0);
+  
+  const { deviceData, isLoading: fingerprintLoading } = useDeviceFingerprint(); 
 
  
   useEffect(() => {
@@ -315,7 +318,8 @@ export default function ContactFormSection() {
             },
             body: JSON.stringify({
               referralCode: formData["email-intro"],
-              formData: formData
+              formData: formData,
+              deviceData: deviceData
             }),
           });
 
@@ -334,6 +338,10 @@ export default function ContactFormSection() {
               showError("Referral code not found. Please check and try again.");
               setIsSubmitting(false);
               return;
+            } else if (referralData.error === 'DEVICE_ALREADY_USED') {
+              showError("This device has already used this referral code. Each device can only use a referral code once.");
+              setIsSubmitting(false);
+              return;
             } else {
               showError("Invalid referral code. Please check and try again.");
               setIsSubmitting(false);
@@ -341,7 +349,6 @@ export default function ContactFormSection() {
             }
           }
         } catch (referralError) {
-          console.error('Referral submission error:', referralError);
           showError("Failed to process referral code. Please try again.");
           setIsSubmitting(false);
           return;
