@@ -244,7 +244,7 @@ export default function ContactFormSection() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -263,6 +263,57 @@ export default function ContactFormSection() {
         ...prev,
         contact: undefined
       }));
+    }
+
+    if (name === "email-intro" && value.trim() && deviceData) {
+      try {
+        const response = await fetch('/api/referral/validate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            referralCode: value.trim(),
+            deviceData: deviceData
+          }),
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+          if (result.error === 'DEVICE_ALREADY_USED') {
+            setErrors(prev => ({
+              ...prev,
+              "email-intro": "This device has already used this referral code"
+            }));
+          } else if (result.error === 'REFERRAL_NOT_FOUND') {
+            setErrors(prev => ({
+              ...prev,
+              "email-intro": "Referral code not found"
+            }));
+          } else if (result.error === 'INVALID_REFERRAL_CODE') {
+            setErrors(prev => ({
+              ...prev,
+              "email-intro": "Invalid referral code format"
+            }));
+          } else {
+            setErrors(prev => ({
+              ...prev,
+              "email-intro": "Failed to validate referral code"
+            }));
+          }
+        } else {
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": undefined
+          }));
+        }
+      } catch (error) {
+        setErrors(prev => ({
+          ...prev,
+          "email-intro": "Failed to validate referral code"
+        }));
+      }
     }
   };
 

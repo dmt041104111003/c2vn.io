@@ -17,26 +17,13 @@ export const POST = withAuth(async (req, currentUser) => {
       return NextResponse.json(createErrorResponse('Invalid referral code format', 'INVALID_REFERRAL_CODE'), { status: 400 });
     }
 
-    // Kiểm tra device fingerprint nếu có
+    let deviceFingerprint = null;
     if (deviceData) {
       const userAgent = req.headers.get('user-agent') || '';
       const serverDeviceInfo = extractDeviceInfoFromRequest(req);
       const combinedDeviceData = { ...serverDeviceInfo, ...deviceData };
-      const fingerprint = generateDeviceFingerprint(userAgent, combinedDeviceData);
+      deviceFingerprint = generateDeviceFingerprint(userAgent, combinedDeviceData);
 
-      // Kiểm tra xem device này đã sử dụng referral code này chưa
-      const existingDeviceUsage = await prisma.referralDeviceUsage.findFirst({
-        where: {
-          deviceFingerprint: {
-            fingerprint: fingerprint
-          },
-          referralCode: referralCode
-        }
-      });
-
-      if (existingDeviceUsage) {
-        return NextResponse.json(createErrorResponse('This device has already used this referral code', 'DEVICE_ALREADY_USED'), { status: 409 });
-      }
     }
 
     const existingSubmission = await prisma.referralSubmission.findUnique({
@@ -57,14 +44,6 @@ export const POST = withAuth(async (req, currentUser) => {
       return NextResponse.json(createErrorResponse('You cannot use your own referral code', 'CANNOT_USE_OWN_CODE'), { status: 400 });
     }
 
-    // Tạo device fingerprint nếu có deviceData
-    let deviceFingerprint = null;
-    if (deviceData) {
-      const userAgent = req.headers.get('user-agent') || '';
-      const serverDeviceInfo = extractDeviceInfoFromRequest(req);
-      const combinedDeviceData = { ...serverDeviceInfo, ...deviceData };
-      deviceFingerprint = generateDeviceFingerprint(userAgent, combinedDeviceData);
-    }
 
     const submission = await prisma.referralSubmission.create({
       data: {
