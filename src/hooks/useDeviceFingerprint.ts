@@ -36,7 +36,12 @@ export function useDeviceFingerprint() {
         if (ctx) {
           ctx.textBaseline = 'top';
           ctx.font = '14px Arial';
-          ctx.fillText('Device fingerprint', 2, 2);
+          ctx.fillStyle = '#f60';
+          ctx.fillRect(125, 1, 62, 20);
+          ctx.fillStyle = '#069';
+          ctx.fillText('Device fingerprint test', 2, 15);
+          ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+          ctx.fillText('Device fingerprint test', 4, 17);
           canvasFingerprint = canvas.toDataURL();
         }
 
@@ -56,27 +61,8 @@ export function useDeviceFingerprint() {
         };
 
         setDeviceData(deviceInfo);
-
-        const response = await fetch('/api/device/fingerprint', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            deviceData: deviceInfo,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to generate fingerprint');
-        }
-
-        const result = await response.json();
-        if (result.success && result.data?.fingerprint) {
-          setFingerprint(result.data.fingerprint);
-        } else {
-          throw new Error('Invalid fingerprint response');
-        }
+        
+        setFingerprint('generated'); 
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
       } finally {

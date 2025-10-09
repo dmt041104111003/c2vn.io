@@ -12,25 +12,24 @@ export interface DeviceFingerprint {
   maxTouchPoints: number;
   colorDepth: number;
   pixelRatio: number;
+  canvasFingerprint?: string;
 }
 
 export function generateDeviceFingerprint(userAgent: string, additionalData?: Partial<DeviceFingerprint>): string {
-  const fingerprint: DeviceFingerprint = {
+  const stableFingerprint = {
     userAgent: userAgent || '',
-    language: additionalData?.language || 'unknown',
     platform: additionalData?.platform || 'unknown',
-    screenResolution: additionalData?.screenResolution || 'unknown',
-    timezone: additionalData?.timezone || 'unknown',
-    cookieEnabled: additionalData?.cookieEnabled || false,
-    doNotTrack: additionalData?.doNotTrack || 'unknown',
+    
     hardwareConcurrency: additionalData?.hardwareConcurrency || 0,
     maxTouchPoints: additionalData?.maxTouchPoints || 0,
     colorDepth: additionalData?.colorDepth || 0,
-    pixelRatio: additionalData?.pixelRatio || 0,
+    
+    screenResolution: additionalData?.screenResolution || 'unknown',
+    
+    canvasFingerprint: additionalData?.canvasFingerprint || 'unknown',
   };
 
-  // Tạo hash từ fingerprint
-  const fingerprintString = JSON.stringify(fingerprint);
+  const fingerprintString = JSON.stringify(stableFingerprint);
   return crypto.createHash('sha256').update(fingerprintString).digest('hex');
 }
 
@@ -63,9 +62,16 @@ export function createClientFingerprintScript(): string {
       function getDeviceFingerprint() {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
+        
         ctx.textBaseline = 'top';
         ctx.font = '14px Arial';
-        ctx.fillText('Device fingerprint', 2, 2);
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Device fingerprint test', 2, 15);
+        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+        ctx.fillText('Device fingerprint test', 4, 17);
+        
         const canvasFingerprint = canvas.toDataURL();
         
         return {
@@ -80,7 +86,7 @@ export function createClientFingerprintScript(): string {
           maxTouchPoints: navigator.maxTouchPoints || 0,
           colorDepth: screen.colorDepth,
           pixelRatio: window.devicePixelRatio || 1,
-          canvasFingerprint: canvasFingerprint.substring(0, 100) // Chỉ lấy 100 ký tự đầu
+          canvasFingerprint: canvasFingerprint.substring(0, 200) 
         };
       }
       

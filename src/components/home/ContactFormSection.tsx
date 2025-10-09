@@ -284,7 +284,7 @@ export default function ContactFormSection() {
           if (result.error === 'DEVICE_ALREADY_USED') {
             setErrors(prev => ({
               ...prev,
-              "email-intro": "This device has already used this referral code"
+              "email-intro": "This device has already used a referral code"
             }));
           } else if (result.error === 'REFERRAL_NOT_FOUND') {
             setErrors(prev => ({
