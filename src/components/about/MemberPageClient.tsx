@@ -12,6 +12,7 @@ import { useToastContext } from "~/components/toast-provider";
 import { ContactFormData, FormErrors } from "~/constants/contact";
 import { Captcha } from "~/components/ui/captcha";
 import { useNotifications } from "~/hooks/useNotifications";
+import { useDeviceFingerprint } from "~/hooks/useDeviceFingerprint";
 // import { Pagination } from "~/components/ui/pagination";
 import Pagination from "../pagination";
 import BackgroundMotion from "~/components/ui/BackgroundMotion";
@@ -487,11 +488,14 @@ export default function MemberPageClient() {
       newErrors["your-name"] = "Name is required";
     }
 
-    const hasPhone = formData["your-number"].trim() !== "";
-    const hasEmail = formData["your-email"].trim() !== "";
-
-    if (!hasPhone && !hasEmail) {
-      newErrors.contact = "Please provide at least one contact method (phone, email, or wallet address)";
+    const email = formData["your-email"].trim();
+    if (!email) {
+      newErrors["your-email"] = "Email is required";
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        newErrors["your-email"] = "Please enter a valid email address";
+      }
     }
 
     setErrors(newErrors);
@@ -524,6 +528,11 @@ export default function MemberPageClient() {
     e.preventDefault();
 
     if (!validateForm()) {
+      return;
+    }
+
+    if (!captchaValid) {
+      setErrors({ contact: "Please complete the captcha verification" });
       return;
     }
 
@@ -846,20 +855,44 @@ export default function MemberPageClient() {
               <Title title="Get in Touch" description="Chúng tôi trân trọng mọi ý kiến và đóng góp của bạn. Hãy chia sẻ suy nghĩ, đề xuất của bạn hoặc cho chúng tôi biết nếu bạn muốn hợp tác cùng Cardano2vn." />
             </div>
             <div className="w-full lg:w-1/2">
-              <AboutContactForm
-                formData={formData}
-                errors={errors}
-                isSubmitting={isSubmitting}
-                captchaValid={captchaValid}
-                captchaKey={captchaKey}
-                onInputChange={handleInputChange}
-                onSubmit={handleSubmit}
-                onCaptchaChange={({ isValid, text, answer }) => {
-                  setCaptchaValid(isValid);
-                  setCaptchaText(text);
-                  setCaptchaAnswer(answer);
-                }}
-              />
+              {session ? (
+                <AboutContactForm
+                  formData={formData}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                  captchaValid={captchaValid}
+                  captchaKey={captchaKey}
+                  onInputChange={handleInputChange}
+                  onSubmit={handleSubmit}
+                  onCaptchaChange={({ isValid, text, answer }) => {
+                    setCaptchaValid(isValid);
+                    setCaptchaText(text);
+                    setCaptchaAnswer(answer);
+                  }}
+                />
+              ) : (
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="p-6 text-center">
+                    <div className="mb-4">
+                      <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                      Login Required
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                      You need to be logged in to submit the contact form.
+                    </p>
+                    <a
+                      href="/login"
+                      className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Login Now
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

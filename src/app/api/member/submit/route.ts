@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createErrorResponse, createSuccessResponse } from '~/lib/api-response';
+import { withAuth } from '~/lib/api-wrapper';
+import { prisma } from '~/lib/prisma';
 
-export const POST = async (req: Request) => {
+export const POST = withAuth(async (req, currentUser) => {
   try {
+    if (!currentUser) {
+      return NextResponse.json(
+        createErrorResponse('You must be logged in to submit this form', 'UNAUTHORIZED'),
+        { status: 401 }
+      );
+    }
+
     const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL_2;
     if (!scriptUrl) {
       return NextResponse.json(
@@ -26,6 +35,40 @@ export const POST = async (req: Request) => {
       return NextResponse.json(createErrorResponse('Wrong captcha', 'WRONG'), { status: 400 });
     }
 
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const user = await prisma.user.findUnique({
+      where: { id: currentUser.id }
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        createErrorResponse('User not found', 'USER_NOT_FOUND'),
+        { status: 404 }
+      );
+    }
+
+    if (!user.lastMemberContactDate || user.lastMemberContactDate < today) {
+      await prisma.user.update({
+        where: { id: currentUser.id },
+        data: {
+          memberContactCount: 0,
+          lastMemberContactDate: today
+        }
+      });
+    }
+
+    if (user.memberContactCount >= 5) {
+      return NextResponse.json(
+        createErrorResponse(
+          'You have reached the daily limit of 5 submissions. Please try again tomorrow.',
+          'DAILY_LIMIT_EXCEEDED'
+        ),
+        { status: 429 }
+      );
+    }
+
     const fd = new FormData();
     for (const [key, value] of Object.entries(formData)) {
       fd.append(key, String(value ?? ''));
@@ -36,6 +79,14 @@ export const POST = async (req: Request) => {
       const text = await upstream.text().catch(() => '');
       return NextResponse.json(createErrorResponse(`Upstream error: ${text || upstream.statusText}`, 'UPSTREAM_ERROR'), { status: 502 });
     }
+
+    await prisma.user.update({
+      where: { id: currentUser.id },
+      data: {
+        memberContactCount: { increment: 1 },
+        lastMemberContactDate: today
+      }
+    });
 
     return NextResponse.json(createSuccessResponse({ ok: true }));
   } catch (error) {

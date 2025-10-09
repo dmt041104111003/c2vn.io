@@ -20,6 +20,8 @@ model User {
   roleId        String
   isBanned      Boolean        @default(false)
   bannedUntil   DateTime?
+  memberContactCount Int        @default(0)
+  lastMemberContactDate DateTime?
   comments      Comment[]      @relation("UserComments")
   media         Media[]        @relation("UserMedia")
   posts         Post[]         @relation("UserPosts")
@@ -449,4 +451,5 @@ model DeviceAttempt {
   @@index([bannedUntil])
   @@index([lastAttemptAt])
 }
+
 
