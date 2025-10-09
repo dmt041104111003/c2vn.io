@@ -13,6 +13,7 @@ import ContactFormSkeleton from './ContactFormSkeleton';
 import { useQuery } from '@tanstack/react-query';
 import Title from "~/components/title";
 import StarIcon from "~/components/ui/StarIcon";
+import BannedForm from "~/components/BannedForm";
 type TabType = "form" | "manage";
 
 export default function ContactFormSection() {
@@ -68,9 +69,35 @@ export default function ContactFormSection() {
   const [captchaKey, setCaptchaKey] = useState(0);
   const [referralCodeValid, setReferralCodeValid] = useState(false);
   const [referralCodeLocked, setReferralCodeLocked] = useState(false);
+  const [isDeviceBanned, setIsDeviceBanned] = useState(false);
+  const [banDetails, setBanDetails] = useState<any>(null);
   
   const { deviceData, isLoading: fingerprintLoading } = useDeviceFingerprint(); 
 
+  useEffect(() => {
+    const checkBanStatus = async () => {
+      if (!deviceData) return;
+      
+      try {
+        const response = await fetch('/api/device/check-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deviceData })
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            setIsDeviceBanned(result.data.isBanned);
+            setBanDetails(result.data);
+          }
+        }
+      } catch (error) {
+      }
+    };
+
+    checkBanStatus();
+  }, [deviceData]);
  
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -293,6 +320,29 @@ export default function ContactFormSection() {
           const result = await response.json();
           
           if (!response.ok) {
+            if (result.error === 'DEVICE_BANNED' || result.code === 'DEVICE_BANNED') {
+              window.location.href = '/not-found';
+              return;
+            }
+            
+            try {
+              const trackResponse = await fetch('/api/device/track-failed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deviceData })
+              });
+              
+              if (trackResponse.status === 403) {
+                const trackResult = await trackResponse.json();
+                if (trackResult.error === 'DEVICE_BANNED') {
+                  window.location.href = '/not-found';
+                  return;
+                }
+              }
+              
+            } catch (error) {
+            }
+            
             setFormData(prev => ({
               ...prev,
               "email-intro": ""
@@ -530,23 +580,31 @@ export default function ContactFormSection() {
               <ContactFormTabs activeTab={activeTab} onTabChange={handleTabChange} />
             )}
             {activeTab === "form" ? (
-              <ContactForm
-                formData={formData}
-                errors={errors}
-                isSubmitting={isSubmitting}
-                captchaValid={captchaValid}
-                captchaKey={captchaKey}
-                referralCodeValid={referralCodeValid}
-                referralCodeLocked={referralCodeLocked}
-                onInputChange={handleInputChange}
-                onSubmit={handleSubmit}
-                onCaptchaChange={({ isValid, text, answer }) => {
-                  setCaptchaValid(isValid);
-                  setCaptchaText(text);
-                  setCaptchaAnswer(answer);
-                }}
-                onCourseChange={handleCourseChange}
-              />
+              isDeviceBanned ? (
+                <BannedForm
+                  failedAttempts={banDetails?.failedAttempts || 0}
+                  bannedUntil={banDetails?.bannedUntil || new Date().toISOString()}
+                  lastAttemptAt={banDetails?.lastAttemptAt || new Date().toISOString()}
+                />
+              ) : (
+                <ContactForm
+                  formData={formData}
+                  errors={errors}
+                  isSubmitting={isSubmitting}
+                  captchaValid={captchaValid}
+                  captchaKey={captchaKey}
+                  referralCodeValid={referralCodeValid}
+                  referralCodeLocked={referralCodeLocked}
+                  onInputChange={handleInputChange}
+                  onSubmit={handleSubmit}
+                  onCaptchaChange={({ isValid, text, answer }) => {
+                    setCaptchaValid(isValid);
+                    setCaptchaText(text);
+                    setCaptchaAnswer(answer);
+                  }}
+                  onCourseChange={handleCourseChange}
+                />
+              )
             ) : activeTab === "manage" ? (
               <div>
                 {coursesLoading ? (

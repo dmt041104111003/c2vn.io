@@ -33,7 +33,9 @@ export const POST = withAuth(async (req, currentUser) => {
     if (deviceFingerprint) {
       const existingDeviceUsage = await prisma.referralSubmission.findFirst({
         where: {
-          deviceFingerprint: deviceFingerprint
+          deviceAttempt: {
+            deviceFingerprint: deviceFingerprint
+          }
         }
       });
 
@@ -53,6 +55,23 @@ export const POST = withAuth(async (req, currentUser) => {
     }
 
 
+    let deviceAttempt = null;
+    if (deviceFingerprint) {
+      deviceAttempt = await prisma.deviceAttempt.findUnique({
+        where: { deviceFingerprint }
+      });
+      
+      if (!deviceAttempt) {
+        deviceAttempt = await prisma.deviceAttempt.create({
+          data: {
+            deviceFingerprint,
+            failedAttempts: 0,
+            lastAttemptAt: new Date()
+          }
+        });
+      }
+    }
+
     const submission = await prisma.referralSubmission.create({
       data: {
         userId: currentUser.id,
@@ -64,7 +83,7 @@ export const POST = withAuth(async (req, currentUser) => {
         wallet: formData['address-wallet'] || null,
         course: formData['your-course'] || null,
         message: formData['message'] || null,
-        deviceFingerprint: deviceFingerprint
+        deviceAttemptId: deviceAttempt?.id || null
       }
     });
 
