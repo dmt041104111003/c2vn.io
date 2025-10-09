@@ -36,10 +36,11 @@ export default function LatestPostsSidebar({ currentPostSlug }: LatestPostsSideb
   const { data: postsData, isLoading } = useQuery({
     queryKey: ["latest-posts"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/posts?public=1&limit=5&sortBy=createdAt&sortOrder=desc");
+      const res = await fetch("/api/public/posts?limit=5&sortBy=createdAt&sortOrder=desc");
       if (!res.ok) throw new Error('Failed to fetch latest posts');
       return res.json();
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
   const latestPosts: LatestPost[] = postsData?.data || [];

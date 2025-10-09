@@ -4,6 +4,8 @@ import { withAdmin } from '~/lib/api-wrapper';
 import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 import { validateRequest, CreatePostSchema } from '~/lib/validation';
 
+export const revalidate = 300;
+
 function getYoutubeIdFromUrl(url: string) {
   if (!url) return '';
   const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/#\s]{11})/);
@@ -65,40 +67,88 @@ export async function GET(request: NextRequest) {
         ]
       };
     }
+
+    const selectFields = isPublic ? {
+      id: true,
+      title: true,
+      slug: true,
+      content: true, 
+      status: true,
+      shares: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: { 
+        select: { 
+          comments_rel: true,
+          postViews: true,
+          reactions: true
+        } as any 
+      },
+      author: { select: { name: true } },
+      tags: { select: { tag: { select: { id: true, name: true } } } },
+      media: { select: { url: true, type: true, id: true } },
+    } : {
+      id: true,
+      title: true,
+      slug: true,
+      content: true,
+      status: true,
+      shares: true,
+      createdAt: true,
+      updatedAt: true,
+      comments_rel: { select: { id: true, userId: true } },
+      reactions: { select: { type: true, userId: true } },
+      author: { select: { name: true } },
+      tags: { select: { tag: { select: { id: true, name: true } } } },
+      media: { select: { url: true, type: true, id: true } },
+      _count: { select: { postViews: true } as any },
+    };
+
     const [posts, total] = await Promise.all([
       prisma.post.findMany({
         where,
         skip: offset,
         take: limit,
         orderBy: { [sortBy]: sortOrder },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          content: true,
-          status: true,
-          shares: true,
-          createdAt: true,
-          updatedAt: true,
-          comments_rel: { select: { id: true, userId: true } },
-          reactions: { select: { type: true, userId: true } },
-          author: { select: { name: true } },
-          tags: { select: { tag: { select: { id: true, name: true } } } },
-          media: { select: { url: true, type: true, id: true } },
-          _count: { select: { postViews: true } as any },
-        },
+        select: selectFields,
       }),
       prisma.post.count({ where })
     ]);
 
     const mapped = posts.map(post => {
-      const reactionCount: Record<string, number> = {};
-      for (const r of post.reactions) {
-        reactionCount[r.type] = (reactionCount[r.type] || 0) + 1;
-      }
       const excerpt = post.content 
         ? post.content.replace(/<[^>]*>/g, '').substring(0, 150).trim() + (post.content.length > 150 ? '...' : '')
         : '';
+
+      if (isPublic) {
+        return {
+          id: post.id,
+          title: post.title,
+          slug: post.slug || post.id,
+          excerpt,
+          status: post.status,
+          shares: post.shares,
+          createdAt: post.createdAt,
+          updatedAt: post.updatedAt,
+          comments: (post as any)._count?.comments_rel || 0,
+          reactions: (post as any)._count?.reactions || 0,
+          media: Array.isArray(post.media)
+            ? post.media.map((m: { url: string; type: string; id: string }) =>
+                m.type === 'YOUTUBE'
+                  ? { ...m, id: m.id && m.id.length === 11 ? m.id : getYoutubeIdFromUrl(m.url) }
+                  : m
+              )
+            : [],
+          author: post.author?.name || 'Admin',
+          tags: post.tags?.map((t: any) => t.tag) || [],
+          totalViews: (post as any)._count?.postViews || 0,
+        };
+      }
+
+      const reactionCount: Record<string, number> = {};
+      for (const r of (post as any).reactions) {
+        reactionCount[r.type] = (reactionCount[r.type] || 0) + 1;
+      }
 
       return {
         id: post.id,
@@ -109,9 +159,9 @@ export async function GET(request: NextRequest) {
         shares: post.shares,
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
-        comments: post.comments_rel.length,
-        comments_rel: post.comments_rel, 
-        reactions: post.reactions,
+        comments: (post as any).comments_rel?.length || 0,
+        comments_rel: (post as any).comments_rel, 
+        reactions: (post as any).reactions,
         media: Array.isArray(post.media)
           ? post.media.map((m: { url: string; type: string; id: string }) =>
               m.type === 'YOUTUBE'

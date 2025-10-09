@@ -27,9 +27,22 @@ export default function BlogPageClient() {
     error: postsError,
     isLoading: postsLoading,
   } = useQuery({
-    queryKey: ['public-posts'],
+    queryKey: ['public-posts', currentPage, selectedTags, search],
     queryFn: async () => {
-      const res = await fetch('/api/admin/posts?public=1');
+      const params = new URLSearchParams({
+        public: '1',
+        page: currentPage.toString(),
+        limit: pageSize.toString(),
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      });
+      
+      if (search) params.append('title', search);
+      if (selectedTags.length > 0) {
+        selectedTags.forEach(tag => params.append('tags', tag));
+      }
+      
+      const res = await fetch(`/api/public/posts?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to fetch posts');
       return res.json();
     }
@@ -41,6 +54,7 @@ export default function BlogPageClient() {
     }
   }, [postsError]);
   const posts: BlogPost[] = postsData?.data || [];
+  const pagination = postsData?.pagination || { page: 1, limit: pageSize, total: 0, totalPages: 1, hasNext: false, hasPrev: false };
 
   const { data: tagsData } = useQuery({
     queryKey: ['public-tags'],
@@ -53,15 +67,7 @@ export default function BlogPageClient() {
   });
   const allTags: BlogTag[] = tagsData || [];
 
-  const filteredPosts = Array.isArray(posts) ? posts.filter(post => {
-    const matchTitle = post.title.toLowerCase().includes(search.toLowerCase());
-    const matchTags = selectedTags.length > 0 ? (Array.isArray(post.tags) && selectedTags.every(tagId => post.tags?.some(tag => tag.id === tagId))) : true;
-    return matchTitle && matchTags;
-  }) : [];
-
-  const publishedPosts = Array.isArray(filteredPosts) ? filteredPosts.filter(post => post.status === 'PUBLISHED') : [];
-  const totalPages = Math.ceil(publishedPosts.length / pageSize);
-  const paginatedPosts = publishedPosts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const paginatedPosts = posts;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -98,7 +104,7 @@ export default function BlogPageClient() {
           />
         </motion.div>
         
-        {publishedPosts.length === 0 && posts.length > 0 ? (
+        {paginatedPosts.length === 0 && posts.length > 0 ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -137,7 +143,7 @@ export default function BlogPageClient() {
         >
           <Pagination
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={pagination.totalPages}
             setCurrentPage={setCurrentPage}
           />
         </motion.div>
