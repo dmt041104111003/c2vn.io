@@ -30,6 +30,18 @@ export const POST = withAuth(async (req, currentUser) => {
       return NextResponse.json(createErrorResponse('You have already submitted a referral form', 'ALREADY_SUBMITTED'), { status: 400 });
     }
 
+    if (deviceFingerprint) {
+      const existingDeviceUsage = await prisma.$queryRaw`
+        SELECT id FROM "ReferralSubmission" 
+        WHERE "deviceFingerprint" = ${deviceFingerprint}
+        LIMIT 1
+      `;
+
+      if (Array.isArray(existingDeviceUsage) && existingDeviceUsage.length > 0) {
+        return NextResponse.json(createErrorResponse('This device has already used a referral code', 'DEVICE_ALREADY_USED'), { status: 409 });
+      }
+    }
+
     const referrer = await findUserByReferralCode(referralCode);
 
     if (!referrer) {

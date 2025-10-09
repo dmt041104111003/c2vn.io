@@ -66,6 +66,8 @@ export default function ContactFormSection() {
   const [captchaText, setCaptchaText] = useState("");
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [captchaKey, setCaptchaKey] = useState(0);
+  const [referralCodeValid, setReferralCodeValid] = useState(false);
+  const [referralCodeLocked, setReferralCodeLocked] = useState(false);
   
   const { deviceData, isLoading: fingerprintLoading } = useDeviceFingerprint(); 
 
@@ -291,26 +293,37 @@ export default function ContactFormSection() {
           const result = await response.json();
           
           if (!response.ok) {
+            setFormData(prev => ({
+              ...prev,
+              "email-intro": ""
+            }));
+            setReferralCodeValid(false);
+            setReferralCodeLocked(false);
+            
             if (result.error === 'DEVICE_ALREADY_USED') {
               localStorage.setItem('deviceUsedReferral', 'true');
+              showError('Device Already Used', 'This device has already used a referral code. Each device can only use one referral code. Please use a different device or contact admin for assistance.');
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "This device has already used a referral code"
               }));
             } else if (result.error === 'REFERRAL_NOT_FOUND') {
+              showError('Referral Code Not Found', 'The referral code you entered does not exist in our system. Please check the code again or contact the person who referred you.');
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Referral code not found"
               }));
             } else if (result.error === 'INVALID_REFERRAL_CODE') {
+              showError('Invalid Referral Code Format', 'The referral code format is incorrect. Please check the code format and try again.');
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Invalid referral code format"
               }));
             } else {
+              showError('Referral Code Validation Failed', 'Unable to validate the referral code. Please try again later.');
               setErrors(prev => ({
                 ...prev,
-                "email-intro": "Failed to validate referral code"
+                "email-intro": "Referral code validation failed"
               }));
             }
           } else {
@@ -318,12 +331,20 @@ export default function ContactFormSection() {
               localStorage.setItem('deviceFingerprint', result.data.fingerprint);
             }
             
+            setReferralCodeValid(true);
+            setReferralCodeLocked(true); 
             setErrors(prev => ({
               ...prev,
               "email-intro": undefined
             }));
           }
         } catch (error) {
+          setFormData(prev => ({
+            ...prev,
+            "email-intro": ""
+          }));
+          setReferralCodeValid(false);
+          setReferralCodeLocked(false); // Unlock the input when network error occurs
           setErrors(prev => ({
             ...prev,
             "email-intro": "Failed to validate referral code"
@@ -394,23 +415,23 @@ export default function ContactFormSection() {
           
           if (!referralResponse.ok) {
             if (referralData.error === 'ALREADY_SUBMITTED') {
-              showError("You have already submitted a referral form. You can only submit once.");
+              showError('Already Registered', 'You have already submitted a registration form. Each account can only register once. Please contact admin if you need assistance.');
               setIsSubmitting(false);
               return;
             } else if (referralData.error === 'CANNOT_USE_OWN_CODE') {
-              showError("You cannot use your own referral code.");
+              showError('Cannot Use Own Referral Code', 'You cannot use a referral code that you created yourself.');
               setIsSubmitting(false);
               return;
             } else if (referralData.error === 'REFERRAL_CODE_NOT_FOUND') {
-              showError("Referral code not found. Please check and try again.");
+              showError('Referral Code Not Found', 'The referral code you entered does not exist in our system. Please check and try again.');
               setIsSubmitting(false);
               return;
             } else if (referralData.error === 'DEVICE_ALREADY_USED') {
-              showError("This device has already used this referral code. Each device can only use a referral code once.");
+              showError('Device Already Used', 'This device has already used a referral code. Each device can only use one referral code. Please use a different device.');
               setIsSubmitting(false);
               return;
             } else {
-              showError("Invalid referral code. Please check and try again.");
+              showError('Referral Code Processing Error', 'Unable to process the referral code. Please try again later.');
               setIsSubmitting(false);
               return;
             }
@@ -515,6 +536,8 @@ export default function ContactFormSection() {
                 isSubmitting={isSubmitting}
                 captchaValid={captchaValid}
                 captchaKey={captchaKey}
+                referralCodeValid={referralCodeValid}
+                referralCodeLocked={referralCodeLocked}
                 onInputChange={handleInputChange}
                 onSubmit={handleSubmit}
                 onCaptchaChange={({ isValid, text, answer }) => {

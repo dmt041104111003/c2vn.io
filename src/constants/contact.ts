@@ -5,6 +5,8 @@ export interface ContactFormProps {
   isSubmitting: boolean;
   captchaValid: boolean;
   captchaKey?: number;
+  referralCodeValid: boolean;
+  referralCodeLocked: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCaptchaChange: (payload: { isValid: boolean; text: string; answer: string }) => void;

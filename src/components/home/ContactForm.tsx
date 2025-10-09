@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ContactFormData, FormErrors, ContactFormProps } from '~/constants/contact';
 import { Captcha } from '~/components/ui/captcha';
 
-export function ContactForm({ formData, errors, isSubmitting, captchaValid, captchaKey, onInputChange, onSubmit, onCaptchaChange, onCourseChange }: ContactFormProps) {
+export function ContactForm({ formData, errors, isSubmitting, captchaValid, captchaKey, referralCodeValid, referralCodeLocked, onInputChange, onSubmit, onCaptchaChange, onCourseChange }: ContactFormProps) {
   const typedFormData: ContactFormData = formData;
   const typedErrors: FormErrors = errors;
   const [selectedCourseImage, setSelectedCourseImage] = useState<string>('');
@@ -116,6 +116,11 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
           <div className="md:col-span-2">
             <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Enter referral code
+            {referralCodeLocked && (
+              <span className="ml-2 text-green-600 dark:text-green-400 text-xs">
+                ✓ Validated
+              </span>
+            )}
             </label>
             <input
               type="text"
@@ -123,7 +128,12 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               placeholder="Enter referral code (optional)"
               value={typedFormData["email-intro"]}
               onChange={onInputChange}
-              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm"
+              disabled={referralCodeLocked}
+              className={`w-full px-3 py-2 border-2 rounded-lg transition-all duration-200 text-sm ${
+                referralCodeLocked 
+                  ? 'border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20 text-gray-700 dark:text-gray-300 cursor-not-allowed' 
+                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'
+              }`}
               aria-label="Enter referral code"
             />
           </div>
@@ -253,7 +263,7 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
         
         <button
           type="submit"
-          disabled={isSubmitting || !captchaValid}
+          disabled={isSubmitting || !captchaValid || !referralCodeValid}
           className="inline-flex items-center justify-center whitespace-nowrap rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success text-base sm:text-lg bg-blue-600 dark:bg-white px-4 sm:px-6 py-2.5 sm:py-3 font-semibold text-white dark:text-blue-900 shadow-lg hover:bg-blue-700 dark:hover:bg-gray-100 w-full"
         >
           {isSubmitting ? (
