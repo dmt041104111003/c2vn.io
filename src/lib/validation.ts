@@ -34,9 +34,9 @@ export const postSchema = z.object({
 });
 
 export const CreatePostSchema = z.object({
-  title: z.string().min(1).max(200),
-  slug: z.string().min(1).max(200),
-  content: z.string().min(1),
+  title: z.string().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  slug: z.string().min(1, "Slug is required").max(200, "Slug must be less than 200 characters"),
+  content: z.string().min(1, "Content is required"),
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).default('DRAFT'),
   tags: z.array(z.string()).optional().default([]),
   media: z.array(z.object({
@@ -44,7 +44,14 @@ export const CreatePostSchema = z.object({
     type: z.enum(['IMAGE', 'YOUTUBE', 'VIDEO', 'image', 'youtube', 'video']),
     id: z.string().optional()
   })).optional().default([]),
-  githubRepo: z.union([z.string().url(), z.literal('')]).optional()
+  githubRepo: z.string().optional().refine((val) => {
+    if (!val || val.trim() === '') return true; 
+    const githubUrlPattern = /^https:\/\/github\.com\/[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+\/?$/;
+    const githubRepoPattern = /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/;
+    return githubUrlPattern.test(val) || githubRepoPattern.test(val);
+  }, {
+    message: "GitHub repository must be a valid GitHub URL (https://github.com/owner/repo) or repository format (owner/repo)"
+  })
 });
 
 export function validateRequest<T>(schema: z.ZodSchema<T>, data: unknown): T {

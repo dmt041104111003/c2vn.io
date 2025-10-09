@@ -43,6 +43,7 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
   const [loadingTags, setLoadingTags] = useState(false);
   const [mediaType, setMediaType] = useState<'image' | 'youtube'>('image');
   const [isClient, setIsClient] = useState(false);
+  const [githubRepoError, setGithubRepoError] = useState<string>('');
   useEffect(() => { setIsClient(true); }, []);
 
   const { showError } = useToastContext();
@@ -77,8 +78,7 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
     fetch('/api/admin/media')
       .then(res => res.json())
       .then(data => {
-        console.log('Fetched media:', data.media);
-        // setAllMedia(data.media || []); // This line was removed as per the edit hint
+      
       });
   }, []);
 
@@ -88,6 +88,10 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
     setPostState(prev => ({
       ...prev, [field]: value
     }));
+    
+    if (field === 'githubRepo') {
+      setGithubRepoError('');
+    }
   };
 
   const handleRemoveTag = (tagName: string) => {
@@ -143,6 +147,7 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
         media: [],
         githubRepo: '',
       });
+      setGithubRepoError('');
     }
   };
 
@@ -157,6 +162,10 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
       showError('Title is required!');
       return;
     }
+    if (postState.title.length > 200) {
+      showError('Title must be less than 200 characters!');
+      return;
+    }
     if (!postState.content || !postState.content.trim()) {
       showError('Content is required!');
       return;
@@ -168,6 +177,15 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
     if (!postState.selectedTags || postState.selectedTags.length === 0) {
       showError('At least one tag is required!');
       return;
+    }
+    
+    if (postState.githubRepo && postState.githubRepo.trim()) {
+      const githubUrlPattern = /^https:\/\/github\.com\/[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+\/?$/;
+      const githubRepoPattern = /^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/;
+      if (!githubUrlPattern.test(postState.githubRepo) && !githubRepoPattern.test(postState.githubRepo)) {
+        setGithubRepoError('GitHub repository must be a valid GitHub URL (https://github.com/owner/repo) or repository format (owner/repo)');
+        return;
+      }
     }
     
     const normalizedMedia = Array.isArray(postState.media) 
@@ -284,9 +302,8 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
                               e.stopPropagation();
                               handleRemoveTag(tag);
                             }}
-                            className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer"
+                            className="ml-1 text-blue-600 hover:text-blue-800 cursor-pointer inline-flex items-center"
                             title={`Remove ${tag} tag`}
-                            style={{ display: 'inline-flex', alignItems: 'center' }}
                           >
                             <X className="h-3 w-3" />
                           </span>
@@ -335,12 +352,20 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
                 type="text"
                 value={postState.githubRepo}
                 onChange={e => handleInputChange('githubRepo', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  githubRepoError ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300'
+                }`}
                 placeholder="Enter GitHub repository (e.g., dmt041104111003/cardano2-vn)"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                This will add a GitHub star widget to your post
-              </p>
+              {githubRepoError ? (
+                <p className="text-xs text-red-500 mt-1">
+                  {githubRepoError}
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500 mt-1">
+                  This will add a GitHub star widget to your post
+                </p>
+              )}
             </div>
 
             <div>
@@ -476,7 +501,7 @@ export function PostEditorClient({ onSave, post, onCancel, postState, setPostSta
                               target.nextElementSibling?.classList.remove('hidden');
                             }}
                           />
-                          <div className="hidden max-w-full max-h-64 rounded-lg shadow-md bg-gray-100 flex items-center justify-center">
+                          <div className="max-w-full max-h-64 rounded-lg shadow-md bg-gray-100 flex items-center justify-center">
                             <span className="text-gray-400">Image not available</span>
                           </div>
                         </div>

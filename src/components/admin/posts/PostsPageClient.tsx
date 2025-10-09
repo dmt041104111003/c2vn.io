@@ -223,6 +223,14 @@ export function PostsPageClient() {
         if (res.ok) {
           await fetchPosts();
           showSuccess('Post created', 'The post has been created.');
+          setPostState({
+            title: '',
+            selectedTags: [],
+            status: 'DRAFT',
+            content: '',
+            media: [],
+            githubRepo: '',
+          });
         } else {
           const errorData = await res.json();
           showError('Failed to create post', errorData.error || 'Unknown error');
