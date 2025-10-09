@@ -18,13 +18,13 @@ export const POST = async (req: Request) => {
 
     const fingerprint = generateDeviceFingerprint(deviceData.userAgent, deviceData);
 
-    const existingDeviceUsage = await prisma.$queryRaw`
-      SELECT id FROM "ReferralSubmission" 
-      WHERE "deviceFingerprint" = ${fingerprint}
-      LIMIT 1
-    `;
+    const existingDeviceUsage = await prisma.referralSubmission.findFirst({
+      where: {
+        deviceFingerprint: fingerprint
+      }
+    });
 
-    if (Array.isArray(existingDeviceUsage) && existingDeviceUsage.length > 0) {
+    if (existingDeviceUsage) {
       return NextResponse.json(createErrorResponse('This device has already used a referral code', 'DEVICE_ALREADY_USED'), { status: 409 });
     }
 

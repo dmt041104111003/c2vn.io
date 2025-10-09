@@ -31,13 +31,13 @@ export const POST = withAuth(async (req, currentUser) => {
     }
 
     if (deviceFingerprint) {
-      const existingDeviceUsage = await prisma.$queryRaw`
-        SELECT id FROM "ReferralSubmission" 
-        WHERE "deviceFingerprint" = ${deviceFingerprint}
-        LIMIT 1
-      `;
+      const existingDeviceUsage = await prisma.referralSubmission.findFirst({
+        where: {
+          deviceFingerprint: deviceFingerprint
+        }
+      });
 
-      if (Array.isArray(existingDeviceUsage) && existingDeviceUsage.length > 0) {
+      if (existingDeviceUsage) {
         return NextResponse.json(createErrorResponse('This device has already used a referral code', 'DEVICE_ALREADY_USED'), { status: 409 });
       }
     }
@@ -53,22 +53,20 @@ export const POST = withAuth(async (req, currentUser) => {
     }
 
 
-    const submission = await prisma.$queryRaw`
-      INSERT INTO "ReferralSubmission" (
-        "id", "userId", "referralCode", "referrerId", "email", "name", 
-        "phone", "wallet", "course", "message", "deviceFingerprint", 
-        "createdAt", "updatedAt"
-      ) VALUES (
-        gen_random_uuid(), ${currentUser.id}, ${referralCode}, ${referrer.id}, 
-        ${formData['your-email'] || ''}, ${formData['your-name'] || ''}, 
-        ${formData['your-number'] || null}, ${formData['address-wallet'] || null}, 
-        ${formData['your-course'] || null}, ${formData['message'] || null}, 
-        ${deviceFingerprint}, NOW(), NOW()
-      ) RETURNING *
-    `;
-
-
-    const submissionData = Array.isArray(submission) ? submission[0] : submission;
+    const submission = await prisma.referralSubmission.create({
+      data: {
+        userId: currentUser.id,
+        referralCode: referralCode,
+        referrerId: referrer.id,
+        email: formData['your-email'] || '',
+        name: formData['your-name'] || '',
+        phone: formData['your-number'] || null,
+        wallet: formData['address-wallet'] || null,
+        course: formData['your-course'] || null,
+        message: formData['message'] || null,
+        deviceFingerprint: deviceFingerprint
+      }
+    });
 
     await prisma.notification.create({
       data: {
@@ -77,7 +75,7 @@ export const POST = withAuth(async (req, currentUser) => {
         title: 'New Referral!',
         message: `${formData['your-name'] || 'Someone'} used your referral code`,
         data: {
-          submissionId: submissionData.id,
+          submissionId: submission.id,
           referrerName: formData['your-name'],
           referralCode: referralCode
         }
@@ -87,8 +85,8 @@ export const POST = withAuth(async (req, currentUser) => {
     return NextResponse.json(createSuccessResponse({
       message: 'Referral submission successful',
       submission: {
-        id: submissionData.id,
-        referralCode: submissionData.referralCode,
+        id: submission.id,
+        referralCode: submission.referralCode,
         referrerName: referrer.name
       }
     }));
