@@ -1,7 +1,37 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { generateDeviceFingerprint } from '~/lib/device-fingerprint';
+import { generateDeviceFingerprint, generateDeviceFingerprintSync } from '~/lib/device-fingerprint';
 import { isDeviceBanned } from '~/lib/device-attempt-utils';
+
+// Simple cache for device fingerprints to avoid repeated crypto operations
+const fingerprintCache = new Map<string, { fingerprint: string; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+function getCachedFingerprint(userAgent: string, deviceData: any): string | null {
+  const key = `${userAgent}-${JSON.stringify(deviceData)}`;
+  const cached = fingerprintCache.get(key);
+  
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.fingerprint;
+  }
+  
+  return null;
+}
+
+function setCachedFingerprint(userAgent: string, deviceData: any, fingerprint: string): void {
+  const key = `${userAgent}-${JSON.stringify(deviceData)}`;
+  fingerprintCache.set(key, { fingerprint, timestamp: Date.now() });
+  
+  // Clean old cache entries
+  if (fingerprintCache.size > 100) {
+    const now = Date.now();
+    for (const [k, v] of fingerprintCache.entries()) {
+      if (now - v.timestamp > CACHE_DURATION) {
+        fingerprintCache.delete(k);
+      }
+    }
+  }
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,7 +42,9 @@ export async function middleware(request: NextRequest) {
       pathname.startsWith('/api/auth/') ||
       pathname.startsWith('/favicon') ||
       pathname.startsWith('/robots') ||
-      pathname.startsWith('/sitemap')) {
+      pathname.startsWith('/sitemap') ||
+      pathname.includes('_next_hmr') ||
+      pathname.includes('__nextjs_original-stack-frames')) {
     return NextResponse.next();
   }
 
@@ -29,7 +61,13 @@ export async function middleware(request: NextRequest) {
       screenResolution: request.headers.get('sec-ch-ua') || ''
     };
 
-    const deviceFingerprint = await generateDeviceFingerprint(userAgent, deviceData);
+    let deviceFingerprint = getCachedFingerprint(userAgent, deviceData);
+    
+    if (!deviceFingerprint) {
+      deviceFingerprint = generateDeviceFingerprintSync(userAgent, deviceData);
+      setCachedFingerprint(userAgent, deviceData, deviceFingerprint);
+    }
+
     const banned = await isDeviceBanned(deviceFingerprint);
 
     if (banned) {
@@ -43,7 +81,6 @@ export async function middleware(request: NextRequest) {
           { status: 403 }
         );
       } else {
-        // Redirect to banned page for all other routes
         const url = request.nextUrl.clone();
         url.pathname = '/auth/banned';
         return NextResponse.redirect(url);

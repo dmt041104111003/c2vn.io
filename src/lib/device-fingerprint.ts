@@ -13,7 +13,16 @@ export interface DeviceFingerprint {
   canvasFingerprint?: string;
 }
 
-// Web Crypto API compatible hash function for Edge Runtime
+function simpleHash(data: string): string {
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; 
+  }
+  return Math.abs(hash).toString(16);
+}
+
 async function createHash(data: string): Promise<string> {
   const encoder = new TextEncoder();
   const dataBuffer = encoder.encode(data);
@@ -32,8 +41,26 @@ export async function generateDeviceFingerprint(userAgent: string, additionalDat
   };
 
   const fingerprintString = `p:${coreFingerprint.platform}|hc:${coreFingerprint.hardwareConcurrency}|sr:${coreFingerprint.screenResolution}|cd:${coreFingerprint.colorDepth}|mt:${coreFingerprint.maxTouchPoints}`;
-  const hash = await createHash(fingerprintString);
-  return hash;
+  
+  try {
+    const hash = await createHash(fingerprintString);
+    return hash;
+  } catch (error) {
+    return simpleHash(fingerprintString);
+  }
+}
+
+export function generateDeviceFingerprintSync(userAgent: string, additionalData?: Partial<DeviceFingerprint>): string {
+  const coreFingerprint = {
+    platform: additionalData?.platform || 'unknown',
+    hardwareConcurrency: additionalData?.hardwareConcurrency || 0,
+    screenResolution: additionalData?.screenResolution || 'unknown',
+    colorDepth: additionalData?.colorDepth || 0,
+    maxTouchPoints: additionalData?.maxTouchPoints || 0,
+  };
+
+  const fingerprintString = `p:${coreFingerprint.platform}|hc:${coreFingerprint.hardwareConcurrency}|sr:${coreFingerprint.screenResolution}|cd:${coreFingerprint.colorDepth}|mt:${coreFingerprint.maxTouchPoints}`;
+  return simpleHash(fingerprintString);
 }
 
 export function extractDeviceInfoFromRequest(req: Request): Partial<DeviceFingerprint> {

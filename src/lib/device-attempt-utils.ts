@@ -82,17 +82,29 @@ export async function trackFailedAttempt(deviceFingerprint: string): Promise<Dev
   }
 }
 
+const bannedCache = new Map<string, { isBanned: boolean; timestamp: number }>();
+const BANNED_CACHE_DURATION = 2 * 60 * 1000; 
+
 export async function isDeviceBanned(deviceFingerprint: string): Promise<boolean> {
   try {
+    const cached = bannedCache.get(deviceFingerprint);
+    if (cached && Date.now() - cached.timestamp < BANNED_CACHE_DURATION) {
+      return cached.isBanned;
+    }
+
     const deviceAttempt = await prisma.deviceAttempt.findUnique({
       where: { deviceFingerprint }
     });
 
     if (!deviceAttempt) {
+      bannedCache.set(deviceFingerprint, { isBanned: false, timestamp: Date.now() });
       return false;
     }
 
-    if (deviceAttempt.isBanned && deviceAttempt.bannedUntil && deviceAttempt.bannedUntil < new Date()) {
+    const now = new Date();
+    let isBanned = deviceAttempt.isBanned;
+
+    if (deviceAttempt.isBanned && deviceAttempt.bannedUntil && deviceAttempt.bannedUntil < now) {
       await prisma.deviceAttempt.update({
         where: { id: deviceAttempt.id },
         data: {
@@ -101,10 +113,21 @@ export async function isDeviceBanned(deviceFingerprint: string): Promise<boolean
           bannedUntil: null
         }
       });
-      return false;
+      isBanned = false;
     }
 
-    return deviceAttempt.isBanned;
+    bannedCache.set(deviceFingerprint, { isBanned, timestamp: Date.now() });
+    
+    if (bannedCache.size > 50) {
+      const cacheNow = Date.now();
+      for (const [k, v] of bannedCache.entries()) {
+        if (cacheNow - v.timestamp > BANNED_CACHE_DURATION) {
+          bannedCache.delete(k);
+        }
+      }
+    }
+
+    return isBanned;
   } catch (error) {
     return false;
   }
