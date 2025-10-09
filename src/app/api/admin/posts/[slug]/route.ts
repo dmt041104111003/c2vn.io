@@ -156,22 +156,36 @@ export const PUT = withAdmin(async (req, user) => {
 });
 
 export const DELETE = withAdmin(async (req) => {
-  const slug = req.nextUrl.pathname.split('/').pop();
-  if (!slug) {
-    return NextResponse.json(createErrorResponse('Missing slug', 'MISSING_SLUG'), { status: 400 });
+  try {
+    const slug = req.nextUrl.pathname.split('/').pop();
+    if (!slug) {
+      return NextResponse.json(createErrorResponse('Missing slug', 'MISSING_SLUG'), { status: 400 });
+    }
+
+    const post = await prisma.post.findFirst({
+      where: { slug }
+    });
+
+    if (!post) {
+      return NextResponse.json(createErrorResponse('Post not found', 'POST_NOT_FOUND'), { status: 404 });
+    }
+
+    await prisma.postView.deleteMany({
+      where: { postId: post.id }
+    });
+
+    await prisma.post.delete({
+      where: { id: post.id }
+    });
+
+    return NextResponse.json(createSuccessResponse({ message: 'Post deleted successfully' }));
+  } catch (error) {
+    return NextResponse.json(
+      createErrorResponse(
+        `Failed to delete post: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'INTERNAL_ERROR'
+      ),
+      { status: 500 }
+    );
   }
-
-  const post = await prisma.post.findFirst({
-    where: { slug }
-  });
-
-  if (!post) {
-    return NextResponse.json(createErrorResponse('Post not found', 'POST_NOT_FOUND'), { status: 404 });
-  }
-
-  await prisma.post.delete({
-    where: { id: post.id }
-  });
-
-  return NextResponse.json(createSuccessResponse({ message: 'Post deleted successfully' }));
 }); 

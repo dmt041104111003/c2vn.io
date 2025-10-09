@@ -125,7 +125,7 @@ model Media {
   uploadedAt DateTime  @default(now())
   postId     String?
   mediaId    String?
-  post       Post?     @relation("PostMedia", fields: [postId], references: [id])
+  post       Post?     @relation("PostMedia", fields: [postId], references: [id], onDelete: Cascade)
   user       User?     @relation("UserMedia", fields: [uploadedBy], references: [id])
 
   @@index([type])
@@ -153,7 +153,7 @@ model PostView {
   postId    String
   viewedAt  DateTime @default(now())
 
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
   @@index([postId])
