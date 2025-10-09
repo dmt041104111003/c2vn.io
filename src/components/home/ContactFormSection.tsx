@@ -62,7 +62,7 @@ export default function ContactFormSection() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaValid, setCaptchaValid] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaText, setCaptchaText] = useState("");
   const [captchaAnswer, setCaptchaAnswer] = useState("");
   const [captchaKey, setCaptchaKey] = useState(0); 
 
@@ -353,7 +353,7 @@ export default function ContactFormSection() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           formData,
-          captchaToken,
+          captchaText,
           captchaAnswer
         })
       });
@@ -371,7 +371,7 @@ export default function ContactFormSection() {
         });
         setErrors({});
         setCaptchaValid(false);
-        setCaptchaToken("");
+        setCaptchaText("");
         setCaptchaAnswer("");
         setCaptchaKey(prev => prev + 1);
         setSelectedCourse(null);
@@ -443,9 +443,9 @@ export default function ContactFormSection() {
                 captchaKey={captchaKey}
                 onInputChange={handleInputChange}
                 onSubmit={handleSubmit}
-                onCaptchaChange={({ isValid, token, answer }) => {
+                onCaptchaChange={({ isValid, text, answer }) => {
                   setCaptchaValid(isValid);
-                  setCaptchaToken(token);
+                  setCaptchaText(text);
                   setCaptchaAnswer(answer);
                 }}
                 onCourseChange={handleCourseChange}

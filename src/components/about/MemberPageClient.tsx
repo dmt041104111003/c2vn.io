@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { useToastContext } from "~/components/toast-provider";
 import { ContactFormData, FormErrors } from "~/constants/contact";
+import { Captcha } from "~/components/ui/captcha";
 import { useNotifications } from "~/hooks/useNotifications";
 // import { Pagination } from "~/components/ui/pagination";
 import Pagination from "../pagination";
@@ -41,14 +42,20 @@ function AboutContactForm({
   formData,
   errors,
   isSubmitting,
+  captchaValid,
+  captchaKey,
   onInputChange,
   onSubmit,
+  onCaptchaChange,
 }: {
   formData: ContactFormData;
   errors: FormErrors;
   isSubmitting: boolean;
+  captchaValid: boolean;
+  captchaKey?: number;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
+  onCaptchaChange: (payload: { isValid: boolean; text: string; answer: string }) => void;
 }) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -148,9 +155,13 @@ function AboutContactForm({
           />
         </div>
 
+        <div>
+          <Captcha key={captchaKey} onCaptchaChange={onCaptchaChange} />
+        </div>
+
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !captchaValid}
           className="inline-flex items-center justify-center whitespace-nowrap rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success text-lg bg-blue-600 dark:bg-white px-6 py-3 font-semibold text-white dark:text-blue-900 shadow-lg hover:bg-blue-700 dark:hover:bg-gray-100 w-full"
         >
           {isSubmitting ? (
@@ -203,6 +214,10 @@ export default function MemberPageClient() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaValid, setCaptchaValid] = useState(false);
+  const [captchaText, setCaptchaText] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaKey, setCaptchaKey] = useState(0);
 
   const { data: queryData, isLoading, error: membersError } = useQuery({
     queryKey: ["members"],
@@ -514,17 +529,15 @@ export default function MemberPageClient() {
 
     setIsSubmitting(true);
 
-    const scriptURL = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL_2 || "";
-
     try {
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
-      });
-
-      const response = await fetch(scriptURL, {
-        method: "POST",
-        body: formDataToSend,
+      const response = await fetch('/api/member/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formData,
+          captchaText,
+          captchaAnswer
+        })
       });
 
       if (response.ok) {
@@ -539,6 +552,10 @@ export default function MemberPageClient() {
           message: "",
         });
         setErrors({});
+        setCaptchaValid(false);
+        setCaptchaText("");
+        setCaptchaAnswer("");
+        setCaptchaKey(prev => prev + 1);
         showSuccess("Thank you! Your message has been sent successfully.");
         
         setTimeout(() => {
@@ -833,8 +850,15 @@ export default function MemberPageClient() {
                 formData={formData}
                 errors={errors}
                 isSubmitting={isSubmitting}
+                captchaValid={captchaValid}
+                captchaKey={captchaKey}
                 onInputChange={handleInputChange}
                 onSubmit={handleSubmit}
+                onCaptchaChange={({ isValid, text, answer }) => {
+                  setCaptchaValid(isValid);
+                  setCaptchaText(text);
+                  setCaptchaAnswer(answer);
+                }}
               />
             </div>
           </div>

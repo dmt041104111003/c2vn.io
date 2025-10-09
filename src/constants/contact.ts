@@ -7,7 +7,7 @@ export interface ContactFormProps {
   captchaKey?: number;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
-  onCaptchaChange: (payload: { isValid: boolean; token: string; answer: string }) => void;
+  onCaptchaChange: (payload: { isValid: boolean; text: string; answer: string }) => void;
   onCourseChange?: (courseName: string) => void;
 }
 

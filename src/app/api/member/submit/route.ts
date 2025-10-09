@@ -3,7 +3,7 @@ import { createErrorResponse, createSuccessResponse } from '~/lib/api-response';
 
 export const POST = async (req: Request) => {
   try {
-    const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL_1 ;
+    const scriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL_2;
     if (!scriptUrl) {
       return NextResponse.json(
         createErrorResponse('Google Script URL not configured', 'CONFIG_ERROR'),
@@ -42,5 +42,3 @@ export const POST = async (req: Request) => {
     return NextResponse.json(createErrorResponse('Failed to submit contact', 'INTERNAL_ERROR'), { status: 500 });
   }
 };
-
-
