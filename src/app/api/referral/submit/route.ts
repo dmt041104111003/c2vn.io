@@ -19,7 +19,7 @@ export const POST = withAuth(async (req, currentUser) => {
 
     let deviceFingerprint = null;
     if (deviceData) {
-      deviceFingerprint = generateDeviceFingerprint(deviceData.userAgent, deviceData);
+      deviceFingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
     }
 
     const existingSubmission = await prisma.referralSubmission.findUnique({

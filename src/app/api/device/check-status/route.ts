@@ -11,7 +11,7 @@ export const POST = async (req: Request) => {
       return NextResponse.json(createErrorResponse('Device data is required', 'MISSING_DEVICE_DATA'), { status: 400 });
     }
 
-    const deviceFingerprint = generateDeviceFingerprint(deviceData.userAgent, deviceData);
+    const deviceFingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
     const deviceDetails = await getDeviceAttemptDetails(deviceFingerprint);
 
     if (!deviceDetails) {

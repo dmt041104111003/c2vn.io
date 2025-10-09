@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 export interface DeviceFingerprint {
   userAgent: string;
   language: string;
@@ -15,7 +13,16 @@ export interface DeviceFingerprint {
   canvasFingerprint?: string;
 }
 
-export function generateDeviceFingerprint(userAgent: string, additionalData?: Partial<DeviceFingerprint>): string {
+// Web Crypto API compatible hash function for Edge Runtime
+async function createHash(data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const dataBuffer = encoder.encode(data);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export async function generateDeviceFingerprint(userAgent: string, additionalData?: Partial<DeviceFingerprint>): Promise<string> {
   const coreFingerprint = {
     platform: additionalData?.platform || 'unknown',
     hardwareConcurrency: additionalData?.hardwareConcurrency || 0,
@@ -25,7 +32,7 @@ export function generateDeviceFingerprint(userAgent: string, additionalData?: Pa
   };
 
   const fingerprintString = `p:${coreFingerprint.platform}|hc:${coreFingerprint.hardwareConcurrency}|sr:${coreFingerprint.screenResolution}|cd:${coreFingerprint.colorDepth}|mt:${coreFingerprint.maxTouchPoints}`;
-  const hash = crypto.createHash('sha256').update(fingerprintString).digest('hex');
+  const hash = await createHash(fingerprintString);
   return hash;
 }
 

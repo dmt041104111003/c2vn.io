@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
       screenResolution: request.headers.get('sec-ch-ua') || ''
     };
 
-    const deviceFingerprint = generateDeviceFingerprint(userAgent, deviceData);
+    const deviceFingerprint = await generateDeviceFingerprint(userAgent, deviceData);
     const banned = await isDeviceBanned(deviceFingerprint);
 
     if (banned) {

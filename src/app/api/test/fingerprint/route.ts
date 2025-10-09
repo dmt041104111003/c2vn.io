@@ -12,7 +12,7 @@ export const POST = async (req: Request) => {
       }));
     }
 
-    const fingerprint = generateDeviceFingerprint(deviceData.userAgent, deviceData);
+    const fingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
     
     return NextResponse.json(createSuccessResponse({
       timestamp: new Date().toISOString(),

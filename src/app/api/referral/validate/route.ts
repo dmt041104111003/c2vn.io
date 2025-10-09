@@ -17,7 +17,7 @@ export const POST = async (req: Request) => {
       return NextResponse.json(createErrorResponse('Device data is required', 'MISSING_DEVICE_DATA'), { status: 400 });
     }
 
-    const fingerprint = generateDeviceFingerprint(deviceData.userAgent, deviceData);
+    const fingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
 
     if (await isDeviceBanned(fingerprint)) {
       return NextResponse.json(createErrorResponse('This device has been temporarily banned due to multiple failed attempts', 'DEVICE_BANNED'), { status: 403 });
