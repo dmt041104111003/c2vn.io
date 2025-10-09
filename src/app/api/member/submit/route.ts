@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createErrorResponse, createSuccessResponse } from '~/lib/api-response';
 import { withAuth } from '~/lib/api-wrapper';
 import { prisma } from '~/lib/prisma';
 
-export const POST = withAuth(async (req, currentUser) => {
+export const POST = withAuth(async (req: NextRequest, currentUser) => {
   try {
     if (!currentUser) {
       return NextResponse.json(
@@ -92,4 +92,4 @@ export const POST = withAuth(async (req, currentUser) => {
   } catch (error) {
     return NextResponse.json(createErrorResponse('Failed to submit contact', 'INTERNAL_ERROR'), { status: 500 });
   }
-};
+});
