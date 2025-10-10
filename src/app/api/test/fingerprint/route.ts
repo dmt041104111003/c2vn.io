@@ -1,49 +1,23 @@
 import { NextResponse } from 'next/server';
 import { createSuccessResponse } from '~/lib/api-response';
 import { generateDeviceFingerprint } from '~/lib/device-fingerprint';
-import { prisma } from '~/lib/prisma';
 
 export const POST = async (req: Request) => {
   try {
-    const { deviceData, fingerprint: inputFingerprint } = await req.json();
-
-    let fingerprint: string | undefined = inputFingerprint;
-    if (!fingerprint && deviceData) {
-      try {
-        fingerprint = await generateDeviceFingerprint(deviceData);
-      } catch (e) {
-      }
-    }
-
-    if (!fingerprint) {
+    const { deviceData } = await req.json();
+    
+    if (!deviceData) {
       return NextResponse.json(createSuccessResponse({
-        error: 'Missing device data or fingerprint'
+        error: 'Missing device data'
       }));
     }
 
-    // Optional reverse lookup of existing device record
-    const deviceRecord = await prisma.deviceAttempt.findUnique({
-      where: { deviceFingerprint: fingerprint },
-      include: { referralSubmissions: true },
-    });
-
+    const fingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
+    
     return NextResponse.json(createSuccessResponse({
       timestamp: new Date().toISOString(),
-      fingerprint,
-      deviceData: deviceData ?? null,
-      deviceRecord: deviceRecord
-        ? {
-            id: deviceRecord.id,
-            deviceFingerprint: deviceRecord.deviceFingerprint,
-            failedAttempts: deviceRecord.failedAttempts,
-            lastAttemptAt: deviceRecord.lastAttemptAt,
-            isBanned: deviceRecord.isBanned,
-            bannedUntil: deviceRecord.bannedUntil,
-            createdAt: deviceRecord.createdAt,
-            updatedAt: deviceRecord.updatedAt,
-            referralCount: deviceRecord.referralSubmissions.length,
-          }
-        : null,
+      fingerprint: fingerprint,
+      deviceData: deviceData
     }));
     
   } catch (error) {

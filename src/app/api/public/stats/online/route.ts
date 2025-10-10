@@ -5,15 +5,13 @@ const NEXT_PUBLIC_WEBSOCKET_URL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || 'http
 
 export const revalidate = 0;
 
-// Simple in-memory cache to avoid hammering upstream
 let cachedPayload: { total: number; authenticated: number; anonymous: number } | null = null;
 let cachedAt = 0;
 const CACHE_TTL_MS = 5_000; // 5 seconds
 
-// Very lightweight IP-based rate limiting (best-effort, per-instance)
 type WindowHits = { timestamps: number[] };
 const ipWindows = new Map<string, WindowHits>();
-const WINDOW_MS = 60_000; // 60s window
+const WINDOW_MS = 60_000; 
 const MAX_REQ_PER_WINDOW = 60; // 60 req/ip/min
 
 function getIp(req: Request): string {
