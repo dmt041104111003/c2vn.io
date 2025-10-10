@@ -65,7 +65,6 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               <option value="">Select Course</option>
               {coursesError && <option value="">Error loading courses</option>}
               {courses?.map((course: any) => {
-                console.log('Rendering course option:', course);
                 return (
                   <option key={course.id} value={course.name}>
                     {course.name}
