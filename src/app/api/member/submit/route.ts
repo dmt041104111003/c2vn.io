@@ -26,6 +26,15 @@ export const POST = withAuth(async (req: NextRequest, currentUser) => {
     if (!formData || typeof formData !== 'object') {
       return NextResponse.json(createErrorResponse('Missing formData', 'BAD_REQUEST'), { status: 400 });
     }
+    const fullName = (formData?.["your-name"] || "").trim();
+    if (!fullName) {
+      return NextResponse.json(createErrorResponse('Full name is required', 'INVALID_NAME'), { status: 400 });
+    }
+    const email = (formData?.["your-email"] || "").trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return NextResponse.json(createErrorResponse('Valid email is required', 'INVALID_EMAIL'), { status: 400 });
+    }
     
     if (!captchaText || !captchaAnswer) {
       return NextResponse.json(createErrorResponse('Missing captcha', 'BAD_REQUEST'), { status: 400 });

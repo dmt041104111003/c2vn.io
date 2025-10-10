@@ -8,6 +8,11 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
   const typedErrors: FormErrors = errors;
   const [selectedCourseImage, setSelectedCourseImage] = useState<string>('');
 
+  const emailValue = (typedFormData["your-email"] || '').trim();
+  const emailValid = emailValue.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+  const nameValue = (typedFormData["your-name"] || '').trim();
+  const nameValid = nameValue.length > 0;
+
 
 
 
@@ -154,6 +159,7 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
                   e.preventDefault();
                 }
               }}
+            required
                 className={`w-full px-3 py-2 border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm ${
                  typedErrors["your-name"] 
                    ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" 
@@ -200,6 +206,7 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
               placeholder="your.email@example.com"
               value={typedFormData["your-email"]}
               onChange={onInputChange}
+            required
                              className={`w-full px-3 py-2 border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-sm ${
                  typedErrors["your-email"] 
                    ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" 
@@ -266,6 +273,8 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
           disabled={
             isSubmitting ||
             !captchaValid ||
+            !nameValid ||
+            !emailValid ||
             (
               (typedFormData["email-intro"]?.trim()?.length || 0) > 0 &&
               !referralCodeValid

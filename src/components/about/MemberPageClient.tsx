@@ -58,6 +58,10 @@ function AboutContactForm({
   onSubmit: (e: React.FormEvent) => void;
   onCaptchaChange: (payload: { isValid: boolean; text: string; answer: string }) => void;
 }) {
+  const nameValue = (formData["your-name"] || "").trim();
+  const nameValid = nameValue.length > 0;
+  const emailValue = (formData["your-email"] || "").trim();
+  const emailValid = emailValue.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
       <form onSubmit={onSubmit} className="p-6 space-y-4">
@@ -76,6 +80,7 @@ function AboutContactForm({
                   e.preventDefault();
                 }
               }}
+              required
               className={`w-full px-3 py-2 border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                 errors["your-name"] ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" : "border-gray-300 dark:border-gray-600"
               }`}
@@ -113,13 +118,14 @@ function AboutContactForm({
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address *</label>
             <input
               type="email"
               name="your-email"
               placeholder="your.email@example.com"
               value={formData["your-email"]}
               onChange={onInputChange}
+              required
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
             />
           </div>
@@ -162,7 +168,7 @@ function AboutContactForm({
 
         <button
           type="submit"
-          disabled={isSubmitting || !captchaValid}
+          disabled={isSubmitting || !captchaValid || !nameValid || !emailValid}
           className="inline-flex items-center justify-center whitespace-nowrap rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success text-lg bg-blue-600 dark:bg-white px-6 py-3 font-semibold text-white dark:text-blue-900 shadow-lg hover:bg-blue-700 dark:hover:bg-gray-100 w-full"
         >
           {isSubmitting ? (
