@@ -21,8 +21,7 @@ export const GET = withAdmin(async (req, currentUser) => {
         name: true,
         email: true,
         wallet: true,
-        referralCode: true,
-        referralCount: true
+        referralCode: true
       } as any
     });
 
@@ -58,14 +57,18 @@ export const GET = withAdmin(async (req, currentUser) => {
       orderBy: { createdAt: 'desc' }
     });
 
+    const referralCount = await (prisma as any).referralSubmission.count({
+      where: { referrerId: userId }
+    });
+
     return NextResponse.json(createSuccessResponse({
       user,
       referrals,
-      totalReferrals: referrals.length
+      totalReferrals: referrals.length,
+      referralCount
     }));
 
   } catch (error) {
-    console.error('Get user referrals error:', error);
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });

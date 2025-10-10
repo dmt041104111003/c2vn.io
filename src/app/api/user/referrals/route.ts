@@ -19,8 +19,7 @@ export const GET = withAuth(async (req, currentUser) => {
         name: true,
         email: true,
         wallet: true,
-        referralCode: true,
-        referralCount: true
+        referralCode: true
       } as any
     });
 
@@ -56,14 +55,18 @@ export const GET = withAuth(async (req, currentUser) => {
       ...(limit && { take: parseInt(limit) })
     });
 
+    const referralCount = await (prisma as any).referralSubmission.count({
+      where: { referrerId: currentUser.id }
+    });
+
     const response: any = {
       user,
       referrals,
-      totalReferrals: referrals.length
+      totalReferrals: referrals.length,
+      referralCount
     };
 
     if (includeStats) {
-      response.referralCount = user.referralCount;
       response.referralCode = user.referralCode;
       response.recentReferrals = referrals.slice(0, 10);
     }
