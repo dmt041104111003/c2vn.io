@@ -263,7 +263,14 @@ export function ContactForm({ formData, errors, isSubmitting, captchaValid, capt
         
         <button
           type="submit"
-          disabled={isSubmitting || !captchaValid || !referralCodeValid}
+          disabled={
+            isSubmitting ||
+            !captchaValid ||
+            (
+              (typedFormData["email-intro"]?.trim()?.length || 0) > 0 &&
+              !referralCodeValid
+            )
+          }
           className="inline-flex items-center justify-center whitespace-nowrap rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success text-base sm:text-lg bg-blue-600 dark:bg-white px-4 sm:px-6 py-2.5 sm:py-3 font-semibold text-white dark:text-blue-900 shadow-lg hover:bg-blue-700 dark:hover:bg-gray-100 w-full"
         >
           {isSubmitting ? (
