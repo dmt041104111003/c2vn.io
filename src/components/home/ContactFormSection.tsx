@@ -295,14 +295,6 @@ export default function ContactFormSection() {
     }
 
     if (name === "email-intro" && value.trim() && deviceData) {
-      const cachedDeviceUsed = localStorage.getItem('deviceUsedReferral');
-      if (cachedDeviceUsed === 'true') {
-        setErrors(prev => ({
-          ...prev,
-          "email-intro": "This device has already used a referral code"
-        }));
-        return;
-      }
       
       setTimeout(async () => {
         try {
@@ -320,44 +312,12 @@ export default function ContactFormSection() {
           const result = await response.json();
           
           if (!response.ok) {
-            if (result.error === 'DEVICE_BANNED' || result.code === 'DEVICE_BANNED') {
-              window.location.href = '/not-found';
-              return;
-            }
             
-            try {
-              const trackResponse = await fetch('/api/device/track-failed', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ deviceData })
-              });
-              
-              if (trackResponse.status === 403) {
-                const trackResult = await trackResponse.json();
-                if (trackResult.error === 'DEVICE_BANNED') {
-                  window.location.href = '/not-found';
-                  return;
-                }
-              }
-              
-            } catch (error) {
-            }
             
-            setFormData(prev => ({
-              ...prev,
-              "email-intro": ""
-            }));
             setReferralCodeValid(false);
             setReferralCodeLocked(false);
             
-            if (result.error === 'DEVICE_ALREADY_USED') {
-              localStorage.setItem('deviceUsedReferral', 'true');
-              showError('Device Already Used', 'This device has already used a referral code. Each device can only use one referral code. Please use a different device or contact admin for assistance.');
-              setErrors(prev => ({
-                ...prev,
-                "email-intro": "This device has already used a referral code"
-              }));
-            } else if (result.error === 'REFERRAL_NOT_FOUND') {
+            if (result.error === 'REFERRAL_NOT_FOUND') {
               showError('Referral Code Not Found', 'The referral code you entered does not exist in our system. Please check the code again or contact the person who referred you.');
               setErrors(prev => ({
                 ...prev,
@@ -394,7 +354,7 @@ export default function ContactFormSection() {
             "email-intro": ""
           }));
           setReferralCodeValid(false);
-          setReferralCodeLocked(false); // Unlock the input when network error occurs
+          setReferralCodeLocked(false); 
           setErrors(prev => ({
             ...prev,
             "email-intro": "Failed to validate referral code"
@@ -428,82 +388,45 @@ export default function ContactFormSection() {
     setIsSubmitting(true);
     
     try {
-      if (formData["email-intro"]) {
-        if (!session?.user) {
-          showError("You must be logged in to use a referral code!");
-          setIsSubmitting(false);
-          return;
-        }
-        try {
-          const userResponse = await fetch('/api/user/referral-code');
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            if (userData.success && userData.data?.referralCode) {
-              showError("You have created your own referral code, you cannot use someone else's code!");
-              setIsSubmitting(false);
-              return;
-            }
-          }
-        } catch (error) {
-          console.error('Error checking user referral code:', error);
-        }
-
-        try {
-          const referralResponse = await fetch('/api/referral/submit', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              referralCode: formData["email-intro"],
-              formData: formData,
-              deviceData: deviceData
-            }),
-          });
-
-          const referralData = await referralResponse.json();
-          
-          if (!referralResponse.ok) {
-            if (referralData.error === 'ALREADY_SUBMITTED') {
-              showError('Already Registered', 'You have already submitted a registration form. Each account can only register once. Please contact admin if you need assistance.');
-              setIsSubmitting(false);
-              return;
-            } else if (referralData.error === 'CANNOT_USE_OWN_CODE') {
-              showError('Cannot Use Own Referral Code', 'You cannot use a referral code that you created yourself.');
-              setIsSubmitting(false);
-              return;
-            } else if (referralData.error === 'REFERRAL_CODE_NOT_FOUND') {
-              showError('Referral Code Not Found', 'The referral code you entered does not exist in our system. Please check and try again.');
-              setIsSubmitting(false);
-              return;
-            } else if (referralData.error === 'DEVICE_ALREADY_USED') {
-              showError('Device Already Used', 'This device has already used a referral code. Each device can only use one referral code. Please use a different device.');
-              setIsSubmitting(false);
-              return;
-            } else {
-              showError('Referral Code Processing Error', 'Unable to process the referral code. Please try again later.');
-              setIsSubmitting(false);
-              return;
-            }
-          }
-        } catch (referralError) {
-          showError("Failed to process referral code. Please try again.");
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
       const response = await fetch('/api/contact/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           formData,
           captchaText,
-          captchaAnswer
+          captchaAnswer,
+          deviceData
         })
       });
 
       if (response.ok) {
+        if (formData["email-intro"]) {
+          if (!session?.user) {
+            showError("You must be logged in to use a referral code!");
+          } else {
+            try {
+              const userResponse = await fetch('/api/user/referral-code');
+              if (userResponse.ok) {
+                const userData = await userResponse.json();
+                if (userData.success && userData.data?.referralCode) {
+                  showError("You have created your own referral code, you cannot use someone else's code!");
+                } else {
+                  void fetch('/api/referral/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      referralCode: formData["email-intro"],
+                      formData: formData,
+                      deviceData: deviceData
+                    })
+                  });
+                }
+              }
+            } catch (error) {
+            }
+          }
+        }
+
         setFormData({
           "your-name": "",
           "your-number": "",
@@ -521,6 +444,7 @@ export default function ContactFormSection() {
         setCaptchaKey(prev => prev + 1);
         setSelectedCourse(null);
         setSelectedCourseImage('');
+        setReferralCodeLocked(false);
         
         if (formData["email-intro"] && session?.user) {
           showSuccess("Thank you! Your message has been sent successfully and your referral has been processed.");

@@ -427,7 +427,7 @@ model ReferralSubmission {
   referrer      User     @relation("UserReferrals", fields: [referrerId], references: [id], onDelete: Cascade)
   deviceAttempt DeviceAttempt? @relation(fields: [deviceAttemptId], references: [id], onDelete: SetNull)
 
-  @@unique([userId]) // Each user can only submit once
+  // @@unique([userId]) 
   @@index([referralCode])
   @@index([referrerId])
   @@index([deviceAttemptId])

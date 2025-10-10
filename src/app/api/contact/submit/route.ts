@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createErrorResponse, createSuccessResponse } from '~/lib/api-response';
+import { generateDeviceFingerprint } from '~/lib/device-fingerprint';
+import { prisma } from '~/lib/prisma';
 
 export const POST = async (req: Request) => {
   try {
@@ -12,10 +14,28 @@ export const POST = async (req: Request) => {
     }
 
     const body = await req.json();
-    const { formData, captchaText, captchaAnswer } = body || {};
+    const { formData, captchaText, captchaAnswer, deviceData } = body || {};
     
     if (!formData || typeof formData !== 'object') {
       return NextResponse.json(createErrorResponse('Missing formData', 'BAD_REQUEST'), { status: 400 });
+    }
+
+    if (!deviceData) {
+      return NextResponse.json(createErrorResponse('Device data is required', 'MISSING_DEVICE_DATA'), { status: 400 });
+    }
+    const deviceFingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
+    
+    let attempt = await prisma.deviceAttempt.findUnique({ where: { deviceFingerprint } });
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (!attempt) {
+      attempt = await prisma.deviceAttempt.create({ data: { deviceFingerprint, failedAttempts: 0, lastAttemptAt: startOfDay } });
+    }
+    if (!attempt.lastAttemptAt || attempt.lastAttemptAt < startOfDay) {
+      attempt = await prisma.deviceAttempt.update({ where: { id: attempt.id }, data: { failedAttempts: 0, lastAttemptAt: startOfDay, isBanned: false, bannedAt: null, bannedUntil: null } });
+    }
+    if (attempt.isBanned && attempt.bannedUntil && attempt.bannedUntil > new Date()) {
+      return NextResponse.json(createErrorResponse('This device is temporarily banned', 'DEVICE_BANNED'), { status: 403 });
     }
   const fullName = (formData?.["your-name"] || "").trim();
   if (!fullName) {
@@ -45,6 +65,18 @@ export const POST = async (req: Request) => {
     if (!upstream.ok) {
       const text = await upstream.text().catch(() => '');
       return NextResponse.json(createErrorResponse(`Upstream error: ${text || upstream.statusText}`, 'UPSTREAM_ERROR'), { status: 502 });
+    }
+
+    // Count this successful submission; ban if now > 5 today
+    const updated = await prisma.deviceAttempt.update({
+      where: { id: attempt.id },
+      data: { failedAttempts: { increment: 1 }, lastAttemptAt: startOfDay }
+    });
+    if (updated.failedAttempts >= 5) {
+      await prisma.deviceAttempt.update({
+        where: { id: updated.id },
+        data: { isBanned: true, bannedAt: new Date(), bannedUntil: new Date(Date.now() + 24 * 60 * 60 * 1000) }
+      });
     }
 
     return NextResponse.json(createSuccessResponse({ ok: true }));

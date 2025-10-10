@@ -22,27 +22,7 @@ export const POST = withAuth(async (req, currentUser) => {
       deviceFingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
     }
 
-    const existingSubmission = await prisma.referralSubmission.findUnique({
-      where: { userId: currentUser.id }
-    });
 
-    if (existingSubmission) {
-      return NextResponse.json(createErrorResponse('You have already submitted a referral form', 'ALREADY_SUBMITTED'), { status: 400 });
-    }
-
-    if (deviceFingerprint) {
-      const existingDeviceUsage = await prisma.referralSubmission.findFirst({
-        where: {
-          deviceAttempt: {
-            deviceFingerprint: deviceFingerprint
-          }
-        }
-      });
-
-      if (existingDeviceUsage) {
-        return NextResponse.json(createErrorResponse('This device has already used a referral code', 'DEVICE_ALREADY_USED'), { status: 409 });
-      }
-    }
 
     const referrer = await findUserByReferralCode(referralCode);
 
