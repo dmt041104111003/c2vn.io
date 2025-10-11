@@ -68,22 +68,39 @@ export const POST = withAdmin(async (req) => {
 });
 
 export const DELETE = withAdmin(async (req, currentUser) => {
-  if (!currentUser) {
-    return NextResponse.json(createErrorResponse('User not found', 'USER_NOT_FOUND'), { status: 404 });
+  try {
+    if (!currentUser) {
+      return NextResponse.json(createErrorResponse('User not found', 'USER_NOT_FOUND'), { status: 404 });
+    }
+    
+    const { address } = await req.json();
+    
+    if (!address) {
+      return NextResponse.json(createErrorResponse('Missing address', 'MISSING_ADDRESS'), { status: 400 });
+    }
+    
+    if (address === currentUser.wallet) {
+      return NextResponse.json(createErrorResponse('Cannot delete yourself', 'CANNOT_DELETE_SELF'), { status: 400 });
+    }
+    
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { wallet: address },
+          { email: address }
+        ]
+      }
+    });
+    
+    if (!user) {
+      return NextResponse.json(createErrorResponse('User not found', 'USER_NOT_FOUND'), { status: 404 });
+    }
+    
+    await prisma.user.delete({ where: { id: user.id } });
+    return NextResponse.json(createSuccessResponse({ success: true }));
+  } catch (error) {
+    return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
-  
-  const { address } = await req.json();
-  
-  if (!address) {
-    return NextResponse.json(createErrorResponse('Missing address', 'MISSING_ADDRESS'), { status: 400 });
-  }
-  
-  if (address === currentUser.wallet) {
-    return NextResponse.json(createErrorResponse('Cannot delete yourself', 'CANNOT_DELETE_SELF'), { status: 400 });
-  }
-  
-  await prisma.user.delete({ where: { wallet: address } });
-  return NextResponse.json(createSuccessResponse({ success: true }));
 });
 
 export const PATCH = withAdmin(async (req, currentUser) => {

@@ -44,7 +44,6 @@ export const GET = withAdmin(async (req) => {
     return NextResponse.json(createSuccessResponse(specialCode));
     
   } catch (error) {
-    console.error('Error in GET /api/admin/special-referral-codes/[id]:', error);
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });
@@ -77,7 +76,6 @@ export const PUT = withAdmin(async (req) => {
     return NextResponse.json(createSuccessResponse(updatedCode));
     
   } catch (error) {
-    console.error('Error in GET /api/admin/special-referral-codes/[id]:', error);
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });
@@ -97,7 +95,6 @@ export const DELETE = withAdmin(async (req) => {
       return NextResponse.json(createErrorResponse('Special referral code not found', 'NOT_FOUND'), { status: 404 });
     }
     
-    // Check if code has been used by counting submissions
     const submissionCount = await prisma.referralSubmission.count({
       where: { specialReferralCodeId: id }
     });
@@ -113,7 +110,6 @@ export const DELETE = withAdmin(async (req) => {
     return NextResponse.json(createSuccessResponse({ message: 'Special referral code deleted successfully' }));
     
   } catch (error) {
-    console.error('Error in GET /api/admin/special-referral-codes/[id]:', error);
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '~/lib/prisma';
 import { withAdmin } from '~/lib/api-wrapper';
+import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 
 export const GET = withAdmin(async (req) => {
   try {
@@ -46,25 +47,8 @@ export const GET = withAdmin(async (req) => {
       prisma.referralSubmission.count({ where })
     ]);
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        submissions,
-        count: totalCount,
-        pagination: {
-          page,
-          limit,
-          totalPages: Math.ceil(totalCount / limit),
-          totalCount
-        }
-      }
-    });
+    return NextResponse.json(createSuccessResponse({ submissions, count: totalCount, pagination: { page, limit, totalPages: Math.ceil(totalCount / limit), totalCount } }));
   } catch (error) {
-    console.error('Error in GET /api/admin/special-referral-codes/[id]/submissions:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Internal server error',
-      code: 'INTERNAL_ERROR'
-    }, { status: 500 });
+    return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });

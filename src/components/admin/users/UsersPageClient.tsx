@@ -96,12 +96,19 @@ export function UsersPageClient() {
   const handleDelete = async (userId: string) => {
     const user = users.find(u => u.id === userId);
     if (!user) return;
+    
+    const identifier = user.address || user.email;
+    if (!identifier) {
+      showError('Cannot delete user: no wallet address or email found');
+      return;
+    }
+    
     try {
       const res = await fetch('/api/admin/users', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ address: user.address })
+        body: JSON.stringify({ address: identifier })
       });
       if (!res.ok) {
         showError('Failed to delete user');
