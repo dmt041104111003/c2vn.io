@@ -5,11 +5,12 @@ import { createSuccessResponse, createErrorResponse } from "~/lib/api-response";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const project = await prisma.project.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!project) {

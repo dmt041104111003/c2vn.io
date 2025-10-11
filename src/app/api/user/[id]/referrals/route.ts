@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 import { prisma } from '~/lib/prisma';
 
-export const GET = async (req: Request, { params }: { params: { id: string } }) => {
+export const GET = async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
   try {
-    const userId = params.id;
+    const { id: userId } = await params;
 
     const referralCount = await prisma.referralSubmission.count({
       where: {

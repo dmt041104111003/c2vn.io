@@ -4,11 +4,12 @@ import { withAdmin } from "~/lib/api-wrapper";
 import { createErrorResponse, createSuccessResponse } from "~/lib/api-response";
 
 export async function GET(
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const technology = await prisma.technology.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!technology) {
