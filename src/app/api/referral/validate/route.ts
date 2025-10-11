@@ -8,12 +8,42 @@ export const POST = async (req: Request) => {
   try {
     const { referralCode, deviceData } = await req.json();
 
-    if (!referralCode || !validateReferralCode(referralCode)) {
-      return NextResponse.json(createErrorResponse('Invalid referral code format', 'INVALID_REFERRAL_CODE'), { status: 400 });
+    if (!referralCode) {
+      return NextResponse.json(createErrorResponse('Referral code is required', 'MISSING_REFERRAL_CODE'), { status: 400 });
     }
 
-
     const fingerprint = deviceData ? await generateDeviceFingerprint(deviceData.userAgent, deviceData) : undefined;
+
+    if (referralCode.startsWith('C2VN') && referralCode.length === 9) {
+      const specialCode = await prisma.specialReferralCode.findUnique({
+        where: { code: referralCode }
+      });
+      
+      if (!specialCode) {
+        return NextResponse.json(createErrorResponse('Special referral code not found', 'REFERRAL_NOT_FOUND'), { status: 404 });
+      }
+      
+      if (!specialCode.isActive) {
+        return NextResponse.json(createErrorResponse('Special referral code is inactive', 'CODE_INACTIVE'), { status: 400 });
+      }
+      
+      if (specialCode.expiresAt && new Date() > specialCode.expiresAt) {
+        return NextResponse.json(createErrorResponse('Special referral code has expired', 'CODE_EXPIRED'), { status: 400 });
+      }
+      
+      return NextResponse.json(createSuccessResponse({ 
+        valid: true, 
+        message: 'Special referral code is valid and can be used',
+        isSpecial: true,
+        code: specialCode.code,
+        expiresAt: specialCode.expiresAt,
+        fingerprint
+      }));
+    }
+
+    if (!validateReferralCode(referralCode)) {
+      return NextResponse.json(createErrorResponse('Invalid referral code format', 'INVALID_REFERRAL_CODE'), { status: 400 });
+    }
 
     const referralUser = await prisma.user.findFirst({
       where: {
@@ -33,6 +63,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json(createSuccessResponse({ 
       valid: true, 
       message: 'Referral code is valid and can be used',
+      isSpecial: false,
       referrerName: referralUser.name,
       fingerprint
     }));

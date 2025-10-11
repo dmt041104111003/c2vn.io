@@ -150,9 +150,6 @@ export function UserTable({
   const [referralsPerPage] = useState(10);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<User | null>(null);
-  const [isBanModalOpen, setIsBanModalOpen] = useState(false);
-  const [selectedUserToBan, setSelectedUserToBan] = useState<User | null>(null);
-  const [banHours, setBanHours] = useState(24);
   const [onlineMap, setOnlineMap] = useState<Map<string, number>>(new Map());
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
@@ -196,23 +193,7 @@ export function UserTable({
     }
   };
 
-  const handleBanClick = (user: User) => {
-    setSelectedUserToBan(user);
-    setIsBanModalOpen(true);
-  };
 
-  const handleConfirmBan = () => {
-    if (selectedUserToBan) {
-      onBanUser(selectedUserToBan.id, banHours);
-      setIsBanModalOpen(false);
-      setSelectedUserToBan(null);
-      setBanHours(24);
-    }
-  };
-
-  const handleUnbanClick = (user: User) => {
-    onUnbanUser(user.id);
-  };
 
   const copyReferralCode = async (code: string) => {
     try {
@@ -394,24 +375,6 @@ export function UserTable({
                   >
                     <Edit className="h-4 w-4" />
                   </button>
-                  {user.isBanned ? (
-                    <button
-                      onClick={() => handleUnbanClick(user)}
-                      className="text-green-600 hover:text-green-900"
-                      title={`Unban ${user.name}`}
-                    >
-                      <Unlock className="h-4 w-4" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleBanClick(user)}
-                      className="text-orange-600 hover:text-orange-900"
-                      title={`Ban ${user.name}`}
-                      disabled={user.role === 'ADMIN' || !!(currentUserAddress && user.address === currentUserAddress)}
-                    >
-                      <Ban className="h-4 w-4" />
-                    </button>
-                  )}
                   <button
                     onClick={() => handleDeleteClick(user)}
                     className="text-red-600 hover:text-red-900"
@@ -473,64 +436,6 @@ export function UserTable({
         </div>
       </Modal>
 
-      <Modal
-        isOpen={isBanModalOpen}
-        onClose={() => setIsBanModalOpen(false)}
-        title="Ban User"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-full">
-              <Ban className="w-5 h-5 text-orange-600" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Ban User</h3>
-              <p className="text-sm text-gray-600">Ban this user from commenting</p>
-            </div>
-          </div>
-          
-          {selectedUserToBan && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm text-gray-500">User to ban:</p>
-              <p className="font-medium text-gray-900">{selectedUserToBan.name}</p>
-              <p className="text-sm text-gray-500">{selectedUserToBan.email || shortenAddress(selectedUserToBan.address, 6)}</p>
-            </div>
-          )}
-          
-                     <div className="space-y-3">
-             <div>
-               <label className="block text-sm font-medium text-gray-700 mb-1">
-                 Ban Duration (hours)
-               </label>
-               <input
-                 type="number"
-                 min="1"
-                 max="8760"
-                 value={banHours}
-                 onChange={(e) => setBanHours(parseInt(e.target.value) || 24)}
-                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                 placeholder="24"
-               />
-             </div>
-           </div>
-          
-          <div className="flex items-center justify-end gap-3 pt-4">
-            <button
-              onClick={() => setIsBanModalOpen(false)}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
-            >
-              Cancel
-            </button>
-                         <button
-               onClick={handleConfirmBan}
-               className="px-4 py-2 text-white bg-orange-600 hover:bg-orange-700 rounded-lg font-medium transition-colors flex items-center gap-2"
-             >
-              <Ban className="w-4 h-4" />
-              Ban User
-            </button>
-          </div>
-        </div>
-      </Modal>
 
       <Modal
         isOpen={isReferralsModalOpen}

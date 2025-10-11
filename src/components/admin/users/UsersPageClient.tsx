@@ -27,6 +27,8 @@ export function UsersPageClient() {
   const [editUser, setEditUser] = useState<User | null>(null);
   const ITEMS_PER_PAGE = 6;
   const [editUserName, setEditUserName] = useState('');
+  const [editUserIsActive, setEditUserIsActive] = useState(true);
+  const [editUserBanDuration, setEditUserBanDuration] = useState(24);
   const { showSuccess, showError } = useToastContext();
   
   useNotifications();
@@ -148,85 +150,45 @@ export function UsersPageClient() {
   const handleEdit = (user: User) => {
     setEditUser(user);
     setEditUserName(user.name || '');
+    setEditUserIsActive(!user.isBanned);
+    setEditUserBanDuration(24); // Default 24 hours
   };
 
-  const handleUpdateUserName = async () => {
+  const handleUpdateUser = async () => {
     if (!editUser) return;
     try {
+      const updateData: any = { 
+        address: editUser.address, 
+        name: editUserName
+      };
+
+      if (!editUserIsActive) {
+        // User is being banned
+        updateData.ban = true;
+        updateData.banHours = editUserBanDuration;
+      } else {
+        // User is being unbanned
+        updateData.unban = true;
+      }
+
       const res = await fetch('/api/admin/users', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ address: editUser.address, name: editUserName })
+        body: JSON.stringify(updateData)
       });
       if (!res.ok) {
-        showError('Failed to update user name');
+        showError('Failed to update user');
         return;
       }
       await fetchUsers();
       setEditUser(null);
-      showSuccess('User updated', 'User name has been updated.');
+      showSuccess('User updated', 'User information has been updated.');
     } catch {
-      showError('Failed to update user name');
+      showError('Failed to update user');
     }
   };
 
-  const handleBanUser = async (userId: string, hours: number) => {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
-    
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ 
-          address: user.address, 
-          ban: true,
-          banHours: hours
-        })
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        showError(errorData.message || 'Failed to ban user');
-        return;
-      }
-      
-      await fetchUsers();
-      showSuccess('User banned', `User has been banned for ${hours} hours`);
-    } catch {
-      showError('Failed to ban user');
-    }
-  };
-
-  const handleUnbanUser = async (userId: string) => {
-    const user = users.find(u => u.id === userId);
-    if (!user) return;
-    
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ 
-          address: user.address, 
-          unban: true
-        })
-      });
-      
-      if (!res.ok) {
-        const errorData = await res.json();
-        showError(errorData.message || 'Failed to unban user');
-        return;
-      }
-      
-      await fetchUsers();
-      showSuccess('User unbanned', 'User has been unbanned successfully');
-    } catch {
-      showError('Failed to unban user');
-    }
-  };
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = (user.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
@@ -356,8 +318,6 @@ export function UsersPageClient() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onRoleChange={handleRoleChange}
-          onBanUser={handleBanUser}
-          onUnbanUser={handleUnbanUser}
           currentUserAddress={currentUserAddress}
           currentUserRole={currentUserRole || undefined}
         />
@@ -370,19 +330,64 @@ export function UsersPageClient() {
         />
       </div>
       )}
-      <Modal isOpen={!!editUser} onClose={() => setEditUser(null)} title="Edit User Name">
-        <input
-          className="w-full border rounded px-3 py-2 mb-4"
-          placeholder="User name"
-          value={editUserName}
-          onChange={e => setEditUserName(e.target.value)}
-          autoFocus
-        />
-        <div className="flex justify-end gap-2">
+      <Modal isOpen={!!editUser} onClose={() => setEditUser(null)} title="Edit User">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">User Name</label>
+            <input
+              className="w-full border rounded px-3 py-2"
+              placeholder="User name"
+              value={editUserName}
+              onChange={e => setEditUserName(e.target.value)}
+              autoFocus
+            />
+          </div>
+          
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={editUserIsActive}
+                onChange={(e) => setEditUserIsActive(e.target.checked)}
+                className="rounded"
+              />
+              <label htmlFor="isActive" className="text-sm font-medium">Active</label>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isInactive"
+                checked={!editUserIsActive}
+                onChange={(e) => setEditUserIsActive(!e.target.checked)}
+                className="rounded"
+              />
+              <label htmlFor="isInactive" className="text-sm font-medium">Inactive (Banned)</label>
+            </div>
+            
+            {!editUserIsActive && (
+              <div className="ml-6">
+                <label className="block text-sm font-medium mb-2">Ban Duration (hours)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="8760"
+                  value={editUserBanDuration}
+                  onChange={(e) => setEditUserBanDuration(parseInt(e.target.value) || 24)}
+                  className="w-full border rounded px-3 py-2"
+                  placeholder="24"
+                />
+                <p className="text-xs text-gray-500 mt-1">Maximum: 8760 hours (1 year)</p>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 mt-6">
           <button className="px-4 py-2 bg-gray-200 rounded" onClick={() => setEditUser(null)}>Cancel</button>
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded"
-            onClick={handleUpdateUserName}
+            onClick={handleUpdateUser}
             disabled={!editUserName.trim()}
           >Save</button>
         </div>

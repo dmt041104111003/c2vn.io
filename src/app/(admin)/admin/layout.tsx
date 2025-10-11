@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Users, Menu, X, Home, LogOut, Cpu, Info, UserPlus } from "lucide-react";
+import { FileText, Users, Menu, X, Home, LogOut, Cpu, Info, UserPlus, Gift } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "~/hooks/useUser";
 import { useEffect } from "react";
@@ -54,6 +54,11 @@ const adminNavItems = [
     title: "Users",
     href: "/admin/users",
     icon: Users,
+  },
+  {
+    title: "Special Referral Codes",
+    href: "/admin/special-referral-codes",
+    icon: Gift,
   },
   {
     title: "Memories & Events",

@@ -20,8 +20,6 @@ export interface UserTableProps {
   onEdit: (user: User) => void;
   onDelete: (userId: string) => void;
   onRoleChange: (userId: string, role: 'USER' | 'ADMIN') => void;
-  onBanUser: (userId: string, hours: number) => void;
-  onUnbanUser: (userId: string) => void;
   currentUserAddress?: string | null;
   currentUserRole?: 'USER' | 'ADMIN';
 }

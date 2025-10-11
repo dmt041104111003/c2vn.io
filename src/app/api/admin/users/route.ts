@@ -160,8 +160,8 @@ export const PATCH = withAdmin(async (req, currentUser) => {
         return NextResponse.json(createErrorResponse('Only admins can ban users', 'FORBIDDEN'), { status: 403 });
       }
       
-      if (!banHours) {
-        return NextResponse.json(createErrorResponse('Missing ban hours', 'MISSING_BAN_HOURS'), { status: 400 });
+      if (!banHours || banHours < 1 || banHours > 8760) {
+        return NextResponse.json(createErrorResponse('Ban hours must be between 1 and 8760 (1 year)', 'INVALID_BAN_HOURS'), { status: 400 });
       }
 
       const bannedUntil = new Date();

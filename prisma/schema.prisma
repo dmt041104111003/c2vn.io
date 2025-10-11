@@ -421,16 +421,19 @@ model ReferralSubmission {
   course        String?  // Course from contact form
   message       String?  // Message from contact form
   deviceAttemptId String? // Link to DeviceAttempt
+  specialReferralCodeId String? // Link to SpecialReferralCode
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation("UserReferralSubmissions", fields: [userId], references: [id], onDelete: Cascade)
   referrer      User     @relation("UserReferrals", fields: [referrerId], references: [id], onDelete: Cascade)
   deviceAttempt DeviceAttempt? @relation(fields: [deviceAttemptId], references: [id], onDelete: SetNull)
+  specialReferralCode SpecialReferralCode? @relation("SpecialReferralCode", fields: [specialReferralCodeId], references: [id], onDelete: SetNull)
 
   // @@unique([userId]) 
   @@index([referralCode])
   @@index([referrerId])
   @@index([deviceAttemptId])
+  @@index([specialReferralCodeId])
   @@index([createdAt])
 }
 
@@ -450,6 +453,22 @@ model DeviceAttempt {
   @@index([isBanned])
   @@index([bannedUntil])
   @@index([lastAttemptAt])
+}
+
+model SpecialReferralCode {
+  id            String   @id @default(uuid())
+  code          String   @unique // Format: C2VN + 5 alphanumeric characters
+  isActive      Boolean  @default(true)
+  createdBy     String   // Admin user ID who created this code
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  expiresAt     DateTime? // Optional expiration date
+  referralSubmissions ReferralSubmission[] @relation("SpecialReferralCode")
+
+  @@index([code])
+  @@index([isActive])
+  @@index([createdBy])
+  @@index([expiresAt])
 }
 
 
