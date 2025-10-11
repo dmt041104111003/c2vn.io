@@ -246,6 +246,41 @@ export default function ContactFormSection() {
     return <ContactFormManager />;
   }, [coursesError, isAdmin]);
 
+  const resetFormState = useCallback(() => {
+    setFormData({
+      "your-name": "",
+      "your-number": "",
+      "your-email": "",
+      "address-wallet": "",
+      "email-intro": "",
+      "event-location": "",
+      "your-course": "",
+      message: ""
+    });
+    setErrors({});
+    setCaptchaValid(false);
+    setCaptchaText("");
+    setCaptchaAnswer("");
+    setCaptchaKey(prev => prev + 1);
+    setSelectedCourse(null);
+    setSelectedCourseImage('');
+    setReferralCodeValid(false);
+    setReferralCodeLocked(false);
+  }, []);
+
+  const clearReferralCode = useCallback(() => {
+    setFormData(prev => ({
+      ...prev,
+      "email-intro": ""
+    }));
+    setErrors(prev => ({
+      ...prev,
+      "email-intro": undefined
+    }));
+    setReferralCodeValid(false);
+    setReferralCodeLocked(false);
+  }, []);
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
@@ -294,9 +329,13 @@ export default function ContactFormSection() {
       }));
     }
 
-    if (name === "email-intro" && value.trim() && deviceData) {
-      
-      setTimeout(async () => {
+    if (name === "email-intro") {
+      if (value.trim() && deviceData) {
+        setReferralCodeValid(false);
+        setReferralCodeLocked(false);
+        
+        // Use a shorter timeout to avoid race conditions
+        setTimeout(async () => {
         try {
           const response = await fetch('/api/referral/validate', {
             method: 'POST',
@@ -317,60 +356,44 @@ export default function ContactFormSection() {
             setReferralCodeValid(false);
             setReferralCodeLocked(false);
             
-            if (result.error === 'REFERRAL_NOT_FOUND') {
+            if (result.code === 'REFERRAL_NOT_FOUND') {
               showError('Referral Code Not Found', 'The referral code you entered does not exist in our system. Please check the code again or contact the person who referred you.');
-              setFormData(prev => ({
-                ...prev,
-                "email-intro": ""
-              }));
+              clearReferralCode();
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Referral code not found"
               }));
-            } else if (result.error === 'INVALID_REFERRAL_CODE') {
+            } else if (result.code === 'INVALID_REFERRAL_CODE') {
               showError('Invalid Referral Code Format', 'The referral code format is incorrect. Please check the code format and try again.');
-              setFormData(prev => ({
-                ...prev,
-                "email-intro": ""
-              }));
+              clearReferralCode();
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Invalid referral code format"
               }));
-            } else if (result.error === 'CODE_INACTIVE') {
+            } else if (result.code === 'CODE_INACTIVE') {
               showError('Special Code Inactive', 'This special referral code is currently inactive and cannot be used.');
-              setFormData(prev => ({
-                ...prev,
-                "email-intro": ""
-              }));
+              clearReferralCode();
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Special code is inactive"
               }));
-            } else if (result.error === 'CODE_EXPIRED') {
+            } else if (result.code === 'CODE_EXPIRED') {
               showError('Special Code Expired', 'This special referral code has expired and can no longer be used.');
-              // Clear the input when code is expired
-              setFormData(prev => ({
-                ...prev,
-                "email-intro": ""
-              }));
+              clearReferralCode();
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Special code has expired"
               }));
-            } else if (result.error === 'CANNOT_USE_OWN_CODE') {
+            } else if (result.code === 'CANNOT_USE_OWN_CODE') {
               showError('Cannot Use Own Code', 'You cannot use your own referral code. Please use a different referral code.');
-              // Clear the input when user tries to use own code
-              setFormData(prev => ({
-                ...prev,
-                "email-intro": ""
-              }));
+              clearReferralCode();
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Cannot use your own referral code"
               }));
             } else {
               showError('Referral Code Validation Failed', 'Unable to validate the referral code. Please try again later.');
+              clearReferralCode();
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Referral code validation failed"
@@ -388,7 +411,6 @@ export default function ContactFormSection() {
               "email-intro": undefined
             }));
 
-            // Show different success messages for special vs regular codes
             if (result.data?.isSpecial) {
               showSuccess('Special Referral Code Validated', 'Special referral code is valid and can be used!');
             } else {
@@ -396,18 +418,21 @@ export default function ContactFormSection() {
             }
           }
         } catch (error) {
-          setFormData(prev => ({
-            ...prev,
-            "email-intro": ""
-          }));
-          setReferralCodeValid(false);
-          setReferralCodeLocked(false); 
+          clearReferralCode();
           setErrors(prev => ({
             ...prev,
             "email-intro": "Failed to validate referral code"
           }));
         }
-      }, 500); 
+      }, 300); 
+      } else {
+        setReferralCodeValid(false);
+        setReferralCodeLocked(false);
+        setErrors(prev => ({
+          ...prev,
+          "email-intro": undefined
+        }));
+      }
     }
   };
 
@@ -474,24 +499,7 @@ export default function ContactFormSection() {
           }
         }
 
-        setFormData({
-          "your-name": "",
-          "your-number": "",
-          "your-email": "",
-          "address-wallet": "",
-          "email-intro": "",
-          "event-location": "",
-          "your-course": "",
-          message: ""
-        });
-        setErrors({});
-        setCaptchaValid(false);
-        setCaptchaText("");
-        setCaptchaAnswer("");
-        setCaptchaKey(prev => prev + 1);
-        setSelectedCourse(null);
-        setSelectedCourseImage('');
-        setReferralCodeLocked(false);
+        resetFormState();
         
         if (formData["email-intro"] && session?.user) {
           showSuccess("Thank you! Your message has been sent successfully and your referral has been processed.");

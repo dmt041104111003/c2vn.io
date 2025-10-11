@@ -3,8 +3,9 @@ import { createErrorResponse, createSuccessResponse } from '~/lib/api-response';
 import { prisma } from '~/lib/prisma';
 import { generateDeviceFingerprint } from '~/lib/device-fingerprint';
 import { validateReferralCode } from '~/lib/referral-utils';
+import { withOptionalAuth } from '~/lib/api-wrapper';
 
-export const POST = async (req: Request) => {
+export const POST = withOptionalAuth(async (req, currentUser) => {
   try {
     const { referralCode, deviceData } = await req.json();
 
@@ -29,6 +30,11 @@ export const POST = async (req: Request) => {
       
       if (specialCode.expiresAt && new Date() > specialCode.expiresAt) {
         return NextResponse.json(createErrorResponse('Special referral code has expired', 'CODE_EXPIRED'), { status: 400 });
+      }
+      
+      // Check if current user is trying to use a special code they created
+      if (currentUser && currentUser.id === specialCode.createdBy) {
+        return NextResponse.json(createErrorResponse('You cannot use a special referral code you created', 'CANNOT_USE_OWN_CODE'), { status: 400 });
       }
       
       return NextResponse.json(createSuccessResponse({ 
@@ -60,6 +66,11 @@ export const POST = async (req: Request) => {
       return NextResponse.json(createErrorResponse('Referral code not found', 'REFERRAL_NOT_FOUND'), { status: 404 });
     }
 
+    // Check if current user is trying to use their own referral code
+    if (currentUser && currentUser.id === referralUser.id) {
+      return NextResponse.json(createErrorResponse('You cannot use your own referral code', 'CANNOT_USE_OWN_CODE'), { status: 400 });
+    }
+
     return NextResponse.json(createSuccessResponse({ 
       valid: true, 
       message: 'Referral code is valid and can be used',
@@ -71,4 +82,4 @@ export const POST = async (req: Request) => {
   } catch (error) {
     return NextResponse.json(createErrorResponse('Failed to validate referral code', 'INTERNAL_ERROR'), { status: 500 });
   }
-};
+});
