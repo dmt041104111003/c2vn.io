@@ -32,9 +32,7 @@ export const POST = withOptionalAuth(async (req, currentUser) => {
         return NextResponse.json(createErrorResponse('Special referral code has expired', 'CODE_EXPIRED'), { status: 400 });
       }
       
-      if (currentUser && currentUser.id === specialCode.createdBy) {
-        return NextResponse.json(createErrorResponse('You cannot use a special referral code you created', 'CANNOT_USE_OWN_CODE'), { status: 400 });
-      }
+
       
       return NextResponse.json(createSuccessResponse({ 
         valid: true, 
