@@ -42,8 +42,16 @@ const config: NextConfig = {
         protocol: "https",
         hostname: "i.ytimg.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.cardano2vn.io",
+      },
+      {
+        protocol: "https",
+        hostname: "cardano2vn.io",
+      },
     ],
-    domains: ["res.cloudinary.com"],
+    domains: ["res.cloudinary.com", "www.cardano2vn.io", "cardano2vn.io"],
   },
   eslint: {
     ignoreDuringBuilds: true,
