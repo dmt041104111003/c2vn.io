@@ -14,7 +14,7 @@ export const POST = async (req: Request) => {
 
     const fingerprint = deviceData ? await generateDeviceFingerprint(deviceData.userAgent, deviceData) : undefined;
 
-    if (referralCode.startsWith('C2VN') && referralCode.length === 9) {
+    if (referralCode.startsWith('CARDANO2VN') && referralCode.length === 15) {
       const specialCode = await prisma.specialReferralCode.findUnique({
         where: { code: referralCode }
       });

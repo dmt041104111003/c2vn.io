@@ -30,9 +30,8 @@ export const POST = withAuth(async (req, currentUser) => {
     let specialReferralCode = null;
     let referrer = null;
     
-    // Only validate referral code if one is provided
     if (referralCode && referralCode.trim() !== '') {
-      if (referralCode.startsWith('C2VN') && referralCode.length === 9) {
+      if (referralCode.startsWith('CARDANO2VN') && referralCode.length === 15) {
         specialReferralCode = await prisma.specialReferralCode.findUnique({
           where: { code: referralCode }
         });

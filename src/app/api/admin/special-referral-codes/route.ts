@@ -5,7 +5,7 @@ import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 
 function generateSpecialReferralCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = 'C2VN';
+  let result = 'CARDANO2VN';
   
   for (let i = 0; i < 5; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));

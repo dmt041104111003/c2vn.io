@@ -56,6 +56,7 @@ export async function findUserByReferralCode(referralCode: string) {
 }
 
 export function validateReferralCode(referralCode: string): boolean {
-  const pattern = /^C2VN[A-Za-z0-9]{4,}$/;
-  return pattern.test(referralCode);
+  const userPattern = /^C2VN[A-Za-z0-9]{4,}$/;
+  const specialPattern = /^CARDANO2VN[A-Za-z0-9]{5}$/;
+  return userPattern.test(referralCode) || specialPattern.test(referralCode);
 }

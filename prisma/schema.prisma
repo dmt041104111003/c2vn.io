@@ -457,7 +457,7 @@ model DeviceAttempt {
 
 model SpecialReferralCode {
   id            String   @id @default(uuid())
-  code          String   @unique // Format: C2VN + 5 alphanumeric characters
+  code          String   @unique
   isActive      Boolean  @default(true)
   createdBy     String   // Admin user ID who created this code
   createdAt     DateTime @default(now())
