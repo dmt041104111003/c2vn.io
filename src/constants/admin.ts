@@ -14,6 +14,8 @@ export interface AdminHeaderProps {
   description: string;
   buttonText?: string;
   onAddClick?: () => void;
+  exportButtonText?: string;
+  onExportClick?: () => void;
 }
 
 // AdminStats interfaces

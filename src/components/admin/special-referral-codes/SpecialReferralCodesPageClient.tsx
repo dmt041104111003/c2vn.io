@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AdminHeader } from '~/components/admin/common/AdminHeader';
 import { AdminFilters } from '~/components/admin/common/AdminFilters';
+import { AdminStats } from '~/components/admin/common/AdminStats';
 import { Pagination } from '~/components/ui/pagination';
 import Modal from '~/components/admin/common/Modal';
 import { useToastContext } from '~/components/toast-provider';
@@ -62,8 +63,30 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
     }
   });
 
+  const {
+    data: statsData,
+    isLoading: statsLoading,
+  } = useQuery({
+    queryKey: ['admin-special-referral-codes-stats'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/special-referral-codes/stats', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch stats');
+      return res.json();
+    }
+  });
+
   const codes = queryData?.data?.codes || [];
   const totalPages = queryData?.data?.pagination?.totalPages || 1;
+  const stats = statsData?.data || {};
+
+  const displayStats = [
+    { label: 'Total Codes', value: stats.totalCodes || 0, color: 'default' as const },
+    { label: 'Active Codes', value: stats.activeCodes || 0, color: 'green' as const },
+    { label: 'Inactive Codes', value: stats.inactiveCodes || 0, color: 'red' as const },
+    { label: 'Total Submissions', value: stats.totalSubmissions || 0, color: 'blue' as const },
+    { label: 'Codes with Submissions', value: stats.codesWithSubmissions || 0, color: 'blue' as const },
+    { label: 'Expired Codes', value: stats.expiredCodes || 0, color: 'red' as const },
+  ];
 
   const handleCreateSuccess = () => {
     setShowCreateModal(false);
@@ -114,6 +137,32 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
     showSuccess('Referral link copied to clipboard');
   };
 
+  const handleExport = async () => {
+    try {
+      const response = await fetch('/api/admin/special-referral-codes/export', {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to export data');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `special-referral-codes-${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      showSuccess('Export successful', 'Special referral codes data has been exported successfully');
+    } catch (error) {
+      showError('Export failed', 'Failed to export special referral codes data');
+    }
+  };
+
   const filterOptions = [
     { value: 'all', label: 'All Status' },
     { value: 'active', label: 'Active' },
@@ -127,8 +176,12 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
         description="Manage special referral codes"
         buttonText="Create Code"
         onAddClick={() => setShowCreateModal(true)}
+        exportButtonText="Export Excel"
+        onExportClick={handleExport}
       />
 
+      <AdminStats stats={displayStats} />
+      
       <AdminFilters
         searchTerm={searchTerm}
         filterType={filterType}
@@ -157,6 +210,8 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
+            totalItems={queryData?.data?.pagination?.totalCount || 0}
+            itemsPerPage={ITEMS_PER_PAGE}
             onPageChange={setCurrentPage}
           />
         </div>
@@ -194,7 +249,7 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
             setSelectedCode(null);
           }}
           title="Special Referral Code Details"
-          size="large"
+          maxWidth="max-w-4xl"
         >
           <ViewSpecialCodeDetails code={selectedCode} />
         </Modal>
