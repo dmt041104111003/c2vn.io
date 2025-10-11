@@ -13,8 +13,11 @@ export const POST = withAuth(async (req, currentUser) => {
 
     const { referralCode, formData, deviceData } = await req.json();
 
-    if (!referralCode || !validateReferralCode(referralCode)) {
-      return NextResponse.json(createErrorResponse('Invalid referral code format', 'INVALID_REFERRAL_CODE'), { status: 400 });
+    // If referral code is provided, it must be valid
+    if (referralCode && referralCode.trim() !== '') {
+      if (!validateReferralCode(referralCode)) {
+        return NextResponse.json(createErrorResponse('Invalid referral code format', 'INVALID_REFERRAL_CODE'), { status: 400 });
+      }
     }
 
     let deviceFingerprint = null;
@@ -27,36 +30,42 @@ export const POST = withAuth(async (req, currentUser) => {
     let specialReferralCode = null;
     let referrer = null;
     
-    if (referralCode.startsWith('C2VN') && referralCode.length === 9) {
-      specialReferralCode = await prisma.specialReferralCode.findUnique({
-        where: { code: referralCode }
-      });
-      
-      if (!specialReferralCode) {
-        return NextResponse.json(createErrorResponse('Special referral code not found', 'REFERRAL_CODE_NOT_FOUND'), { status: 404 });
-      }
-      
-      if (!specialReferralCode.isActive) {
-        return NextResponse.json(createErrorResponse('Special referral code is inactive', 'CODE_INACTIVE'), { status: 400 });
-      }
-      
-      if (specialReferralCode.expiresAt && new Date() > specialReferralCode.expiresAt) {
-        return NextResponse.json(createErrorResponse('Special referral code has expired', 'CODE_EXPIRED'), { status: 400 });
-      }
-      
+    // Only validate referral code if one is provided
+    if (referralCode && referralCode.trim() !== '') {
+      if (referralCode.startsWith('C2VN') && referralCode.length === 9) {
+        specialReferralCode = await prisma.specialReferralCode.findUnique({
+          where: { code: referralCode }
+        });
+        
+        if (!specialReferralCode) {
+          return NextResponse.json(createErrorResponse('Special referral code not found', 'REFERRAL_CODE_NOT_FOUND'), { status: 404 });
+        }
+        
+        if (!specialReferralCode.isActive) {
+          return NextResponse.json(createErrorResponse('Special referral code is inactive', 'CODE_INACTIVE'), { status: 400 });
+        }
+        
+        if (specialReferralCode.expiresAt && new Date() > specialReferralCode.expiresAt) {
+          return NextResponse.json(createErrorResponse('Special referral code has expired', 'CODE_EXPIRED'), { status: 400 });
+        }
+        
+        if (specialReferralCode.createdBy === currentUser.id) {
+          return NextResponse.json(createErrorResponse('You cannot use your own special referral code', 'CANNOT_USE_OWN_CODE'), { status: 400 });
+        }
 
-      referrer = await prisma.user.findUnique({
-        where: { id: specialReferralCode.createdBy }
-      });
-    } else {
-      referrer = await findUserByReferralCode(referralCode);
-      
-      if (!referrer) {
-        return NextResponse.json(createErrorResponse('Referral code not found', 'REFERRAL_CODE_NOT_FOUND'), { status: 404 });
-      }
-      
-      if (referrer.id === currentUser.id) {
-        return NextResponse.json(createErrorResponse('You cannot use your own referral code', 'CANNOT_USE_OWN_CODE'), { status: 400 });
+        referrer = await prisma.user.findUnique({
+          where: { id: specialReferralCode.createdBy }
+        });
+      } else {
+        referrer = await findUserByReferralCode(referralCode);
+        
+        if (!referrer) {
+          return NextResponse.json(createErrorResponse('Referral code not found', 'REFERRAL_CODE_NOT_FOUND'), { status: 404 });
+        }
+        
+        if (referrer.id === currentUser.id) {
+          return NextResponse.json(createErrorResponse('You cannot use your own referral code', 'CANNOT_USE_OWN_CODE'), { status: 400 });
+        }
       }
     }
 
@@ -81,8 +90,8 @@ export const POST = withAuth(async (req, currentUser) => {
     const submission = await prisma.referralSubmission.create({
       data: {
         userId: currentUser.id,
-        referralCode: referralCode,
-        referrerId: referrer.id,
+        referralCode: referralCode || null,
+        referrerId: referrer?.id || null,
         email: formData['your-email'] || '',
         name: formData['your-name'] || '',
         phone: formData['your-number'] || null,
@@ -95,22 +104,24 @@ export const POST = withAuth(async (req, currentUser) => {
     });
 
 
-    await prisma.notification.create({
-      data: {
-        userId: referrer.id,
-        type: 'referral',
-        title: specialReferralCode ? 'New Special Referral!' : 'New Referral!',
-        message: specialReferralCode 
-          ? `${formData['your-name'] || 'Someone'} used special referral code ${referralCode}`
-          : `${formData['your-name'] || 'Someone'} used your referral code`,
+    if (referrer) {
+      await prisma.notification.create({
         data: {
-          submissionId: submission.id,
-          referrerName: formData['your-name'],
-          referralCode: referralCode,
-          isSpecialCode: !!specialReferralCode
+          userId: referrer.id,
+          type: 'referral',
+          title: specialReferralCode ? 'New Special Referral!' : 'New Referral!',
+          message: specialReferralCode 
+            ? `${formData['your-name'] || 'Someone'} used special referral code ${referralCode}`
+            : `${formData['your-name'] || 'Someone'} used your referral code`,
+          data: {
+            submissionId: submission.id,
+            referrerName: formData['your-name'],
+            referralCode: referralCode,
+            isSpecialCode: !!specialReferralCode
+          }
         }
-      }
-    });
+      });
+    }
 
     return NextResponse.json(createSuccessResponse({
       message: 'Referral submission successful',

@@ -319,15 +319,55 @@ export default function ContactFormSection() {
             
             if (result.error === 'REFERRAL_NOT_FOUND') {
               showError('Referral Code Not Found', 'The referral code you entered does not exist in our system. Please check the code again or contact the person who referred you.');
+              setFormData(prev => ({
+                ...prev,
+                "email-intro": ""
+              }));
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Referral code not found"
               }));
             } else if (result.error === 'INVALID_REFERRAL_CODE') {
               showError('Invalid Referral Code Format', 'The referral code format is incorrect. Please check the code format and try again.');
+              setFormData(prev => ({
+                ...prev,
+                "email-intro": ""
+              }));
               setErrors(prev => ({
                 ...prev,
                 "email-intro": "Invalid referral code format"
+              }));
+            } else if (result.error === 'CODE_INACTIVE') {
+              showError('Special Code Inactive', 'This special referral code is currently inactive and cannot be used.');
+              setFormData(prev => ({
+                ...prev,
+                "email-intro": ""
+              }));
+              setErrors(prev => ({
+                ...prev,
+                "email-intro": "Special code is inactive"
+              }));
+            } else if (result.error === 'CODE_EXPIRED') {
+              showError('Special Code Expired', 'This special referral code has expired and can no longer be used.');
+              // Clear the input when code is expired
+              setFormData(prev => ({
+                ...prev,
+                "email-intro": ""
+              }));
+              setErrors(prev => ({
+                ...prev,
+                "email-intro": "Special code has expired"
+              }));
+            } else if (result.error === 'CANNOT_USE_OWN_CODE') {
+              showError('Cannot Use Own Code', 'You cannot use your own referral code. Please use a different referral code.');
+              // Clear the input when user tries to use own code
+              setFormData(prev => ({
+                ...prev,
+                "email-intro": ""
+              }));
+              setErrors(prev => ({
+                ...prev,
+                "email-intro": "Cannot use your own referral code"
               }));
             } else {
               showError('Referral Code Validation Failed', 'Unable to validate the referral code. Please try again later.');
@@ -347,6 +387,13 @@ export default function ContactFormSection() {
               ...prev,
               "email-intro": undefined
             }));
+
+            // Show different success messages for special vs regular codes
+            if (result.data?.isSpecial) {
+              showSuccess('Special Referral Code Validated', 'Special referral code is valid and can be used!');
+            } else {
+              showSuccess('Referral Code Validated', `Referral code from ${result.data?.referrerName || 'user'} is valid!`);
+            }
           }
         } catch (error) {
           setFormData(prev => ({
