@@ -75,6 +75,35 @@ export default function ContactFormSection() {
   const { deviceData, isLoading: fingerprintLoading } = useDeviceFingerprint(); 
 
   useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      console.log('Hash changed:', hash);
+      
+      const match = hash.match(/#contact#code=([^&]+)/);
+      if (match && match[1]) {
+        const referralCode = decodeURIComponent(match[1]);
+        
+        setFormData(prev => ({
+          ...prev,
+          "email-intro": referralCode
+        }));
+        
+        if (deviceData) {
+          validateReferralCodeFromUrl(referralCode);
+        }
+      }
+    };
+
+    handleHashChange();
+    
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [deviceData]);
+
+  useEffect(() => {
     const checkBanStatus = async () => {
       if (!deviceData) return;
       
@@ -280,6 +309,94 @@ export default function ContactFormSection() {
     setReferralCodeValid(false);
     setReferralCodeLocked(false);
   }, []);
+
+  const validateReferralCodeFromUrl = useCallback(async (referralCode: string) => {
+    if (!referralCode || !deviceData) return;
+    
+    setReferralCodeValid(false);
+    setReferralCodeLocked(false);
+    
+    try {
+      const response = await fetch('/api/referral/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          referralCode: referralCode.trim(),
+          deviceData: deviceData
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        setReferralCodeValid(false);
+        setReferralCodeLocked(false);
+        
+        if (result.code === 'REFERRAL_NOT_FOUND') {
+          showError('Referral Code Not Found', 'The referral code you entered does not exist in our system. Please check the code again or contact the person who referred you.');
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": "Referral code not found"
+          }));
+        } else if (result.code === 'INVALID_REFERRAL_CODE') {
+          showError('Invalid Referral Code Format', 'The referral code format is incorrect. Please check the code format and try again.');
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": "Invalid referral code format"
+          }));
+        } else if (result.code === 'CODE_INACTIVE') {
+          showError('Special Code Inactive', 'This special referral code is currently inactive and cannot be used.');
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": "Special code is inactive"
+          }));
+        } else if (result.code === 'CODE_EXPIRED') {
+          showError('Special Code Expired', 'This special referral code has expired and can no longer be used.');
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": "Special code has expired"
+          }));
+        } else if (result.code === 'CANNOT_USE_OWN_CODE') {
+          showError('Cannot Use Own Code', 'You cannot use your own referral code. Please use a different referral code.');
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": "Cannot use your own referral code"
+          }));
+        } else {
+          showError('Referral Code Validation Failed', 'Unable to validate the referral code. Please try again later.');
+          setErrors(prev => ({
+            ...prev,
+            "email-intro": "Referral code validation failed"
+          }));
+        }
+      } else {
+        console.log('Setting referral code as valid from URL');
+        if (result.data?.fingerprint) {
+          localStorage.setItem('deviceFingerprint', result.data.fingerprint);
+        }
+        
+        setReferralCodeValid(true);
+        setReferralCodeLocked(true); 
+        setErrors(prev => ({
+          ...prev,
+          "email-intro": undefined
+        }));
+
+        if (result.data?.isSpecial) {
+          showSuccess('Special Referral Code Validated', 'Special referral code is valid and can be used!');
+        } else {
+          showSuccess('Referral Code Validated', `Referral code from ${result.data?.referrerName || 'user'} is valid!`);
+        }
+      }
+    } catch (error) {
+      setErrors(prev => ({
+        ...prev,
+        "email-intro": "Failed to validate referral code"
+      }));
+    }
+  }, [deviceData, showError, showSuccess]);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
