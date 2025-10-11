@@ -1,11 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '~/lib/prisma';
 import { withAdmin } from '~/lib/api-wrapper';
 import { createSuccessResponse, createErrorResponse } from '~/lib/api-response';
 
-export const GET = withAdmin(async (req, currentUser, { params }: { params: { id: string } }) => {
+export const GET = withAdmin(async (req) => {
   try {
-    const { id } = params;
+    const id = req.nextUrl.pathname.split('/').pop();
+    if (!id) {
+      return NextResponse.json(createErrorResponse('Missing ID', 'MISSING_ID'), { status: 400 });
+    }
     
     const specialCode = await prisma.specialReferralCode.findUnique({
       where: { id },
@@ -41,13 +44,18 @@ export const GET = withAdmin(async (req, currentUser, { params }: { params: { id
     return NextResponse.json(createSuccessResponse(specialCode));
     
   } catch (error) {
+    console.error('Error in GET /api/admin/special-referral-codes/[id]:', error);
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });
 
-export const PUT = withAdmin(async (req, currentUser, { params }: { params: { id: string } }) => {
+export const PUT = withAdmin(async (req) => {
   try {
-    const { id } = params;
+    const id = req.nextUrl.pathname.split('/').pop();
+    if (!id) {
+      return NextResponse.json(createErrorResponse('Missing ID', 'MISSING_ID'), { status: 400 });
+    }
+    
     const { isActive, expiresAt } = await req.json();
     
     const existingCode = await prisma.specialReferralCode.findUnique({
@@ -69,13 +77,17 @@ export const PUT = withAdmin(async (req, currentUser, { params }: { params: { id
     return NextResponse.json(createSuccessResponse(updatedCode));
     
   } catch (error) {
+    console.error('Error in GET /api/admin/special-referral-codes/[id]:', error);
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });
 
-export const DELETE = withAdmin(async (req, currentUser, { params }: { params: { id: string } }) => {
+export const DELETE = withAdmin(async (req) => {
   try {
-    const { id } = params;
+    const id = req.nextUrl.pathname.split('/').pop();
+    if (!id) {
+      return NextResponse.json(createErrorResponse('Missing ID', 'MISSING_ID'), { status: 400 });
+    }
     
     const existingCode = await prisma.specialReferralCode.findUnique({
       where: { id }
@@ -101,6 +113,7 @@ export const DELETE = withAdmin(async (req, currentUser, { params }: { params: {
     return NextResponse.json(createSuccessResponse({ message: 'Special referral code deleted successfully' }));
     
   } catch (error) {
+    console.error('Error in GET /api/admin/special-referral-codes/[id]:', error);
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
   }
 });

@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '~/lib/prisma';
 import { withAdmin } from '~/lib/api-wrapper';
 
-export const GET = withAdmin(async (req, currentUser, { params }: { params: { id: string } }) => {
+export const GET = withAdmin(async (req) => {
   try {
-
-    const { id } = params;
+    const id = req.nextUrl.pathname.split('/').slice(-2, -1)[0];
+    if (!id) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing ID',
+        code: 'MISSING_ID'
+      }, { status: 400 });
+    }
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');
@@ -54,6 +60,7 @@ export const GET = withAdmin(async (req, currentUser, { params }: { params: { id
       }
     });
   } catch (error) {
+    console.error('Error in GET /api/admin/special-referral-codes/[id]/submissions:', error);
     return NextResponse.json({
       success: false,
       error: 'Internal server error',
