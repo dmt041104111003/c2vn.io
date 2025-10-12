@@ -29,7 +29,8 @@ export const GET = withAdmin(async (req, currentUser) => {
     if (search) {
       where.OR = [
         { code: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } }
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } }
       ];
     }
     
@@ -78,7 +79,7 @@ export const GET = withAdmin(async (req, currentUser) => {
 
 export const POST = withAdmin(async (req, currentUser) => {
   try {
-    const { expiresAt } = await req.json();
+    const { expiresAt, name, email } = await req.json();
     
     let code: string;
     let attempts = 0;
@@ -101,6 +102,8 @@ export const POST = withAdmin(async (req, currentUser) => {
     const specialCode = await prisma.specialReferralCode.create({
       data: {
         code,
+        name: name || null,
+        email: email || null,
         createdBy: currentUser.id,
         expiresAt: expiresAt ? new Date(expiresAt) : null
       }

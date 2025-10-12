@@ -55,7 +55,7 @@ export const PUT = withAdmin(async (req) => {
       return NextResponse.json(createErrorResponse('Missing ID', 'MISSING_ID'), { status: 400 });
     }
     
-    const { isActive, expiresAt } = await req.json();
+    const { name, email, isActive, expiresAt } = await req.json();
     
     const existingCode = await prisma.specialReferralCode.findUnique({
       where: { id }
@@ -68,6 +68,8 @@ export const PUT = withAdmin(async (req) => {
     const updatedCode = await prisma.specialReferralCode.update({
       where: { id },
       data: {
+        name: name !== undefined ? (name.trim() || null) : existingCode.name,
+        email: email !== undefined ? (email.trim() || null) : existingCode.email,
         isActive: isActive !== undefined ? isActive : existingCode.isActive,
         expiresAt: expiresAt !== undefined ? (expiresAt ? new Date(expiresAt) : null) : existingCode.expiresAt
       }

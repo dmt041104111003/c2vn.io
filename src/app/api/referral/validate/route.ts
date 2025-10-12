@@ -39,6 +39,8 @@ export const POST = withOptionalAuth(async (req, currentUser) => {
         message: 'Special referral code is valid and can be used',
         isSpecial: true,
         code: specialCode.code,
+        name: specialCode.name,
+        email: specialCode.email,
         expiresAt: specialCode.expiresAt,
         fingerprint
       }));

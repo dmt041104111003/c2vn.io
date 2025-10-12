@@ -16,6 +16,8 @@ import { CreateSpecialCodeForm, EditSpecialCodeForm, ViewSpecialCodeDetails } fr
 interface SpecialReferralCode {
   id: string;
   code: string;
+  name?: string;
+  email?: string;
   isActive: boolean;
   createdAt: string;
   expiresAt?: string;

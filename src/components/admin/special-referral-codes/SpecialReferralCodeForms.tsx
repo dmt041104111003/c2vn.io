@@ -35,6 +35,8 @@ interface ViewSpecialCodeDetailsProps {
 export function CreateSpecialCodeForm({ onSuccess }: CreateSpecialCodeFormProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
+    email: '',
     expiresAt: ''
   });
   const { showSuccess, showError } = useToastContext();
@@ -49,6 +51,8 @@ export function CreateSpecialCodeForm({ onSuccess }: CreateSpecialCodeFormProps)
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
+          name: formData.name.trim() || null,
+          email: formData.email.trim() || null,
           expiresAt: formData.expiresAt || null
         })
       });
@@ -58,6 +62,8 @@ export function CreateSpecialCodeForm({ onSuccess }: CreateSpecialCodeFormProps)
       if (data.success) {
         showSuccess('Special referral code created successfully');
         onSuccess();
+        // Reset form
+        setFormData({ name: '', email: '', expiresAt: '' });
       } else {
         showError(data.error || 'Failed to create code');
       }
@@ -71,7 +77,29 @@ export function CreateSpecialCodeForm({ onSuccess }: CreateSpecialCodeFormProps)
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium mb-2">Expiration Date</label>
+        <label className="block text-sm font-medium mb-2">Name (Optional)</label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter name for this referral code"
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">Email (Optional)</label>
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter email for this referral code"
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">Expiration Date (Optional)</label>
         <input
           type="datetime-local"
           value={formData.expiresAt}
@@ -80,6 +108,7 @@ export function CreateSpecialCodeForm({ onSuccess }: CreateSpecialCodeFormProps)
           title="Select expiration date and time"
         />
       </div>
+      
       <div className="flex justify-end gap-2">
         <button 
           type="submit" 
@@ -97,6 +126,8 @@ export function CreateSpecialCodeForm({ onSuccess }: CreateSpecialCodeFormProps)
 export function EditSpecialCodeForm({ code, onSuccess }: EditSpecialCodeFormProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
+    name: code.name || '',
+    email: code.email || '',
     isActive: code.isActive,
     expiresAt: code.expiresAt ? new Date(code.expiresAt).toISOString().slice(0, 16) : ''
   });
@@ -112,6 +143,8 @@ export function EditSpecialCodeForm({ code, onSuccess }: EditSpecialCodeFormProp
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
+          name: formData.name.trim() || null,
+          email: formData.email.trim() || null,
           isActive: formData.isActive,
           expiresAt: formData.expiresAt || null
         })
@@ -144,8 +177,31 @@ export function EditSpecialCodeForm({ code, onSuccess }: EditSpecialCodeFormProp
           title="Special referral code (read-only)"
         />
       </div>
+      
       <div>
-        <label className="block text-sm font-medium mb-2">Expiration Date</label>
+        <label className="block text-sm font-medium mb-2">Name (Optional)</label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, name: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter name for this referral code"
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">Email (Optional)</label>
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, email: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter email for this referral code"
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-2">Expiration Date (Optional)</label>
         <input
           type="datetime-local"
           value={formData.expiresAt}
@@ -228,6 +284,14 @@ export function ViewSpecialCodeDetails({ code }: ViewSpecialCodeDetailsProps) {
           }`}>
             {code.isActive ? 'Active' : 'Inactive'}
           </span>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <span>{code.name || 'Not specified'}</span>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <span>{code.email || 'Not specified'}</span>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Created</label>
