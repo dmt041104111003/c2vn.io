@@ -40,39 +40,14 @@ export const GET = withAdmin(async (req: NextRequest) => {
 
     const creatorMap = new Map(creators.map(creator => [creator.id, creator]));
 
-    const exportData = specialCodes.map(code => {
-      const submissionCount = code.referralSubmissions.length;
-      const submissions = code.referralSubmissions.map(sub => ({
-        'Submission ID': sub.id,
-        'Name': sub.name,
-        'Email': sub.email,
-        'Phone': sub.phone || '',
-        'Wallet': sub.wallet || '',
-        'Course': sub.course || '',
-        'Message': sub.message || '',
-        'Submitted At': new Date(sub.createdAt).toLocaleString('vi-VN')
-      }));
-
-      const creator = creatorMap.get(code.createdBy);
-
-      return {
-        'Code': code.code,
-        'Status': code.isActive ? 'Active' : 'Inactive',
-        'Created At': new Date(code.createdAt).toLocaleString('vi-VN'),
-        'Expires At': code.expiresAt ? new Date(code.expiresAt).toLocaleString('vi-VN') : 'Never',
-        'Created By': creator?.name || 'Unknown',
-        'Creator Email': creator?.email || '',
-        'Total Submissions': submissionCount,
-        'Submissions': submissions
-      };
-    });
-
     const workbook = XLSX.utils.book_new();
 
     const summaryData = specialCodes.map(code => {
       const creator = creatorMap.get(code.createdBy);
       return {
         'Code': code.code,
+        'Code Name': code.name || '',
+        'Code Email': code.email || '',
         'Status': code.isActive ? 'Active' : 'Inactive',
         'Created At': new Date(code.createdAt).toLocaleString('vi-VN'),
         'Expires At': code.expiresAt ? new Date(code.expiresAt).toLocaleString('vi-VN') : 'Never',
@@ -88,6 +63,8 @@ export const GET = withAdmin(async (req: NextRequest) => {
     const allSubmissions = specialCodes.flatMap(code => 
       code.referralSubmissions.map(sub => ({
         'Special Code': code.code,
+        'Code Name': code.name || '',
+        'Code Email': code.email || '',
         'Code Status': code.isActive ? 'Active' : 'Inactive',
         'Submission ID': sub.id,
         'Name': sub.name,
