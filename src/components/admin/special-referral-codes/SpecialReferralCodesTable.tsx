@@ -9,6 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 interface SpecialReferralCode {
   id: string;
   code: string;
+  name?: string;
+  email?: string;
   isActive: boolean;
   createdAt: string;
   expiresAt?: string;
@@ -210,6 +212,16 @@ export function SpecialReferralCodesTable({
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="font-medium text-gray-900">Code: {selectedCodeToDelete.code}</p>
               <p className="text-sm text-gray-500">Created: {formatDateTime(selectedCodeToDelete.createdAt)}</p>
+              {selectedCodeToDelete.referralSubmissions.length > 0 && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                  <p className="text-sm text-red-800 font-medium">
+                    ⚠️ WARNING: This code has {selectedCodeToDelete.referralSubmissions.length} submission(s)
+                  </p>
+                  <p className="text-xs text-red-600 mt-1">
+                    Deleting this code will also delete all related submissions permanently.
+                  </p>
+                </div>
+              )}
             </div>
           )}
           

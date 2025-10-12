@@ -121,7 +121,12 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
       const data = await response.json();
 
       if (data.success) {
-        showSuccess('Special referral code deleted successfully');
+        if (data.data?.warning) {
+          showSuccess(data.data.message);
+          showError(`WARNING: ${data.data.warning}`);
+        } else {
+          showSuccess(data.data?.message || 'Special referral code deleted successfully');
+        }
         fetchCodes();
       } else {
         showError(data.error || 'Failed to delete code');

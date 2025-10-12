@@ -101,15 +101,18 @@ export const DELETE = withAdmin(async (req) => {
       where: { specialReferralCodeId: id }
     });
     
-    if (submissionCount > 0) {
-      return NextResponse.json(createErrorResponse('Cannot delete code that has been used', 'CODE_IN_USE'), { status: 400 });
-    }
-    
     await prisma.specialReferralCode.delete({
       where: { id }
     });
     
-    return NextResponse.json(createSuccessResponse({ message: 'Special referral code deleted successfully' }));
+    const message = submissionCount > 0 
+      ? `Special referral code deleted successfully. WARNING: This code had ${submissionCount} submission(s) which have also been deleted.`
+      : 'Special referral code deleted successfully';
+    
+    return NextResponse.json(createSuccessResponse({ 
+      message,
+      warning: submissionCount > 0 ? `Deleted ${submissionCount} related submission(s)` : null
+    }));
     
   } catch (error) {
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
