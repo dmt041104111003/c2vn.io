@@ -3,6 +3,7 @@
 import React from "react";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { useToastContext } from "~/components/toast-provider";
+import ContestResult, { ContestResultData } from "~/components/home/ContestResult";
 
 type QuizQuestion = {
   index: number;
@@ -23,6 +24,9 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
   const [correctCount, setCorrectCount] = React.useState(0);
   const [submitting, setSubmitting] = React.useState(false);
   const { showSuccess, showError } = useToastContext();
+  const [showResult, setShowResult] = React.useState(false);
+  const [resultData, setResultData] = React.useState<ContestResultData | null>(null);
+  const selectionsRef = React.useRef<Array<'A' | 'B' | 'C' | 'D' | ''>>([]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -58,7 +62,10 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
             correct: ((row[idxCorrect] ?? '').toString().trim().toUpperCase() as any) || '',
             explanation: (row[idxExplain] ?? '').toString(),
           }));
-          if (!cancelled) setQuestions(parsed);
+          if (!cancelled) {
+            setQuestions(parsed);
+            selectionsRef.current = new Array(parsed.length).fill('');
+          }
         } else {
           if (!cancelled) setQuestions([]);
         }
@@ -94,12 +101,17 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
   if (error) return <div className="text-sm text-red-600">Error: {error}</div>;
   if (questions.length === 0) return <div className="text-sm text-gray-500">No questions available</div>;
 
+  if (showResult && resultData) {
+    return <ContestResult data={resultData} onBack={onBack} />;
+  }
+
   const q = questions[current];
   const isLast = current === questions.length - 1;
   const isCorrect = selected && selected === q.correct;
 
   function submitAnswer() {
     if (!selected) return;
+    selectionsRef.current[current] = selected;
     setShowExplain(true);
     if (selected === q.correct) setCorrectCount((c) => c + 1);
   }
@@ -188,11 +200,12 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
                         throw new Error(data?.error || 'Submit failed');
                       }
                       showSuccess('Submitted', 'Your result has been recorded');
+                      setResultData({ questions, selections: selectionsRef.current, correctCount });
+                      setShowResult(true);
                     } catch (e) {
                       showError('Submit failed', (e as Error).message);
                     } finally {
                       setSubmitting(false);
-                      if (onBack) onBack();
                     }
                   }}
                 >
