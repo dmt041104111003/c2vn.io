@@ -2,7 +2,7 @@
 
 import Loading from "~/components/ui/Loading";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import LandingSection from "~/components/home/LandingSection";
 // import TrustSection from "~/components/home/TrustSection";
 import ProtocolSection from "~/components/home/BlogHomeSection";
@@ -17,6 +17,7 @@ import ContactFormSection from "~/components/home/ContactFormSection";
 // import StatsSection from "~/components/home/StatsSection";
 import { useNotifications } from "~/hooks/useNotifications";
 import BackgroundMotion from "~/components/ui/BackgroundMotion";
+// import ContestForm from "~/components/home/ContestForm";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -146,7 +147,8 @@ export default function HomePage() {
       {/* <CardanoSection /> */}
       <CTASection />
       <CourseSection />
-      <ContactFormSection />      
+      <ContactFormSection />    
+      {/* <ContestForm /> */}
       {/* <WaveFooterSection /> */}
     </main>
   );

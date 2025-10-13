@@ -468,7 +468,7 @@ export function UserTable({
                     </code>
                     <button
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}#contact&code=${selectedUserForReferrals.referralCode}`;
+                        const shareUrl = `${window.location.origin}#contact#code=${selectedUserForReferrals.referralCode}`;
                         navigator.clipboard.writeText(shareUrl);
                         showSuccess('Share link copied!');
                       }}

@@ -6,9 +6,11 @@ import { motion } from "framer-motion";
 import { Course } from "~/constants/admin";
 import CourseModal from "./CourseModal";
 import { Pagination } from "~/components/ui/pagination";
-import StarIcon from "../ui/StarIcon";
 
-type TabType = "latest" | "all";
+import StarIcon from "../ui/StarIcon";
+import ContestSection from "./ContestSection";
+
+type TabType = "latest" | "all" | "contest";
 
 export default function CourseSection() {
   const [activeTab, setActiveTab] = useState<TabType>("latest");
@@ -39,7 +41,7 @@ export default function CourseSection() {
   
   const allCourses = courses.sort((a: Course, b: Course) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const currentCourses = activeTab === "latest" ? latestCourses : allCourses;
+  const currentCourses = activeTab === "all" ? allCourses : latestCourses;
   const displayCourses = [...currentCourses];
   while (displayCourses.length < 3) displayCourses.push(null);
 
@@ -159,10 +161,28 @@ export default function CourseSection() {
                    <span className="sm:hidden">All</span>
                 </div>
               </button>
+              <button
+                onClick={() => handleTabChange("contest")}
+                className={`py-2 px-2 sm:px-3 md:px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
+                  activeTab === "contest"
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+              >
+                <div className="flex items-center">
+                  <svg className="h-4 w-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="hidden sm:inline">Contest</span>
+                  <span className="sm:hidden">Contest</span>
+                </div>
+              </button>
             </nav>
           </div>
 
-          {activeTab === "latest" ? (
+          {activeTab === "contest" ? (
+            <ContestSection />
+          ) : activeTab === "latest" ? (
             <div className="grid max-w-none gap-8 md:gap-10 lg:gap-8 lg:grid-cols-3">
               {isLoading ? (
                 [...Array(3)].map((_, idx) => (
