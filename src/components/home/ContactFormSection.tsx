@@ -79,7 +79,7 @@ export default function ContactFormSection() {
       const hash = window.location.hash;
       console.log('Hash changed:', hash);
       
-      const match = hash.match(/#contact#code=([^&]+)/);
+      const match = hash.match(/#contact(?:#|&)code=([^#&]+)/i);
       if (match && match[1]) {
         const referralCode = decodeURIComponent(match[1]);
         

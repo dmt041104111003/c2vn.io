@@ -139,7 +139,7 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
 
   const copyToClipboard = (code: string) => {
     const baseUrl = window.location.origin;
-    const referralLink = `${baseUrl}#contact#code=${code}`;
+    const referralLink = `${baseUrl}#contact&code=${code}`;
     navigator.clipboard.writeText(referralLink);
     showSuccess('Referral link copied to clipboard');
   };

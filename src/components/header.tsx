@@ -189,7 +189,7 @@ function MobileUserInfo({ session, onClose, onShowModal }: { session: any; onClo
                 </div>
                 <button
                   onClick={() => {
-                    const shareUrl = `${window.location.origin}#contact#code=${referralCode}`;
+                    const shareUrl = `${window.location.origin}#contact&code=${referralCode}`;
                     navigator.clipboard.writeText(shareUrl);
                     showSuccess('Share link copied!');
                   }}
@@ -528,7 +528,7 @@ function UserDropdown({ session, onClose, onShowModal, autoEdit = false }: { ses
                       </div>
                       <button
                         onClick={() => {
-                          const shareUrl = `${window.location.origin}#contact#code=${referralCode}`;
+                          const shareUrl = `${window.location.origin}#contact&code=${referralCode}`;
                           navigator.clipboard.writeText(shareUrl);
                           showSuccess('Share link copied!');
                         }}

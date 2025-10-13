@@ -14,7 +14,7 @@ export const GET = withAuth(async (req, currentUser) => {
 
     return NextResponse.json(createSuccessResponse({
       referralCode,
-      shareUrl: referralCode ? `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}#contact#code=${referralCode}` : null
+      shareUrl: referralCode ? `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}#contact&code=${referralCode}` : null
     }));
   } catch (error) {
     return NextResponse.json(createErrorResponse('Internal server error', 'INTERNAL_ERROR'), { status: 500 });
@@ -47,7 +47,7 @@ export const POST = withAuth(async (req, currentUser) => {
 
       return NextResponse.json(createSuccessResponse({
         referralCode: newReferralCode,
-        shareUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}#contact#code=${newReferralCode}`
+        shareUrl: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}#contact&code=${newReferralCode}`
       }));
     }
 
