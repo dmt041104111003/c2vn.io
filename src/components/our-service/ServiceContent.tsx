@@ -10,8 +10,7 @@ import { Lucid, Blockfrost } from "lucid-cardano";
 import * as CardanoWasm from "@emurgo/cardano-serialization-lib-asmjs";
 import { cardanoWallet } from "~/lib/cardano-wallet";
 
-const BLOCKFROST_API = "https://cardano-mainnet.blockfrost.io/api/v0";
-const BLOCKFROST_KEY = process.env.NEXT_PUBLIC_BLOCKFROST_KEY!;
+const BLOCKFROST_PROXY = "/api/blockfrost";
 
 const DREP_BECH32 =
   "drep1ygqlu72zwxszcx0kqdzst4k3g6fxx4klwcmpk0fcuujskvg3pmhgs";
@@ -51,11 +50,8 @@ export default function ServiceContent() {
       setError(null);
       try {
         // ================= DRep via Blockfrost =================
-        if (!BLOCKFROST_KEY) {
-          throw new Error("Missing NEXT_PUBLIC_BLOCKFROST_KEY env var");
-        }
-        const drepEndpoint = `${BLOCKFROST_API}/governance/dreps/${DREP_BECH32}`;
-        const drepResp = await fetch(drepEndpoint, { headers: { project_id: BLOCKFROST_KEY } });
+        const drepEndpoint = `${BLOCKFROST_PROXY}/governance/dreps/${DREP_BECH32}`;
+        const drepResp = await fetch(drepEndpoint);
         const contentType = drepResp.headers.get("content-type") || "";
         if (contentType.includes("application/json")) {
           const drepJson = await drepResp.json();
@@ -88,9 +84,7 @@ export default function ServiceContent() {
         }
 
         async function getPoolInfo(poolId: string) {
-          const res = await fetch(`${BLOCKFROST_API}/pools/${poolId}`, {
-            headers: { project_id: BLOCKFROST_KEY },
-          });
+          const res = await fetch(`${BLOCKFROST_PROXY}/pools/${poolId}`);
           if (!res.ok) {
             return null;
           }
@@ -205,9 +199,7 @@ export default function ServiceContent() {
       const cert = CardanoWasm.Certificate.new_vote_delegation(
         CardanoWasm.VoteDelegation.new(stakeCred, drep)
       );
-      const ppRes = await fetch(`${BLOCKFROST_API}/epochs/latest/parameters`, {
-        headers: { project_id: BLOCKFROST_KEY },
-      });
+      const ppRes = await fetch(`${BLOCKFROST_PROXY}/epochs/latest/parameters`);
       if (!ppRes.ok) throw new Error(`Params HTTP ${ppRes.status}`);
       const protocolParams = await ppRes.json();
 
@@ -285,7 +277,7 @@ export default function ServiceContent() {
       const walletApi = await walletProvider.enable();
       // const { Lucid, Blockfrost } = await import("lucid-cardano");
       const lucid = await Lucid.new(
-        new Blockfrost(BLOCKFROST_API, BLOCKFROST_KEY),
+        new Blockfrost(`${window.location.origin}${BLOCKFROST_PROXY}`, "proxy"),
         "Mainnet"
       );
 

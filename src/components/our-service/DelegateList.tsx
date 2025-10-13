@@ -3,8 +3,7 @@
 import React from "react";
 import { useToastContext } from "~/components/toast-provider";
 
-const BLOCKFROST_API = "https://cardano-mainnet.blockfrost.io/api/v0";
-const BLOCKFROST_KEY = process.env.NEXT_PUBLIC_BLOCKFROST_KEY!;
+const BLOCKFROST_PROXY = "/api/blockfrost";
 
 type DelegatorItem = {
   address?: string; 
@@ -30,18 +29,17 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
       setLoading(true);
       setError(null);
       try {
-        if (!BLOCKFROST_KEY) throw new Error("Missing NEXT_PUBLIC_BLOCKFROST_KEY env var");
         const basePath = drepId
           ? `/governance/dreps/${drepId}/delegators`
           : poolId
           ? `/pools/${poolId}/delegators`
           : null;
         if (!basePath) throw new Error("Missing drepId or poolId");
-        const url = new URL(`${BLOCKFROST_API}${basePath}`);
+        const url = new URL(`${BLOCKFROST_PROXY}${basePath}`, window.location.origin);
         url.searchParams.set("order", "desc");
         url.searchParams.set("count", "5");
         url.searchParams.set("page", "1");
-        const res = await fetch(url.toString(), { headers: { project_id: BLOCKFROST_KEY } });
+        const res = await fetch(url.toString());
         if (!res.ok) throw new Error(`Delegators HTTP ${res.status}`);
         const data = await res.json();
         const baseList: DelegatorItem[] = Array.isArray(data) ? data.slice(0, 5) : [];
@@ -51,7 +49,7 @@ export default function DelegateList({ drepId, poolId, title }: { drepId?: strin
             let details: AccountInfo | null = null;
             try {
               if (addr) {
-                const a = await fetch(`${BLOCKFROST_API}/accounts/${addr}`, { headers: { project_id: BLOCKFROST_KEY } });
+                const a = await fetch(`${BLOCKFROST_PROXY}/accounts/${addr}`);
                 if (a.ok) details = await a.json();
               }
             } catch {}

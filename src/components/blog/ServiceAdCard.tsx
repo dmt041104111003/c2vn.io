@@ -14,8 +14,7 @@ interface ServiceAdCardProps {
   onDelegateService?: () => void;
 }
 
-const BLOCKFROST_API = "https://cardano-mainnet.blockfrost.io/api/v0";
-const BLOCKFROST_KEY = process.env.NEXT_PUBLIC_BLOCKFROST_KEY!;
+const BLOCKFROST_PROXY = "/api/blockfrost";
 
 const DREP_BECH32 = "drep1ygqlu72zwxszcx0kqdzst4k3g6fxx4klwcmpk0fcuujskvg3pmhgs";
 const VILAI_POOL = "pool1u7zrgexnxsysctnnwljjjymr70he829fr5n3vefnv80guxr42dv";
@@ -93,9 +92,7 @@ export default function ServiceAdCard({
         CardanoWasm.VoteDelegation.new(stakeCred, drep)
       );
       
-      const ppRes = await fetch(`${BLOCKFROST_API}/epochs/latest/parameters`, {
-        headers: { project_id: BLOCKFROST_KEY },
-      });
+      const ppRes = await fetch(`${BLOCKFROST_PROXY}/epochs/latest/parameters`);
       if (!ppRes.ok) throw new Error(`Params HTTP ${ppRes.status}`);
       const protocolParams = await ppRes.json();
 
@@ -171,7 +168,7 @@ export default function ServiceAdCard({
       const walletApi = await walletProvider.enable();
       
       const lucid = await Lucid.new(
-        new Blockfrost(BLOCKFROST_API, BLOCKFROST_KEY),
+        new Blockfrost(`${window.location.origin}${BLOCKFROST_PROXY}`, "proxy"),
         "Mainnet"
       );
 
