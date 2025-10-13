@@ -84,6 +84,7 @@ function AboutContactForm({
               className={`w-full px-3 py-2 border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 ${
                 errors["your-name"] ? "border-red-500 focus:ring-red-500/20 focus:border-red-500" : "border-gray-300 dark:border-gray-600"
               }`}
+              disabled={isSubmitting}
             />
             {errors["your-name"] && (
               <p className="text-red-500 text-xs mt-1 flex items-center">
@@ -114,6 +115,7 @@ function AboutContactForm({
                 }
               }}
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -127,6 +129,7 @@ function AboutContactForm({
               onChange={onInputChange}
               required
               className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -158,12 +161,15 @@ function AboutContactForm({
             value={formData.message}
             onChange={onInputChange}
             rows={3}
+            disabled={isSubmitting}
             className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 resize-none"
           />
         </div>
 
         <div>
-          <Captcha key={captchaKey} onCaptchaChange={onCaptchaChange} />
+          <div className={`${isSubmitting ? 'opacity-60 pointer-events-none' : ''}`}>
+            <Captcha key={captchaKey} onCaptchaChange={onCaptchaChange} />
+          </div>
         </div>
 
         <button
