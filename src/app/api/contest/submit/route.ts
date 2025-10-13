@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     } catch {}
 
     const body = new URLSearchParams();
-    body.set('stt', String(nextStt)); 
+    body.set('stt', `C2VN-${nextStt}`); 
     if (emailStr) body.set('your-email', emailStr);
     if (score != null) body.set('score', String(score));
 
