@@ -10,7 +10,7 @@ import { Pagination } from "~/components/ui/pagination";
 import StarIcon from "../ui/StarIcon";
 import ContestSection from "./ContestSection";
 
-type TabType = "latest" | "all" | "contest";
+type TabType = "latest" | "all" | "quiz-blockchain";
 
 export default function CourseSection() {
   const [activeTab, setActiveTab] = useState<TabType>("latest");
@@ -18,6 +18,22 @@ export default function CourseSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
+
+  useEffect(() => {
+    const handleHash = () => {
+      if (typeof window === 'undefined') return;
+      if (window.location.hash === '#quiz-blockchain') {
+        setActiveTab('quiz-blockchain');
+        const section = document.getElementById('courses');
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   const { data: coursesData, isLoading, error: coursesError } = useQuery({
     queryKey: ["courses"],
@@ -103,6 +119,15 @@ export default function CourseSection() {
     if (tab === "all") {
       setCurrentPage(1);
     }
+    if (typeof window !== 'undefined') {
+      if (tab === 'quiz-blockchain') {
+        if (window.location.hash !== '#quiz-blockchain') {
+          window.location.hash = 'quiz-blockchain';
+        }
+      } else if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
   };
 
   return (
@@ -157,14 +182,15 @@ export default function CourseSection() {
                       d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                     />
                   </svg>
-                                     <span className="hidden sm:inline">All Courses</span>
+                <span className="hidden sm:inline">All Courses</span>
                    <span className="sm:hidden">All</span>
                 </div>
               </button>
               <button
-                onClick={() => handleTabChange("contest")}
+                id="quiz-blockchain"
+                onClick={() => handleTabChange("quiz-blockchain")}
                 className={`py-2 px-2 sm:px-3 md:px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
-                  activeTab === "contest"
+                  activeTab === "quiz-blockchain"
                     ? "border-blue-500 text-blue-600 dark:text-blue-400"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
                 }`}
@@ -173,14 +199,14 @@ export default function CourseSection() {
                   <svg className="h-4 w-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="hidden sm:inline">Contest</span>
-                  <span className="sm:hidden">Contest</span>
+                  <span className="hidden sm:inline">Quiz blockhain</span>
+                  <span className="sm:hidden">Quiz blockhain</span>
                 </div>
               </button>
             </nav>
           </div>
 
-          {activeTab === "contest" ? (
+          {activeTab === "quiz-blockchain" ? (
             <ContestSection />
           ) : activeTab === "latest" ? (
             <div className="grid max-w-none gap-8 md:gap-10 lg:gap-8 lg:grid-cols-3">
