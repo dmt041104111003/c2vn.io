@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { useToastContext } from "~/components/toast-provider";
 import ContestResult, { ContestResultData } from "~/components/home/ContestResult";
 
@@ -20,7 +19,6 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
   const [error, setError] = React.useState<string | null>(null);
   const [current, setCurrent] = React.useState(0);
   const [selected, setSelected] = React.useState<'A' | 'B' | 'C' | 'D' | ''>('');
-  const [showExplain, setShowExplain] = React.useState(false);
   const [correctCount, setCorrectCount] = React.useState(0);
   const [submitting, setSubmitting] = React.useState(false);
   const { showSuccess, showError } = useToastContext();
@@ -107,19 +105,14 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
 
   const q = questions[current];
   const isLast = current === questions.length - 1;
-  const isCorrect = selected && selected === q.correct;
-
   function submitAnswer() {
     if (!selected) return;
     selectionsRef.current[current] = selected;
-    setShowExplain(true);
     if (selected === q.correct) setCorrectCount((c) => c + 1);
-  }
-
-  function nextQuestion() {
-    setShowExplain(false);
-    setSelected('');
-    if (!isLast) setCurrent((i) => i + 1);
+    if (!isLast) {
+      setSelected('');
+      setCurrent((i) => i + 1);
+    }
   }
 
   return (
@@ -127,14 +120,11 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
       <div className="p-4 sm:p-5 w-full space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Quiz: {current + 1}/{questions.length}</h3>
-          {onBack && (
-            <button onClick={onBack} className="text-sm px-3 py-1 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">Back</button>
-          )}
         </div>
 
         <div className="space-y-3">
           <div className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">{q.text}</div>
-          <div className="space-y-2">
+          <div className={`space-y-2 ${submitting ? 'opacity-70 pointer-events-none' : ''}`}>
             {q.options.map((opt) => (
               <label key={opt.key} className={`flex items-center gap-2 p-2 rounded border ${selected === opt.key ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'}`}>
                 <input
@@ -143,6 +133,7 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
                   value={opt.key}
                   checked={selected === opt.key}
                   onChange={() => setSelected(opt.key)}
+                  disabled={submitting}
                 />
                 <span className="font-semibold w-6">{opt.key}.</span>
                 <span className="text-sm sm:text-base">{opt.text}</span>
@@ -151,69 +142,47 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
           </div>
         </div>
 
-        {!showExplain ? (
+        {!isLast ? (
           <button
             className="mt-2 inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-            disabled={!selected}
+            disabled={!selected || submitting}
             onClick={submitAnswer}
           >
-            Submit Answer
+            Next
           </button>
         ) : (
-          <div className="space-y-3">
-            <div className={`flex items-center gap-2 text-sm ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {isCorrect ? (
-                <AiOutlineCheckCircle className="w-5 h-5" />
-              ) : (
-                <AiOutlineCloseCircle className="w-5 h-5" />
-              )}
-              <span>
-                {isCorrect ? 'Correct!' : `Incorrect. Correct answer: ${q.correct}`}
-              </span>
-            </div>
-            {q.explanation && (
-              <div className="text-sm text-gray-700 dark:text-gray-300">
-                <span className="font-medium">Explanation:</span> {q.explanation}
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-600 dark:text-gray-400">Score: {correctCount} / {questions.length}</div>
-              {!isLast ? (
-                <button className="inline-flex items-center px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700" onClick={nextQuestion}>Next Question</button>
-              ) : (
-                <button
-                  className="inline-flex items-center justify-center whitespace-nowrap rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success text-sm sm:text-base bg-blue-600 dark:bg-white px-4 sm:px-5 py-2 sm:py-2.5 font-semibold text-white dark:text-blue-900 shadow-lg hover:bg-blue-700 dark:hover:bg-gray-100"
-                  disabled={submitting}
-                  onClick={async () => {
-                    setSubmitting(true);
-                    try {
-                      const score = correctCount * 10;
-                      const email = sessionStorage.getItem('contest_email') || '';
-                      if (!email) throw new Error('Missing email');
-                      const res = await fetch('/api/contest/submit', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, score })
-                      });
-                      const data = await res.json();
-                      if (!res.ok || !data.success) {
-                        throw new Error(data?.error || 'Submit failed');
-                      }
-                      showSuccess('Submitted', 'Your result has been recorded');
-                      setResultData({ questions, selections: selectionsRef.current, correctCount });
-                      setShowResult(true);
-                    } catch (e) {
-                      showError('Submit failed', (e as Error).message);
-                    } finally {
-                      setSubmitting(false);
-                    }
-                  }}
-                >
-                  Submit Result
-                </button>
-              )}
-            </div>
-          </div>
+          <button
+            className="mt-2 inline-flex items-center justify-center whitespace-nowrap rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:text-success text-sm sm:text-base bg-blue-600 dark:bg-white px-4 sm:px-5 py-2 sm:py-2.5 font-semibold text-white dark:text-blue-900 shadow-lg hover:bg-blue-700 dark:hover:bg-gray-100"
+            disabled={submitting || !selected}
+            onClick={async () => {
+              if (selected) submitAnswer();
+              setSubmitting(true);
+              try {
+                const finalCorrect = selectionsRef.current.reduce((acc, sel, i) => acc + (sel && sel === questions[i].correct ? 1 : 0), 0);
+                const score = finalCorrect * 10;
+                const email = sessionStorage.getItem('contest_email') || '';
+                if (!email) throw new Error('Missing email');
+                const res = await fetch('/api/contest/submit', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email, score })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                  throw new Error(data?.error || 'Submit failed');
+                }
+                showSuccess('Submitted', 'Your result has been recorded');
+                setResultData({ questions, selections: selectionsRef.current, correctCount: finalCorrect });
+                setShowResult(true);
+              } catch (e) {
+                showError('Submit failed', (e as Error).message);
+              } finally {
+                setSubmitting(false);
+              }
+            }}
+          >
+            Submit Result
+          </button>
         )}
       </div>
     </div>
