@@ -83,7 +83,7 @@ Want to nest other content in lists? Just indent to achieve nested effects.
 
 [Visit Cardano2vn](https://github.com/cardano2vn/website/tree/main/content/docs)
 
-![cardano2vn](/images/common/logo.png)
+![cardano2vn](https://raw.githubusercontent.com/cardano2vn/website/main/public/images/common/logo.png)
 
 Easily achieve rich media content display!
 
@@ -228,5 +228,9 @@ Now, pick up your Markdown editor and start creating! Explore the world of Markd
 ---
 
 <div className="text-center">
-    <img src="/images/common/cardano2vn.jpg" style={{width: '100px'}} alt="Cardano2vn" />
+    <img
+  src="https://raw.githubusercontent.com/cardano2vn/website/main/public/images/common/cardano2vn.jpg"
+  style={{ width: '100px' }}
+  alt="Cardano2vn"
+/>
 </div>
