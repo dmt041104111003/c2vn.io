@@ -201,23 +201,25 @@ export function SpecialReferralCodesPageClient({ initialCodes = [] }: SpecialRef
       {loading ? (
         <AdminTableSkeleton columns={6} />
       ) : codes.length === 0 ? (
-        <NotFoundInline />
-      ) : (
-        <SpecialReferralCodesTable
-          codes={codes}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onView={handleView}
-          onCopyCode={copyToClipboard}
+        <NotFoundInline 
+          onClearFilters={() => {
+            setSearchTerm('');
+            setFilterType('all');
+          }}
         />
-      )}
-
-      {totalPages > 1 && (
-        <div className="flex justify-center">
+      ) : (
+        <div className="bg-white rounded-lg shadow">
+          <SpecialReferralCodesTable
+            codes={codes}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onView={handleView}
+            onCopyCode={copyToClipboard}
+          />
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            totalItems={queryData?.data?.pagination?.totalCount || 0}
+            totalItems={queryData?.data?.pagination?.total || 0}
             itemsPerPage={ITEMS_PER_PAGE}
             onPageChange={setCurrentPage}
           />
