@@ -81,9 +81,9 @@ Want to nest other content in lists? Just indent to achieve nested effects.
 - **Links**: Create links with square brackets and parentheses `[display text](link address)`.
 - **Images**: Similar to links, just add `!` in front, like `![description text](image link)`.
 
-[Visit Doocs](https://github.com/doocs)
+[Visit Cardano2vn](https://github.com/cardano2vn/website/tree/main/content/docs)
 
-![doocs](https://cdn-doocs.oss-cn-shenzhen.aliyuncs.com/gh/doocs/md/images/logo-2.png)
+![cardano2vn](/images/common/logo.png)
 
 Easily achieve rich media content display!
 
@@ -109,7 +109,7 @@ This makes your quotes more layered and meaningful.
 - **Code blocks**: Wrap with three backticks and specify the language, like:
 
 ```js
-console.log(`Hello, Doocs!`)
+console.log(`Hello, Cardano2vn!`)
 ```
 
 Syntax highlighting makes your code more readable.
@@ -128,9 +128,8 @@ Markdown supports simple tables, using `|` and `-` to separate cells and headers
 
 | Project Member                                    | Email                   | WeChat ID   |
 | ------------------------------------------------- | ----------------------- | ----------- |
-| [yanglbme](https://github.com/yanglbme)           | contact@yanglibin.info  | YLB0109     |
-| [YangFong](https://github.com/YangFong)           | yangfong2022@gmail.com  | yq2419731931|
-| [thinkasany](https://github.com/thinkasany)       | thinkasany@gmail.com    | thinkasany  |
+| [C2VN](https://github.com/cardano2vn)             | cardano2vn@gmail.com    | C2VN        |
+
 
 Such tables make data display much cleaner!
 
@@ -229,5 +228,5 @@ Now, pick up your Markdown editor and start creating! Explore the world of Markd
 ---
 
 <div className="text-center">
-    <img src="https://cdn-doocs.oss-cn-shenzhen.aliyuncs.com/gh/doocs/md/images/1648303220922-7e14aefa-816e-44c1-8604-ade709ca1c69.png" style={{width: '100px'}} alt="Doocs Logo" />
+    <img src="/images/common/cardano2vn.jpg" style={{width: '100px'}} alt="Cardano2vn" />
 </div>
