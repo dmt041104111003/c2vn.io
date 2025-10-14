@@ -3,6 +3,7 @@
 import React from "react";
 import { useToastContext } from "~/components/toast-provider";
 import ContestResult, { ContestResultData } from "~/components/home/ContestResult";
+import { InlineMath, BlockMath } from "react-katex";
 
 type QuizQuestion = {
   index: number;
@@ -26,6 +27,18 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
   const [resultData, setResultData] = React.useState<ContestResultData | null>(null);
   const selectionsRef = React.useRef<Array<'A' | 'B' | 'C' | 'D' | ''>>([]);
   const displayOptionsRef = React.useRef<Array<Array<{ key: 'A' | 'B' | 'C' | 'D'; text: string }>>>([]);
+
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const id = 'katex-css-cdn';
+    if (!document.getElementById(id)) {
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';
+      document.head.appendChild(link);
+    }
+  }, []);
 
   function shuffle<T>(arr: T[]): T[] {
     const a = arr.slice();
@@ -135,7 +148,7 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
         </div>
 
         <div className="space-y-3">
-          <div className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">{q.text}</div>
+          <div className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100"><MathText text={q.text} /></div>
           <div className={`space-y-2 ${submitting ? 'opacity-70 pointer-events-none' : ''}`}>
             {displayOptions.map((opt) => (
               <label key={opt.key} className={`flex items-center gap-2 p-2 rounded border ${selected === opt.key ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'}`}>
@@ -147,7 +160,7 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
                   onChange={() => setSelected(opt.key)}
                   disabled={submitting}
                 />
-                <span className="text-sm sm:text-base">{opt.text}</span>
+                <span className="text-sm sm:text-base"><MathText text={opt.text} /></span>
               </label>
             ))}
           </div>
@@ -200,4 +213,49 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
   );
 }
 
+function MathText({ text }: { text: string }) {
+  const parts = React.useMemo(() => tokenizeMath(text), [text]);
+  return (
+    <span className="[&_span.katex-display]:my-2">
+      {parts.map((p, i) => p.type === 'block'
+        ? <BlockMath key={i} math={p.value} />
+        : p.type === 'inline'
+          ? <InlineMath key={i} math={p.value} />
+          : <span key={i}>{p.value}</span>
+      )}
+    </span>
+  );
+}
 
+type Token = { type: 'text' | 'inline' | 'block'; value: string };
+function tokenizeMath(input: string): Token[] {
+  if (!input) return [{ type: 'text', value: '' }];
+  const tokens: Token[] = [];
+  let i = 0;
+  while (i < input.length) {
+    if (input[i] === '$' && input[i + 1] === '$') {
+      const end = input.indexOf('$$', i + 2);
+      if (end !== -1) {
+        tokens.push({ type: 'block', value: input.slice(i + 2, end).trim() });
+        i = end + 2;
+        continue;
+      }
+    }
+    if (input[i] === '$') {
+      const end = input.indexOf('$', i + 1);
+      if (end !== -1) {
+        tokens.push({ type: 'inline', value: input.slice(i + 1, end).trim() });
+        i = end + 1;
+        continue;
+      }
+    }
+    const next = nextDollar(input, i);
+    tokens.push({ type: 'text', value: input.slice(i, next) });
+    i = next;
+  }
+  return tokens;
+}
+function nextDollar(s: string, from: number) {
+  const i1 = s.indexOf('$', from);
+  return i1 === -1 ? s.length : i1;
+}
