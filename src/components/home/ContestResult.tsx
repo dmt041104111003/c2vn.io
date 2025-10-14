@@ -16,6 +16,7 @@ export interface ContestResultData {
   questions: QuizQuestion[];
   selections: AnswerKey[];
   correctCount: number;
+  displayOptions?: Array<Array<{ key: 'A' | 'B' | 'C' | 'D'; text: string }>>;
 }
 
 export default function ContestResult({ data, onBack }: { data: ContestResultData; onBack?: () => void }) {
@@ -25,6 +26,7 @@ export default function ContestResult({ data, onBack }: { data: ContestResultDat
   const sel = data.selections[current] || '';
   const isCorrect = sel && sel === q.correct;
   const isLast = current === total - 1;
+  const opts = (data.displayOptions && data.displayOptions[current]) ? data.displayOptions[current] : q.options;
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden w-full">
@@ -41,12 +43,12 @@ export default function ContestResult({ data, onBack }: { data: ContestResultDat
         <div className="py-2">
           <div className="mb-2 text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">{current + 1}. {q.text}</div>
           <div className="space-y-2">
-            {q.options.map(opt => {
+            {opts.map(opt => {
               const isSel = sel === opt.key;
               const isAns = q.correct === opt.key;
               return (
                 <div key={opt.key} className={`p-2 rounded border text-sm sm:text-base ${isAns ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : isSel ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'}`}>
-                  <span className="font-semibold w-6 inline-block">{opt.key}.</span> {opt.text}
+                  {opt.text}
                   {isSel && (
                     <span className={`ml-2 text-xs ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                       {isCorrect ? '(your choice - correct)' : '(your choice)'}

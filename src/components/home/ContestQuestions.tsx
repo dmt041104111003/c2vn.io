@@ -25,6 +25,16 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
   const [showResult, setShowResult] = React.useState(false);
   const [resultData, setResultData] = React.useState<ContestResultData | null>(null);
   const selectionsRef = React.useRef<Array<'A' | 'B' | 'C' | 'D' | ''>>([]);
+  const displayOptionsRef = React.useRef<Array<Array<{ key: 'A' | 'B' | 'C' | 'D'; text: string }>>>([]);
+
+  function shuffle<T>(arr: T[]): T[] {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
   React.useEffect(() => {
     let cancelled = false;
@@ -63,6 +73,7 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
           if (!cancelled) {
             setQuestions(parsed);
             selectionsRef.current = new Array(parsed.length).fill('');
+            displayOptionsRef.current = parsed.map(q => shuffle(q.options));
           }
         } else {
           if (!cancelled) setQuestions([]);
@@ -105,6 +116,7 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
 
   const q = questions[current];
   const isLast = current === questions.length - 1;
+  const displayOptions = (displayOptionsRef.current[current] || q.options);
   function submitAnswer() {
     if (!selected) return;
     selectionsRef.current[current] = selected;
@@ -125,7 +137,7 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
         <div className="space-y-3">
           <div className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">{q.text}</div>
           <div className={`space-y-2 ${submitting ? 'opacity-70 pointer-events-none' : ''}`}>
-            {q.options.map((opt) => (
+            {displayOptions.map((opt) => (
               <label key={opt.key} className={`flex items-center gap-2 p-2 rounded border ${selected === opt.key ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'}`}>
                 <input
                   type="radio"
@@ -135,7 +147,6 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
                   onChange={() => setSelected(opt.key)}
                   disabled={submitting}
                 />
-                <span className="font-semibold w-6">{opt.key}.</span>
                 <span className="text-sm sm:text-base">{opt.text}</span>
               </label>
             ))}
@@ -172,7 +183,7 @@ export default function ContestQuestions({ onBack }: { onBack?: () => void }) {
                   throw new Error(data?.error || 'Submit failed');
                 }
                 showSuccess('Submitted', 'Your result has been recorded');
-                setResultData({ questions, selections: selectionsRef.current, correctCount: finalCorrect });
+                setResultData({ questions, selections: selectionsRef.current, correctCount: finalCorrect, displayOptions: displayOptionsRef.current });
                 setShowResult(true);
               } catch (e) {
                 showError('Submit failed', (e as Error).message);
