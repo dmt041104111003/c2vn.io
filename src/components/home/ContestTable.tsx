@@ -30,7 +30,7 @@ export default function ContestTable({ page = 1, pageSize = 20 }: { page?: numbe
               if (at <= 0) return str;
               const local = str.slice(0, at);
               const domain = str.slice(at);
-              const keep = Math.ceil(local.length * 0.4); 
+              const keep = Math.ceil(local.length * 0.7); 
               const masked = local.slice(0, keep) + '*'.repeat(Math.max(0, local.length - keep));
               return masked + domain;
             };
