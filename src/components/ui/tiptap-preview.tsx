@@ -20,6 +20,8 @@ import { TooltipPreviewHandler } from './tiptap/tooltip-preview-handler';
 import { createLowlight, common } from 'lowlight';
 import { useEffect, useState, useRef } from 'react';
 import { tiptapPreviewStyles } from './tiptap/styles';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 
 const lowlight = createLowlight(common);
 
@@ -74,6 +76,53 @@ export function TipTapPreview({ content, className = "" }: TipTapPreviewProps) {
       pre.appendChild(btn);
     });
   }, [content, isClient]);
+
+  useEffect(() => {
+    if (!isClient || !proseRef.current) return;
+    const root = proseRef.current;
+
+    const shouldSkip = (el: Element) => {
+      const tag = el.tagName.toLowerCase();
+      return tag === 'pre' || tag === 'code' || tag === 'script' || tag === 'style';
+    };
+
+    const renderMathInElement = (el: Element) => {
+      if (shouldSkip(el)) return;
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+      const textNodes: Text[] = [];
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        const parent = node.parentElement;
+        if (!parent || shouldSkip(parent)) continue;
+        const text = node.textContent || '';
+        if (!/\$/.test(text)) continue;
+        textNodes.push(node as Text);
+      }
+      textNodes.forEach(tn => {
+        const html = transformLatexToHtml(tn.textContent || '');
+        if (html && html !== tn.textContent) {
+          const span = document.createElement('span');
+          span.innerHTML = html;
+          tn.replaceWith(span);
+        }
+      });
+    };
+
+    Array.from(root.children).forEach(child => renderMathInElement(child));
+    renderMathInElement(root);
+  }, [content, isClient]);
+
+  function transformLatexToHtml(input: string): string {
+    if (!input.includes('$')) return input;
+    let output = input;
+    output = output.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr: string) => {
+      try { return katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false }); } catch { return _; }
+    });
+    output = output.replace(/\$(?!\$)([^\n$]+?)\$/g, (_, expr: string) => {
+      try { return katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false }); } catch { return _; }
+    });
+    return output;
+  }
 
   const editor = useEditor({
     extensions: [
