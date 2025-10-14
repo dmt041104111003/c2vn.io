@@ -8,23 +8,30 @@ export async function GET() {
     const welcomeModal = await prisma.welcomeModal.findFirst({
       where: {
         isActive: true,
-        publishStatus: 'PUBLISHED',
         OR: [
           {
-            startDate: null,
-            endDate: null
+            publishStatus: 'PUBLISHED',
+            OR: [
+              {
+                startDate: null,
+                endDate: null
+              },
+              {
+                startDate: { lte: now },
+                endDate: { gte: now }
+              },
+              {
+                startDate: { lte: now },
+                endDate: null
+              },
+              {
+                startDate: null,
+                endDate: { gte: now }
+              }
+            ]
           },
           {
-            startDate: { lte: now },
-            endDate: { gte: now }
-          },
-          {
-            startDate: { lte: now },
-            endDate: null
-          },
-          {
-            startDate: null,
-            endDate: { gte: now }
+            publishStatus: 'DRAFT'
           }
         ]
       },

@@ -29,19 +29,8 @@ export default function WelcomeModalEdit({
     return <WelcomeModalEditSkeleton />;
   }
 
-  const safeFormData = {
-    title: formData.title || "",
-    description: formData.description || "",
-    imageUrl: formData.imageUrl || "",
-    buttonLink: formData.buttonLink || "",
-    startDate: formData.startDate || "",
-    endDate: formData.endDate || "",
-    publishStatus: formData.publishStatus || "DRAFT",
-    isActive: formData.isActive !== undefined ? formData.isActive : true
-  };
-
   const maxDescriptionLength = 1200;
-  const currentDescriptionLength = safeFormData.description?.length || 0;
+  const currentDescriptionLength = formData.description?.length || 0;
   const isDescriptionLimitReached = currentDescriptionLength >= maxDescriptionLength;
 
   const handleDescriptionChange = (content: string) => {
@@ -63,7 +52,7 @@ export default function WelcomeModalEdit({
     onInputChange('endDate', value);
   };
 
-  const isEndDateRequired = !safeFormData.endDate;
+  const isEndDateRequired = !formData.endDate;
 
   return (
     <motion.div
@@ -79,7 +68,7 @@ export default function WelcomeModalEdit({
         </label>
         <input
           type="text"
-          value={safeFormData.title}
+          value={formData.title}
           onChange={(e) => onInputChange('title', e.target.value)}
           placeholder="Welcome to Cardano2VN"
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
@@ -127,7 +116,7 @@ export default function WelcomeModalEdit({
           </span>
         </div>
         <TipTapEditor
-          content={safeFormData.description}
+          content={formData.description}
           onChange={handleDescriptionChange}
           placeholder="Discover the power of Cardano blockchain technology..."
         />
@@ -141,7 +130,7 @@ export default function WelcomeModalEdit({
           </label>
           <input
             type="date"
-            value={safeFormData.startDate || ""}
+            value={formData.startDate || ""}
             onChange={handleStartDateChange}
             min={new Date().toISOString().slice(0, 10)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
@@ -154,9 +143,9 @@ export default function WelcomeModalEdit({
           </label>
           <input
             type="date"
-            value={safeFormData.endDate || ""}
+            value={formData.endDate || ""}
             onChange={handleEndDateChange}
-            min={safeFormData.startDate || new Date().toISOString().slice(0, 10)}
+            min={formData.startDate || new Date().toISOString().slice(0, 10)}
             required
             className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-center ${
               isEndDateRequired 
@@ -180,7 +169,7 @@ export default function WelcomeModalEdit({
         </label>
         <input
           type="url"
-          value={safeFormData.buttonLink || ""}
+          value={formData.buttonLink || ""}
           onChange={(e) => onInputChange('buttonLink', e.target.value)}
           placeholder="https://example.com"
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
@@ -192,7 +181,7 @@ export default function WelcomeModalEdit({
           Publish Status
         </label>
         <select
-          value={safeFormData.publishStatus}
+          value={formData.publishStatus}
           onChange={(e) => onInputChange('publishStatus', e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
           title="Select publish status"

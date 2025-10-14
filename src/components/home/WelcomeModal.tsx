@@ -62,7 +62,7 @@ export default function WelcomeModal({ isOpen, onClose, origin }: WelcomeModalPr
     checkAdminStatus();
   }, [session]);
 
-  const { data: welcomeData, isLoading: isDataLoading } = useQuery({
+  const { data: welcomeData } = useQuery({
     queryKey: ['welcome-modal'],
     queryFn: async () => {
       const response = await fetch('/api/welcome-modal');
@@ -70,14 +70,12 @@ export default function WelcomeModal({ isOpen, onClose, origin }: WelcomeModalPr
         return null;
       }
       return response.json();
-    },
-    staleTime: 0,
-    gcTime: 0
+    }
   });
 
   useEffect(() => {
     if (welcomeData?.data) {
-      const data = welcomeData.data as any;
+      const data = welcomeData.data;
       setFormData({
         title: data.title || "",
         description: data.description || "",
@@ -91,23 +89,6 @@ export default function WelcomeModal({ isOpen, onClose, origin }: WelcomeModalPr
       setPreviewImage(data.imageUrl || "");
     }
   }, [welcomeData]);
-
-  useEffect(() => {
-    if (isAdmin && welcomeData?.data) {
-      const data = welcomeData.data as any;
-      setFormData({
-        title: data.title || "",
-        description: data.description || "",
-        imageUrl: data.imageUrl || "",
-        buttonLink: data.buttonLink || "",
-        startDate: data.startDate || "",
-        endDate: data.endDate || "",
-        publishStatus: data.publishStatus || "DRAFT",
-        isActive: data.isActive || true
-      });
-      setPreviewImage(data.imageUrl || "");
-    }
-  }, [isAdmin, welcomeData]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: WelcomeModalData) => {
@@ -173,11 +154,13 @@ export default function WelcomeModal({ isOpen, onClose, origin }: WelcomeModalPr
   };
 
   const shouldDisplayModal = () => {
+    // Always show modal for admins (they can see edit tab)
     if (isAdmin) return true;
 
+    // For non-admins, check if modal should be displayed based on publish status and dates
     if (!welcomeData?.data) return false;
     
-    const data = welcomeData.data as any;
+    const data = welcomeData.data;
     const now = new Date();
     const startDate = data.startDate ? new Date(data.startDate) : null;
     const endDate = data.endDate ? new Date(data.endDate) : null;
@@ -248,7 +231,6 @@ export default function WelcomeModal({ isOpen, onClose, origin }: WelcomeModalPr
                       onImageChange={handleImageChange}
                       onSave={handleSave}
                       isSaving={saveMutation.isPending}
-                      isLoading={isDataLoading}
                     />
                   )}
                 </div>
