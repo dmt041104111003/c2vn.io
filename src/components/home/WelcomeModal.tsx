@@ -154,13 +154,14 @@ export default function WelcomeModal({ isOpen, onClose, origin }: WelcomeModalPr
   };
 
   const shouldDisplayModal = () => {
-    // Always show modal for admins (they can see edit tab)
     if (isAdmin) return true;
 
-    // For non-admins, check if modal should be displayed based on publish status and dates
     if (!welcomeData?.data) return false;
     
     const data = welcomeData.data;
+    
+    if (data.publishStatus !== 'PUBLISHED') return false;
+    
     const now = new Date();
     const startDate = data.startDate ? new Date(data.startDate) : null;
     const endDate = data.endDate ? new Date(data.endDate) : null;
