@@ -30,7 +30,7 @@ export default function ContestTable({ page = 1, pageSize = 20 }: { page?: numbe
               if (at <= 0) return str;
               const local = str.slice(0, at);
               const domain = str.slice(at);
-              const keep = Math.ceil(local.length * 0.5);
+              const keep = Math.ceil(local.length * 0.4); 
               const masked = local.slice(0, keep) + '*'.repeat(Math.max(0, local.length - keep));
               return masked + domain;
             };
@@ -83,19 +83,184 @@ export default function ContestTable({ page = 1, pageSize = 20 }: { page?: numbe
         <thead className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
           <tr>
             {displayHeaders.map((cell, i) => (
-              <th key={i} className="px-3 py-2 text-left font-semibold border-b border-gray-200 dark:border-gray-700">{cell}</th>
+              <th
+                key={i}
+                className={`px-3 py-2 text-left font-semibold border-b border-gray-200 dark:border-gray-700 ${i === 0 ? 'w-24 min-w-[6rem]' : ''}`}
+              >
+                {cell}
+              </th>
             ))}
           </tr>
         </thead>
         <tbody className="bg-white dark:bg-gray-900">
-          {rows.slice(1).map((r, ri) => (
-            <tr key={ri} className="border-b border-gray-100 dark:border-gray-800">
-              <td className="px-3 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{ri + 1}</td>
+          {rows.slice(1).map((r, ri) => {
+            const topClass = ri === 0
+              ? 'bg-blue-500/20 dark:bg-blue-500/5'
+              : ri === 1
+                ? 'bg-blue-500/12 dark:bg-blue-500/10'
+                : ri === 2
+                  ? 'bg-blue-500/8 dark:bg-blue-500/15'
+                  : '';
+
+                  const Medal = () => {
+                    const Wrapper = ({ color, children }: { color: string; children: React.ReactNode }) => (
+                      <span className="relative inline-flex items-center justify-center w-5 h-5 mr-1">
+                        <span className={`absolute inline-flex h-full w-full rounded-full ${color} opacity-70 animate-ping`}></span>
+                        <span className="relative z-10">{children}</span>
+                      </span>
+                    );
+                    if (ri === 0) {
+                      return (
+                        <Wrapper color="bg-cyan-400">
+                          <svg
+                            aria-label="Top 1 - Kim cương"
+                            className="w-4 h-4 shrink-0"
+                            viewBox="0 0 64 64"
+                          >
+                            <defs>
+                              <radialGradient id="diamondGradient" cx="50%" cy="40%" r="60%">
+                                <stop offset="0%" stopColor="#e0faff" />
+                                <stop offset="40%" stopColor="#7dd3fc" />
+                                <stop offset="100%" stopColor="#0ea5e9" />
+                              </radialGradient>
+                              <filter id="glowDiamond">
+                                <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+                                <feMerge>
+                                  <feMergeNode in="coloredBlur" />
+                                  <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                              </filter>
+                            </defs>
+                            <path
+                              d="M32 4L8 20l24 40 24-40L32 4z"
+                              fill="url(#diamondGradient)"
+                              stroke="#bae6fd"
+                              strokeWidth="2"
+                              filter="url(#glowDiamond)"
+                            />
+                            <circle cx="32" cy="20" r="8" fill="white" opacity="0.4">
+                              <animate
+                                attributeName="opacity"
+                                values="0.2;0.8;0.2"
+                                dur="2s"
+                                repeatCount="indefinite"
+                              />
+                            </circle>
+                          </svg>
+                        </Wrapper>
+                      );
+                    }
+                    if (ri === 1) {
+                      return (
+                        <Wrapper color="bg-yellow-400">
+                          <svg
+                            aria-label="Top 2 - Vàng"
+                            className="w-4 h-4 shrink-0"
+                            viewBox="0 0 64 64"
+                          >
+                            <defs>
+                              <radialGradient id="goldGradient" cx="50%" cy="50%" r="60%">
+                                <stop offset="0%" stopColor="#fff9c4" />
+                                <stop offset="40%" stopColor="#facc15" />
+                                <stop offset="100%" stopColor="#ca8a04" />
+                              </radialGradient>
+                              <filter id="glowGold">
+                                <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+                                <feMerge>
+                                  <feMergeNode in="coloredBlur" />
+                                  <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                              </filter>
+                            </defs>
+                            <path
+                              d="M32 6l7.5 15.2 16.8 2.4-12.2 11.9 2.9 16.8L32 43.6l-14.9 8.7 2.9-16.8-12.2-11.9 16.8-2.4L32 6z"
+                              fill="url(#goldGradient)"
+                              stroke="#fef08a"
+                              strokeWidth="2"
+                              filter="url(#glowGold)"
+                            />
+                            <circle cx="32" cy="20" r="6" fill="white" opacity="0.3">
+                              <animate
+                                attributeName="opacity"
+                                values="0.3;1;0.3"
+                                dur="2s"
+                                repeatCount="indefinite"
+                              />
+                            </circle>
+                          </svg>
+                        </Wrapper>
+                      );
+                    }
+                  
+                    if (ri === 2) {
+                      return (
+                        <Wrapper color="bg-amber-500">
+                          <svg
+                            aria-label="Top 3 - Đồng"
+                            className="w-4 h-4 shrink-0"
+                            viewBox="0 0 64 64"
+                          >
+                            <defs>
+                              <radialGradient id="bronzeGradient" cx="50%" cy="50%" r="60%">
+                                <stop offset="0%" stopColor="#fde68a" />
+                                <stop offset="40%" stopColor="#d97706" />
+                                <stop offset="100%" stopColor="#78350f" />
+                              </radialGradient>
+                              <filter id="glowBronze">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                                <feMerge>
+                                  <feMergeNode in="coloredBlur" />
+                                  <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                              </filter>
+                            </defs>
+                            <path
+                              d="M32 6l7.5 15.2 16.8 2.4-12.2 11.9 2.9 16.8L32 43.6l-14.9 8.7 2.9-16.8-12.2-11.9 16.8-2.4L32 6z"
+                              fill="url(#bronzeGradient)"
+                              stroke="#fbbf24"
+                              strokeWidth="2"
+                              filter="url(#glowBronze)"
+                            />
+                            <circle cx="32" cy="22" r="5" fill="white" opacity="0.25">
+                              <animate
+                                attributeName="opacity"
+                                values="0.2;0.7;0.2"
+                                dur="2.4s"
+                                repeatCount="indefinite"
+                              />
+                            </circle>
+                          </svg>
+                        </Wrapper>
+                      );
+                    }
+                    
+                    return (
+                      <svg
+                        aria-label="Rank"
+                        className="w-4 h-4 mr-1 shrink-0 fill-current text-gray-400 dark:text-gray-500"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2l3.09 6.26 6.91 1.01-5 4.87 1.18 6.86L12 18.77l-6.18 3.23L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    );
+                  };
+                  
+            return (
+              <tr key={ri} className={`border-b border-gray-100 dark:border-gray-800 ${topClass}`}>
+                <td className="px-3 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center justify-center w-5 h-5">
+                      <Medal />
+                    </span>
+                    <span className="tabular-nums w-5 text-center">{ri + 1}</span>
+                  </span>
+                </td>
               {r.map((cell, ci) => (
                 <td key={ci} className="px-3 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{cell}</td>
               ))}
-            </tr>
-          ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
