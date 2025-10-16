@@ -80,8 +80,8 @@ export function MediaTable({ media, onDelete }: MediaTableProps) {
       const res = await fetch(`/api/admin/posts?title=${encodeURIComponent(title)}&public=1`);
       const data = await res.json();
       const post = data.data?.[0];
-      if (post && post.id) {
-        router.push(`/blog/${post.id}`);
+      if (post && (post.slug || post.id)) {
+        router.push(`/blog/${post.slug || post.id}`);
       } else {
         showError('Not found', 'Not found!');
       }

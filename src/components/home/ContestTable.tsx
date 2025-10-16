@@ -100,11 +100,12 @@ export default function ContestTable({ page: initialPage = 1, pageSize: initialP
         </thead>
         <tbody className="bg-white dark:bg-gray-900">
           {rows.slice(1).map((r, ri) => {
-            const topClass = ri === 0
+            const overallIndex = (page - 1) * pageSize + ri;
+            const topClass = overallIndex === 0
               ? 'bg-blue-500/20 dark:bg-blue-500/5'
-              : ri === 1
+              : overallIndex === 1
                 ? 'bg-blue-500/12 dark:bg-blue-500/10'
-                : ri === 2
+                : overallIndex === 2
                   ? 'bg-blue-500/8 dark:bg-blue-500/15'
                   : '';
 
@@ -115,7 +116,7 @@ export default function ContestTable({ page: initialPage = 1, pageSize: initialP
                         <span className="relative z-10">{children}</span>
                       </span>
                     );
-                    if (ri === 0) {
+                    if (overallIndex === 0) {
                       return (
                         <Wrapper color="bg-cyan-400">
                           <svg
@@ -156,7 +157,7 @@ export default function ContestTable({ page: initialPage = 1, pageSize: initialP
                         </Wrapper>
                       );
                     }
-                    if (ri === 1) {
+                    if (overallIndex === 1) {
                       return (
                         <Wrapper color="bg-yellow-400">
                           <svg
@@ -198,7 +199,7 @@ export default function ContestTable({ page: initialPage = 1, pageSize: initialP
                       );
                     }
                   
-                    if (ri === 2) {
+                    if (overallIndex === 2) {
                       return (
                         <Wrapper color="bg-amber-500">
                           <svg
@@ -258,7 +259,7 @@ export default function ContestTable({ page: initialPage = 1, pageSize: initialP
                     <span className="inline-flex items-center justify-center w-5 h-5">
                       <Medal />
                     </span>
-                    <span className="tabular-nums w-5 text-center">{ri + 1}</span>
+                    <span className="tabular-nums w-5 text-center">{overallIndex + 1}</span>
                   </span>
                 </td>
               {r.map((cell, ci) => (
