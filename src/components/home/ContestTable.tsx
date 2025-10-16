@@ -1,11 +1,15 @@
 "use client";
 
 import React from "react";
+import Pagination from "~/components/pagination";
 
-export default function ContestTable({ page = 1, pageSize = 20 }: { page?: number; pageSize?: number }) {
+export default function ContestTable({ page: initialPage = 1, pageSize: initialPageSize = 10 }: { page?: number; pageSize?: number }) {
   const [rows, setRows] = React.useState<string[][] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [page, setPage] = React.useState<number>(initialPage);
+  const [totalPages, setTotalPages] = React.useState<number>(1);
+  const pageSize = initialPageSize || 10;
 
   React.useEffect(() => {
     let cancelled = false;
@@ -20,6 +24,8 @@ export default function ContestTable({ page = 1, pageSize = 20 }: { page?: numbe
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data?.error || 'Failed');
         let values: string[][] = data.data?.values || [];
+        const metaTotalPages = Number(data?.data?.totalPages) || 1;
+        if (!cancelled) setTotalPages(metaTotalPages);
         if (values.length > 1) {
           const headers = values[0].map((h: string) => (h || '').toString().trim().toLowerCase());
           const emailIdx = headers.indexOf('your-email');
@@ -263,6 +269,7 @@ export default function ContestTable({ page = 1, pageSize = 20 }: { page?: numbe
           })}
         </tbody>
       </table>
+      <Pagination currentPage={page} totalPages={totalPages} setCurrentPage={setPage} />
     </div>
   );
 }
