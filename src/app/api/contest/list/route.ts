@@ -8,6 +8,7 @@ export async function GET(req: Request) {
     const apiKey = process.env.GOOGLE_SHEETS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_SHEETS_API_KEY || '';
     const pageParam = parseInt(url.searchParams.get('page') || '1', 10);
     const sizeParam = parseInt(url.searchParams.get('pageSize') || '20', 10);
+    const period = (url.searchParams.get('period') || 'all').toLowerCase();
 
     if (!sheetId || !apiKey) {
       return NextResponse.json({ success: false, error: 'Missing sheetId or API key' }, { status: 400 });
@@ -32,7 +33,7 @@ export async function GET(req: Request) {
     const idxEmail = lower.indexOf('your-email');
     const idxScore = lower.indexOf('score');
     const idxDate = lower.indexOf('date');
-    const entries = values.slice(1).map((row: string[]) => {
+    let entries = values.slice(1).map((row: string[]) => {
       const scoreRaw = (row[idxScore] ?? '').toString().replace(/,/g, '');
       const score = Number(scoreRaw);
       const dateStr = (row[idxDate] ?? '').toString();
@@ -46,6 +47,20 @@ export async function GET(req: Request) {
         ts,
       };
     });
+
+    if (period === 'week') {
+      const now = new Date();
+      const day = now.getDay();
+      const diffToMonday = (day === 0 ? -6 : 1 - day); 
+      const weekStart = new Date(now);
+      weekStart.setHours(0, 0, 0, 0);
+      weekStart.setDate(now.getDate() + diffToMonday);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 7);
+      const startTs = weekStart.getTime();
+      const endTs = weekEnd.getTime();
+      entries = entries.filter(e => Number.isFinite(e.ts) && e.ts >= startTs && e.ts < endTs);
+    }
 
     entries.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
