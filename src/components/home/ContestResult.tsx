@@ -40,6 +40,9 @@ export default function ContestResult({ data, onBack }: { data: ContestResultDat
         </div>
 
         <div className="text-sm text-gray-700 dark:text-gray-300">Score: <span className="font-semibold">{data.correctCount * 10}</span> ({data.correctCount}/{total} correct)</div>
+        <div className="text-xs sm:text-sm text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
+          Lưu ý: Sau khi xem xong kết quả, hãy tải lại trang để kiểm tra xem bạn có lọt Top trên bảng xếp hạng không nhé.
+        </div>
 
         <div className="py-2">
           <div className="mb-2 text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">{current + 1}. <MathText text={q.text} /></div>
