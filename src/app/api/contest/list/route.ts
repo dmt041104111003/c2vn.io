@@ -33,12 +33,29 @@ export async function GET(req: Request) {
     const idxEmail = lower.indexOf('your-email');
     const idxScore = lower.indexOf('score');
     const idxDate = lower.indexOf('date');
+    function parseSheetDate(input: string): number {
+      const s = (input || '').trim();
+      if (!s) return NaN;
+      const m = s.match(/^([0-3]?\d)\/(1[0-2]|0?\d)\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+      if (m) {
+        const day = parseInt(m[1], 10);
+        const month = parseInt(m[2], 10) - 1;
+        const year = parseInt(m[3], 10);
+        const hour = m[4] ? parseInt(m[4], 10) : 0;
+        const minute = m[5] ? parseInt(m[5], 10) : 0;
+        const d = new Date(year, month, day, hour, minute, 0, 0);
+        return d.getTime();
+      }
+      const d2 = new Date(s);
+      return d2.getTime();
+    }
+
     let entries = values.slice(1).map((row: string[]) => {
       const scoreRaw = (row[idxScore] ?? '').toString().replace(/,/g, '');
       const score = Number(scoreRaw);
       const dateStr = (row[idxDate] ?? '').toString();
-      const d = new Date(dateStr);
-      const ts = isNaN(d.getTime()) ? Infinity : d.getTime();
+      const tsRaw = parseSheetDate(dateStr);
+      const ts = Number.isFinite(tsRaw) ? tsRaw : Infinity;
       return {
         stt: (row[idxSTT] ?? '').toString(),
         email: (row[idxEmail] ?? '').toString(),
