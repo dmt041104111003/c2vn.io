@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import BackgroundMotion from "~/components/ui/BackgroundMotion";
-import LightBulbScene from "~/components/ui/LightBulbScene";
+// import LightBulbScene from "~/components/ui/LightBulbScene";
 
 export const metadata: Metadata = {
   title: "Login - Cardano2vn",
@@ -31,7 +31,7 @@ export default function LoginLayout({
   return (
     <div className="relative">
       <BackgroundMotion />
-      <LightBulbScene />
+      {/* <LightBulbScene /> */}
       {children}
     </div>
   );
