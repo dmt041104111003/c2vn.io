@@ -8,7 +8,7 @@ import Footer from "~/components/footer";
 import Header from "~/components/header";
 import BackToTop from "~/components/ui/BackToTop";
 import BackToBottom from "~/components/ui/BackToBottom";
-import LightBulbScene from "~/components/ui/LightBulbScene";
+// import LightBulbScene from "~/components/ui/LightBulbScene";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -42,7 +42,7 @@ export default function LandingLayout({
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="min-h-screen bg-white dark:bg-gradient-to-br dark:from-gray-950 dark:via-gray-950 dark:to-gray-900 text-gray-900 dark:text-white relative">
-        <LightBulbScene />
+        {/* <LightBulbScene /> */}
         <Header />
         <div>{children}</div>
         <Footer />
