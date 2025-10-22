@@ -86,30 +86,22 @@ export const POST = withAuth(async (req, currentUser) => {
       }
     }
 
-    const submissionData: any = {
-      userId: currentUser.id,
-      referralCode: referralCode || null,
-      email: formData['your-email'] || '',
-      name: formData['your-name'] || '',
-      phone: formData['your-number'] || null,
-      wallet: formData['address-wallet'] || null,
-      course: formData['your-course'] || null,
-      message: formData['message'] || null,
-      deviceAttemptId: deviceAttempt?.id || null,
-      specialReferralCodeId: specialReferralCode?.id || null
-    };
-
-    // Only set referrerId for regular codes, not special codes
-    if (!specialReferralCode && referrer?.id) {
-      submissionData.referrerId = referrer.id;
-    }
-
     const submission = await prisma.referralSubmission.create({
-      data: submissionData
+      data: {
+        userId: currentUser.id,
+        referralCode: referralCode || null,
+        referrerId: referrer?.id || null,
+        email: formData['your-email'] || '',
+        name: formData['your-name'] || '',
+        phone: formData['your-number'] || null,
+        wallet: formData['address-wallet'] || null,
+        course: formData['your-course'] || null,
+        message: formData['message'] || null,
+        deviceAttemptId: deviceAttempt?.id || null,
+        specialReferralCodeId: specialReferralCode?.id || null
+      }
     });
 
-
-    // Only create notification for regular referral codes, not special codes
     if (referrer && !specialReferralCode) {
       await prisma.notification.create({
         data: {
