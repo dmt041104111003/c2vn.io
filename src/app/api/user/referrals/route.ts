@@ -55,8 +55,12 @@ export const GET = withAuth(async (req, currentUser) => {
       ...(limit && { take: parseInt(limit) })
     });
 
+    // Only count regular referrals, exclude special referral codes
     const referralCount = await (prisma as any).referralSubmission.count({
-      where: { referrerId: currentUser.id }
+      where: { 
+        referrerId: currentUser.id,
+        specialReferralCodeId: null  // Exclude special referral codes
+      }
     });
 
     const response: any = {

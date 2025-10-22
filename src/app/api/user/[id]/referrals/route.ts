@@ -6,9 +6,11 @@ export const GET = async (req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { id: userId } = await params;
 
+    // Only count regular referrals, exclude special referral codes
     const referralCount = await prisma.referralSubmission.count({
       where: {
-        referrerId: userId
+        referrerId: userId,
+        specialReferralCodeId: null  // Exclude special referral codes
       }
     });
 

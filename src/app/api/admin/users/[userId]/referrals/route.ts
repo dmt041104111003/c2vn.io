@@ -57,8 +57,12 @@ export const GET = withAdmin(async (req, currentUser) => {
       orderBy: { createdAt: 'desc' }
     });
 
+    // Only count regular referrals, exclude special referral codes
     const referralCount = await (prisma as any).referralSubmission.count({
-      where: { referrerId: userId }
+      where: { 
+        referrerId: userId,
+        specialReferralCodeId: null  // Exclude special referral codes
+      }
     });
 
     return NextResponse.json(createSuccessResponse({
