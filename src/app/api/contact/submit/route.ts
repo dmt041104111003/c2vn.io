@@ -26,13 +26,25 @@ export const POST = async (req: Request) => {
     const deviceFingerprint = await generateDeviceFingerprint(deviceData.userAgent, deviceData);
     
     let attempt = await prisma.deviceAttempt.findUnique({ where: { deviceFingerprint } });
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const now = new Date();
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+    
     if (!attempt) {
-      attempt = await prisma.deviceAttempt.create({ data: { deviceFingerprint, failedAttempts: 0, lastAttemptAt: startOfDay } });
+      attempt = await prisma.deviceAttempt.create({ data: { deviceFingerprint, failedAttempts: 0, lastAttemptAt: now } });
     }
-    if (!attempt.lastAttemptAt || attempt.lastAttemptAt < startOfDay) {
-      attempt = await prisma.deviceAttempt.update({ where: { id: attempt.id }, data: { failedAttempts: 0, lastAttemptAt: startOfDay, isBanned: false, bannedAt: null, bannedUntil: null } });
+    
+    // Reset attempts if last attempt was more than 15 minutes ago
+    if (!attempt.lastAttemptAt || attempt.lastAttemptAt < fifteenMinutesAgo) {
+      attempt = await prisma.deviceAttempt.update({ 
+        where: { id: attempt.id }, 
+        data: { 
+          failedAttempts: 0, 
+          lastAttemptAt: now, 
+          isBanned: false, 
+          bannedAt: null, 
+          bannedUntil: null 
+        } 
+      });
     }
     if (attempt.isBanned && attempt.bannedUntil && attempt.bannedUntil > new Date()) {
       return NextResponse.json(createErrorResponse('This device is temporarily banned', 'DEVICE_BANNED'), { status: 403 });
@@ -67,15 +79,15 @@ export const POST = async (req: Request) => {
       return NextResponse.json(createErrorResponse(`Upstream error: ${text || upstream.statusText}`, 'UPSTREAM_ERROR'), { status: 502 });
     }
 
-    // Count this successful submission; ban if now > 5 today
+    // Count this successful submission; ban if now >= 5 in 15 minutes
     const updated = await prisma.deviceAttempt.update({
       where: { id: attempt.id },
-      data: { failedAttempts: { increment: 1 }, lastAttemptAt: startOfDay }
+      data: { failedAttempts: { increment: 1 }, lastAttemptAt: now }
     });
     if (updated.failedAttempts >= 5) {
       await prisma.deviceAttempt.update({
         where: { id: updated.id },
-        data: { isBanned: true, bannedAt: new Date(), bannedUntil: new Date(Date.now() + 24 * 60 * 60 * 1000) }
+        data: { isBanned: true, bannedAt: new Date(), bannedUntil: new Date(Date.now() + 15 * 60 * 1000) }
       });
     }
 

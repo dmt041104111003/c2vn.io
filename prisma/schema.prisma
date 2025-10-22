@@ -444,7 +444,7 @@ model DeviceAttempt {
   lastAttemptAt     DateTime @default(now())
   isBanned          Boolean  @default(false)
   bannedAt          DateTime?
-  bannedUntil       DateTime? // Ban for 1 day
+  bannedUntil       DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   referralSubmissions ReferralSubmission[]

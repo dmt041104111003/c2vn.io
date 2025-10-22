@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface BannedFormProps {
   failedAttempts: number;
@@ -8,10 +8,33 @@ interface BannedFormProps {
 
 export default function BannedForm({ failedAttempts, bannedUntil, lastAttemptAt }: BannedFormProps) {
   const banEndTime = new Date(bannedUntil);
-  const lastAttemptTime = new Date(lastAttemptAt);
-  const now = new Date();
-  const timeRemaining = Math.max(0, banEndTime.getTime() - now.getTime());
-  const hoursRemaining = Math.ceil(timeRemaining / (1000 * 60 * 60));
+  const [timeRemaining, setTimeRemaining] = useState(0);
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const remaining = Math.max(0, banEndTime.getTime() - now.getTime());
+      setTimeRemaining(remaining);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [banEndTime]);
+
+  const formatTimeRemaining = (milliseconds: number) => {
+    if (milliseconds <= 0) return 'Expired';
+    
+    const minutes = Math.floor(milliseconds / (1000 * 60));
+    const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);
+    
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    } else {
+      return `${seconds}s`;
+    }
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-red-200 dark:border-red-800 overflow-hidden max-w-2xl mx-auto">
@@ -35,16 +58,11 @@ export default function BannedForm({ failedAttempts, bannedUntil, lastAttemptAt 
               <p className="font-semibold text-red-800 dark:text-red-200">Failed Attempts</p>
               <p className="text-red-600 dark:text-red-400">{failedAttempts}/5</p>
             </div>
-            <div>
-              <p className="font-semibold text-red-800 dark:text-red-200">Last Attempt</p>
-              <p className="text-red-600 dark:text-red-400">
-                {lastAttemptTime.toLocaleString()}
-              </p>
-            </div>
+  
             <div>
               <p className="font-semibold text-red-800 dark:text-red-200">Time Remaining</p>
-              <p className="text-red-600 dark:text-red-400">
-                {hoursRemaining > 0 ? `${hoursRemaining} hours` : 'Expired'}
+              <p className="text-red-600 dark:text-red-400 font-mono text-lg">
+                {formatTimeRemaining(timeRemaining)}
               </p>
             </div>
           </div>

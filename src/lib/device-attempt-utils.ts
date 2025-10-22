@@ -45,7 +45,7 @@ export async function trackFailedAttempt(deviceFingerprint: string): Promise<Dev
         const shouldBan = newFailedAttempts >= 5;
         
         
-        const bannedUntil = shouldBan ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null; 
+        const bannedUntil = shouldBan ? new Date(Date.now() + 15 * 60 * 1000) : null; 
         
         deviceAttempt = await prisma.deviceAttempt.update({
           where: { id: deviceAttempt.id },
