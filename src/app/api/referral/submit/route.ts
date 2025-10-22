@@ -86,37 +86,42 @@ export const POST = withAuth(async (req, currentUser) => {
       }
     }
 
+    const submissionData: any = {
+      userId: currentUser.id,
+      referralCode: referralCode || null,
+      email: formData['your-email'] || '',
+      name: formData['your-name'] || '',
+      phone: formData['your-number'] || null,
+      wallet: formData['address-wallet'] || null,
+      course: formData['your-course'] || null,
+      message: formData['message'] || null,
+      deviceAttemptId: deviceAttempt?.id || null,
+      specialReferralCodeId: specialReferralCode?.id || null
+    };
+
+    // Only set referrerId for regular codes, not special codes
+    if (!specialReferralCode && referrer?.id) {
+      submissionData.referrerId = referrer.id;
+    }
+
     const submission = await prisma.referralSubmission.create({
-      data: {
-        userId: currentUser.id,
-        referralCode: referralCode || null,
-        referrerId: referrer?.id || null,
-        email: formData['your-email'] || '',
-        name: formData['your-name'] || '',
-        phone: formData['your-number'] || null,
-        wallet: formData['address-wallet'] || null,
-        course: formData['your-course'] || null,
-        message: formData['message'] || null,
-        deviceAttemptId: deviceAttempt?.id || null,
-        specialReferralCodeId: specialReferralCode?.id || null
-      }
+      data: submissionData
     });
 
 
-    if (referrer) {
+    // Only create notification for regular referral codes, not special codes
+    if (referrer && !specialReferralCode) {
       await prisma.notification.create({
         data: {
           userId: referrer.id,
           type: 'referral',
-          title: specialReferralCode ? 'New Special Referral!' : 'New Referral!',
-          message: specialReferralCode 
-            ? `${formData['your-name'] || 'Someone'} used special referral code ${referralCode}`
-            : `${formData['your-name'] || 'Someone'} used your referral code`,
+          title: 'New Referral!',
+          message: `${formData['your-name'] || 'Someone'} used your referral code`,
           data: {
             submissionId: submission.id,
             referrerName: formData['your-name'],
             referralCode: referralCode,
-            isSpecialCode: !!specialReferralCode
+            isSpecialCode: false
           }
         }
       });
@@ -127,7 +132,7 @@ export const POST = withAuth(async (req, currentUser) => {
       submission: {
         id: submission.id,
         referralCode: submission.referralCode,
-        referrerName: referrer.name
+        referrerName: referrer?.name || null
       }
     }));
 
