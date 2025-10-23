@@ -1,0 +1,40 @@
+
+hercules-ci:
+  build:
+    when:
+      ref: main
+      event: push
+    
+    effects:
+      - name: "Build Next.js App"
+        script: |
+          # Cài đặt dependencies
+          npm ci
+          
+          # Generate Prisma client
+          npx prisma generate
+          
+          # Build Next.js app
+          npm run build
+          
+          echo "Build completed successfully!"
+          
+      - name: "Deploy to Vercel"
+        script: |
+          # Tạo vercel.json cho prebuilt deployment
+          cat > vercel.json << 'EOF'
+          {
+            "buildCommand": "echo 'Prebuilt - skip build'",
+            "installCommand": "echo 'Prebuilt - skip install'",
+            "outputDirectory": ".next",
+            "framework": "nextjs",
+            "env": {
+              "VERCEL_PREBUILT": "true"
+            }
+          }
+          EOF
+          
+          # Deploy lên Vercel (cần VERCEL_TOKEN)
+          npx vercel deploy --prod --token $VERCEL_TOKEN --yes
+          
+          echo "Deploy thành công!"
